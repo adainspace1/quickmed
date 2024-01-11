@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "200709773011",
+    "project_id": "quickmedapp-68e93",
+    "storage_bucket": "quickmedapp-68e93.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:200709773011:android:ce2c778af1316ce2b16626",
+        "android_client_info": {
+          "package_name": "com.example.quickmed"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0yrDAJcCq3r2j7abgBWDrLMj2hexOUt8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
