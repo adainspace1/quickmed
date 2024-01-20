@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quickmed/component/animated_text.dart';
 import 'package:quickmed/screen/signin_screen.dart';
 import 'package:quickmed/widget/custom_screen.dart';
 import 'package:quickmed/widget/welcome_button.dart';
@@ -24,7 +23,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     horizontal: 40.0
                 ),
 
-                child: const Center(child: AnimatedText()),
+                child: const Center(child: Text("QuickMed")),
               )
           ),
           const Flexible(flex:2,

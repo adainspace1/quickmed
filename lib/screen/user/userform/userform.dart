@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quickmed/component/util.dart';
+import 'package:quickmed/controller/storage.dart';
 import 'package:quickmed/global/global.dart';
-import 'package:quickmed/screen/user/user_googlemap_home_screen.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:quickmed/screen/user/user_home_screen.dart';
 import 'package:quickmed/model/user/user_model.dart';
+import 'package:quickmed/screen/user/service/user_databaseservice.dart';
 import 'package:quickmed/util/constant.dart';
 
 class UserForm extends StatefulWidget {
@@ -43,6 +44,8 @@ class _UserFormState extends State<UserForm> {
   final dateOfBirthTextEditingController = TextEditingController();
   // weight
   final weightTextEditingController = TextEditingController();
+  //gender
+  final genderTextEditingController = TextEditingController();
 
   // i declear a bool for the circular indicator
   bool _isSubmitting = false;
@@ -51,7 +54,6 @@ class _UserFormState extends State<UserForm> {
   final _formKey = GlobalKey<FormState>();
 
   // function to handle submit
-
   void _submit() async {
     if (_formKey.currentState!.validate()) {
       // set the state for the progress
@@ -69,7 +71,9 @@ class _UserFormState extends State<UserForm> {
           nextOfKinTextEditingController.text.isEmpty ||
           addressOfNextOfKinTextEditingController.text.isEmpty ||
           heightTextEditingController.text.isEmpty ||
-          weightTextEditingController.text.isEmpty) {
+          weightTextEditingController.text.isEmpty||
+          genderTextEditingController.text.isEmpty
+          ) {
         // Display an error message or handle the empty fields as needed
         // For now, we'll just return without further processing
         setState(() {
@@ -81,16 +85,8 @@ class _UserFormState extends State<UserForm> {
       var user = firebaseAuth.currentUser;
       if (user != null) {
         // Upload image to Firebase Storage
-        String imagePath = 'user_profile_images/${user.uid}.jpg';
-
-        firebase_storage.Reference storageReference =
-            firebase_storage.FirebaseStorage.instance.ref().child(imagePath);
-
-        firebase_storage.UploadTask uploadTask =
-            storageReference.putData(_image!);
-        await uploadTask.whenComplete(() => null);
-
-        String imageUrl = await storageReference.getDownloadURL();
+        String photoUrl = await StorageMethod().uploadImageToStorage(
+            'user_profile_images/${user.uid}.jpg', _image!, false);
 
         UserModel user1 = UserModel(
           id: currentUser?.uid,
@@ -105,17 +101,16 @@ class _UserFormState extends State<UserForm> {
           weight: weightTextEditingController.text.trim(),
           phone: currentUser?.phoneNumber,
           bloodGroup: bloodGroupTextEditingController.text.trim(),
-          profileImageUrl: imageUrl,
+          profileImageUrl: photoUrl,
+          gender: genderTextEditingController.text.trim()
         );
-
-        await DatabaseService.addUserToDatabase(user1);
-        //add to realtime
-        await DatabaseService.addtoRealtime(user1);
+        //await UserServices.addUserToDatabase(user1);
+        await UserServices.addUserToDatabase(user1);
       }
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => UserGoogleMapScreen()),
+        MaterialPageRoute(builder: (context) => UserHomeScreen()),
       );
     } else {
       // Validation failed, handle it as needed
@@ -167,7 +162,7 @@ class _UserFormState extends State<UserForm> {
                     onPressed: _selectImage,
                     icon: Icon(Icons.add_a_photo),
                   ),
-                  bottom: -5,
+                  bottom: -10,
                   left: 80,
                 ),
                 SizedBox(
@@ -205,6 +200,7 @@ class _UserFormState extends State<UserForm> {
                                 if (text == null || text.isEmpty) {
                                   return "Name cannot be empty";
                                 }
+
                                 if (text.length < 2) {
                                   return "please enter a valid full name";
                                 }
@@ -241,6 +237,12 @@ class _UserFormState extends State<UserForm> {
                               validator: (text) {
                                 if (text == null || text.isEmpty) {
                                   return "Email cannot be empty";
+                                }
+                                // Use RegExp for email validation
+                                final emailRegex = RegExp(
+                                    r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+                                if (!emailRegex.hasMatch(text)) {
+                                  return "Enter a valid email address";
                                 }
 
                                 if (text.length < 2) {
@@ -374,7 +376,7 @@ class _UserFormState extends State<UserForm> {
 
                             TextFormField(
                               inputFormatters: [
-                                LengthLimitingTextInputFormatter(3)
+                                LengthLimitingTextInputFormatter(5)
                               ],
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
@@ -405,7 +407,7 @@ class _UserFormState extends State<UserForm> {
                             // genotype
                             TextFormField(
                               inputFormatters: [
-                                LengthLimitingTextInputFormatter(11)
+                                LengthLimitingTextInputFormatter(3)
                               ],
                               decoration: InputDecoration(
                                 hintText: "Genotype",
@@ -435,7 +437,7 @@ class _UserFormState extends State<UserForm> {
                             // height
                             TextFormField(
                               inputFormatters: [
-                                LengthLimitingTextInputFormatter(2)
+                                LengthLimitingTextInputFormatter(5)
                               ],
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
@@ -487,6 +489,34 @@ class _UserFormState extends State<UserForm> {
                               onChanged: (text) {
                                 setState(() {
                                   nextOfKinTextEditingController.text = text;
+                                });
+                              },
+                            ),
+                              const SizedBox(height: 10,),
+                              //gender selection
+                             TextFormField(
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(100)
+                              ],
+                              decoration: InputDecoration(
+                                hintText: "Select Gender eg male or female ",
+                                hintStyle: TextStyle(color: Colors.grey),
+                                filled: true,
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 0, style: BorderStyle.none)),
+                              ),
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: (text) {
+                                if (text == null || text.isEmpty) {
+                                  return "Next of Kin cannot be empty";
+                                }
+                                return null;
+                              },
+                              onChanged: (text) {
+                                setState(() {
+                                  genderTextEditingController.text = text;
                                 });
                               },
                             ),

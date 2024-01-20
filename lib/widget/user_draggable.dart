@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:quickmed/helpers/screen_navigation.dart';
+import 'package:quickmed/screen/user/search/List_econsultant.dart';
 import 'package:quickmed/widget/loading.dart';
 
 // this is a draggable widget for the user dashbaord.
@@ -12,19 +14,13 @@ class UserWidget extends StatefulWidget {
 
 class _UserWidgetState extends State<UserWidget> {
   bool isLoading = false;
- 
-
- 
-
- 
-
 
 //  is for the draggable widget
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-        initialChildSize: 0.1,
-        minChildSize: 0.01,
+        initialChildSize: 0.3,
+        minChildSize: 0.3,
         maxChildSize: 0.5,
         builder: (BuildContext context, myscrollController) {
           return Container(
@@ -40,7 +36,6 @@ class _UserWidgetState extends State<UserWidget> {
               ],
             ),
             child: ListView(controller: myscrollController, children: [
-             
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: TextField(
@@ -99,6 +94,9 @@ class _UserWidgetState extends State<UserWidget> {
                     ],
                   )),
               ListTile(
+                  onTap: () {
+                    changeScreen(context,const Econsultant());
+                  },
                   leading: Image.network(
                     "https://res.cloudinary.com/damufjozr/image/upload/v1701761216/pers_jfroff.png",
                     width: 40,
@@ -117,8 +115,7 @@ class _UserWidgetState extends State<UserWidget> {
                     ],
                   )),
               ListTile(
-                  onTap: () async {
-                  },
+                  onTap: () async {},
                   leading: Image.network(
                     "https://res.cloudinary.com/damufjozr/image/upload/v1701760812/amb2_gpa3lp.jpg",
                     width: 40,

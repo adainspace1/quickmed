@@ -8,10 +8,11 @@ class TripWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return 
-      DraggableScrollableSheet(
+      DraggableScrollableSheet(   
          initialChildSize: 0.2,
-          minChildSize: 0.05,
+          minChildSize: 0.2,
           maxChildSize: 0.8,
+       
         builder: (BuildContext context, myscrollController) {
         return Container(
           decoration: BoxDecoration(

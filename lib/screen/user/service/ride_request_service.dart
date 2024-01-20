@@ -10,9 +10,7 @@ class RideRequest {
     String? id,
     String? userId,
     String? name,
-    Map<String, dynamic>? destination,
-    Map<String, dynamic>? position,
-    Map? distance,
+   
   }) {
     var db = FirebaseFirestore.instance;
 
@@ -20,9 +18,7 @@ class RideRequest {
       "name": name,
       "id": id,
       "Status": "pending",
-      "destination": destination,
-      "position": position,
-      "distance": distance
+    
     });
   }
 

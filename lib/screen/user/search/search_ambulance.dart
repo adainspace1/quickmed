@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:quickmed/model/user/user_model.dart';
+import 'package:quickmed/screen/user/service/user_databaseservice.dart';
 //import 'package:quickmed/model/user/user_model.dart';
 
 class Search extends StatefulWidget {
@@ -25,7 +25,7 @@ initiateSearch() async {
     });
 
     try {
-      var snapshot = await DatabaseService().searchByName(searchEditingController.text);
+      var snapshot = await UserServices().searchByName(searchEditingController.text);
       if (snapshot.docs.isNotEmpty) {
         setState(() {
           searchResultSnapshot = snapshot;
@@ -38,8 +38,8 @@ initiateSearch() async {
           haveUserSearched = true;
         });
       }
+    // ignore: empty_catches
     } catch (e) {
-      print(e);
     }
   }
 }
@@ -137,70 +137,66 @@ Widget userList() {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Container(
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            )
-          : Container(
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    color: const Color(0x54FFFFFF),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: searchEditingController,
-                            style: const TextStyle(),
-                            decoration: const InputDecoration(
-                                hintText: "search username ...",
-                                hintStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                ),
-                                border: InputBorder.none),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            initiateSearch();
-                          },
-                          child: Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0x36FFFFFF),
-                                        Color(0x0FFFFFFF)
-                                      ],
-                                      begin: FractionalOffset.topLeft,
-                                      end: FractionalOffset.bottomRight),
-                                  borderRadius: BorderRadius.circular(40)),
-                              padding: const EdgeInsets.all(12),
-                              child: const Icon(
-                              Icons.search,
-                              size: 30,
-                              color: Colors.blueAccent,
+          ? const Center(
+            child: CircularProgressIndicator(),
+          )
+          : Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                color: const Color(0x54FFFFFF),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: searchEditingController,
+                        style: const TextStyle(),
+                        decoration: const InputDecoration(
+                            hintText: "search username ...",
+                            hintStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
                             ),
-                              
-                              ),
-
-                              // child: Image.asset(
-                              //   "assets/images/search_white.png",
-                              //   height: 25,
-                              //   width: 25,
-                              // )),
-                        )
-                      ],
+                            border: InputBorder.none),
+                      ),
                     ),
-                  ),
-                  userList()
-                ],
+                    GestureDetector(
+                      onTap: () {
+                        initiateSearch();
+                      },
+                      child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0x36FFFFFF),
+                                    Color(0x0FFFFFFF)
+                                  ],
+                                  begin: FractionalOffset.topLeft,
+                                  end: FractionalOffset.bottomRight),
+                              borderRadius: BorderRadius.circular(40)),
+                          padding: const EdgeInsets.all(12),
+                          child: const Icon(
+                          Icons.search,
+                          size: 30,
+                          color: Colors.blueAccent,
+                        ),
+                          
+                          ),
+          
+                          // child: Image.asset(
+                          //   "assets/images/search_white.png",
+                          //   height: 25,
+                          //   width: 25,
+                          // )),
+                    )
+                  ],
+                ),
               ),
-            ),
+              userList()
+            ],
+          ),
     );
   }
 }

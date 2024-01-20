@@ -12,8 +12,9 @@ pickImage(ImageSource source, BuildContext context,
     List<int> bytes = await file.readAsBytes();
 
     if (bytes.length > maxByteSize) {
+      
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("File too large"),
+        content: Text("File too large image size must be 2mb"),
         backgroundColor: Colors.red,
       ));
     } else {

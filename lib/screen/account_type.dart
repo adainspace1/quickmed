@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/screen/medical_service.dart';
-import 'package:quickmed/screen/user/userform.dart';
+import 'package:quickmed/screen/user/userform/userform.dart';
 
 class AccountSelect extends StatefulWidget {
   const AccountSelect({super.key});
@@ -23,9 +23,7 @@ class _AccountSelectState extends State<AccountSelect> {
 class CardWidget extends StatelessWidget {
   const CardWidget({super.key});
 
-  Future<void> accountType() async {
-    
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +45,6 @@ class CardWidget extends StatelessWidget {
                 'https://res.cloudinary.com/damufjozr/image/upload/v1703326116/imgbin_computer-icons-avatar-user-login-png_t9t5b9.png', // Replace with the path to your logo image
             text: 'User',
             onPress: () {
-              accountType();
               changeScreen(context, const UserForm());
             },
           ),

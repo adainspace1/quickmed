@@ -2,7 +2,6 @@
 
 // ignore_for_file: avoid_print
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 class UserModel {
   String? phone;
@@ -21,46 +20,56 @@ class UserModel {
   String? dateOfBirth;
   String? nextOfKin;
   String? addressOfKin;
+  double? latitude;
+  double? longitude;
+  int? rating;
+  
 
-  UserModel({
-    this.id,
-    this.phone,
-    this.address,
-    this.name,
-    this.weight,
-    this.genotype,
-    this.email,
-    this.gender,
-    this.height,
-    this.nextOfKin,
-    this.addressOfKin,
-    this.dateOfBirth,
-    this.accountType,
-    this.bloodGroup,
-    this.profileImageUrl,
-    this.nin,
-  });
+  UserModel(
+      {this.id,
+      this.phone,
+      this.address,
+      this.name,
+      this.weight,
+      this.genotype,
+      this.email,
+      this.gender,
+      this.height,
+      this.nextOfKin,
+      this.addressOfKin,
+      this.dateOfBirth,
+      this.accountType,
+      this.bloodGroup,
+      this.profileImageUrl,
+      this.nin,
+      this.latitude,
+      this.longitude,
+      this.rating,
+      });
 
   factory UserModel.fromSnapshot(DocumentSnapshot snapshot) {
     var userData = snapshot.data() as Map<String, dynamic>;
     return UserModel(
-      id: snapshot.id,
-      phone: userData['phone'] ?? "",
-      address: userData['address'] ?? "",
-      genotype: userData['genotype'] ?? "",
-      name: userData['name'] ?? "",
-      email: userData['email'] ?? "",
-      weight: userData['weight'] ?? "",
-      height: userData['height'] ?? "",
-      nextOfKin: userData['nextOfKin'] ?? "",
-      addressOfKin: userData['addressOfKin'] ?? "",
-      dateOfBirth: userData['dateOfBirth'] ?? "",
-      accountType: userData['accountType'] ?? "",
-      bloodGroup: userData['bloodGroup'] ?? "",
-      gender: userData['gender'] ?? "",
-      profileImageUrl: userData['profileImageUrl'] ?? "",
-      nin: userData['nin'] ?? "",
-    );
+        id: snapshot.id,
+        phone: userData['phone'] ?? "",
+        address: userData['address'] ?? "",
+        genotype: userData['genotype'] ?? "",
+        name: userData['name'] ?? "",
+        email: userData['email'] ?? "",
+        weight: userData['weight'] ?? "",
+        height: userData['height'] ?? "",
+        nextOfKin: userData['nextOfKin'] ?? "",
+        addressOfKin: userData['addressOfKin'] ?? "",
+        dateOfBirth: userData['dateOfBirth'] ?? "",
+        accountType: userData['accountType'] ?? "",
+        bloodGroup: userData['bloodGroup'] ?? "",
+        gender: userData['gender'] ?? "",
+        profileImageUrl: userData['profileImageUrl'] ?? "",
+        nin: userData['nin'] ?? "",
+        latitude: userData['latitude'] ?? "",
+        longitude: userData['longitude'] ?? "",
+        rating: userData["rating"] ?? "",
+        );
   }
 
   Map<String, dynamic> toJson() {
@@ -79,75 +88,18 @@ class UserModel {
       "gender": gender,
       "nextOfKin": nextOfKin,
       "addressOfKin": addressOfKin,
-      "nin": nin
+      "nin": nin,
+      "latitude": 0.0,
+      "longitude": 0.0,
+      "rating": 0,
+      
     };
   }
+
+
 }
 
-class DatabaseService {
-  // this function adds user to realtime database
-  static Future addtoRealtime(UserModel user) async {
-    try {
-    DatabaseReference _databaseReference = FirebaseDatabase.instance.ref();
-    _databaseReference.child("${user.phone}").child("${user.name}").update(user.toJson());
-      
-    } catch (e) {
-      print('Error adding user to FirebaseDatabase: $e');
-    }
 
-  }
-  
-  // this function add user to the firestore database
-  static Future addUserToDatabase(UserModel user) async {
-    try {
-      var db = FirebaseFirestore.instance;
-      //await db.collection('users').add(user.toJson());
-      await db
-          .collection('users')
-          .doc(user.id)
-          .set(user.toJson(), SetOptions(merge: true));
-    } catch (e) {
-      print('Error adding user to Firestore: $e');
-    }
-  }
-
-  //this function gets user UID
-  static Future<UserModel?> getUserByUid(String userId) async {
-    try {
-      var db = FirebaseFirestore.instance;
-      var useRef = db.collection("users").doc(userId);
-      var snapShot = await useRef.get();
-
-      if (snapShot.exists) {
-        return UserModel.fromSnapshot(snapShot);
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print('Error getting user by ID from Firestore: $e');
-      // print('Error getting user from Firestore: $e\n$stackTrace');
-      return null;
-    }
-  }
-
-  Future<QuerySnapshot> searchByName(String searchField) {
-    return FirebaseFirestore.instance
-        .collection("ambulance")
-        .where('userName', isEqualTo: searchField)
-        .limit(20)
-        .get();
-  }
-
-  Future<void> addChatRoom(
-      Map<String, dynamic> chatRoom, String chatRoomId) async {
-    // Implement logic to add chat room details to your database
-    // Example using Firestore:
-    await FirebaseFirestore.instance
-        .collection('chatRooms')
-        .doc(chatRoomId)
-        .set(chatRoom);
-  }
-}
 
 
 

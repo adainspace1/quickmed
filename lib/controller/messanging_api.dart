@@ -16,7 +16,8 @@ class FirebaseAPi {
       carPlay: false,
       criticalAlert: false,
       provisional: false,
-      sound: true
+      sound: true,
+      
 
     );
 

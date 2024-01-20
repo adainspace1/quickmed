@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class StarsWidget extends StatelessWidget {
   final int numberOfStars;
 
-  const StarsWidget({required Key key, required this.numberOfStars}) : super(key: key);
+  const StarsWidget({super.key, required this.numberOfStars});
   @override
   Widget build(BuildContext context) {
     if (numberOfStars == 0) {
@@ -12,23 +12,23 @@ class StarsWidget extends StatelessWidget {
         children: [
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           )
         ],
       );
@@ -42,19 +42,19 @@ class StarsWidget extends StatelessWidget {
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           )
         ],
       );
@@ -69,15 +69,15 @@ class StarsWidget extends StatelessWidget {
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           )
         ],
       );
@@ -93,11 +93,11 @@ class StarsWidget extends StatelessWidget {
           const Icon(Icons.star, color: Colors.amber),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           ),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           )
         ],
       );
@@ -114,7 +114,7 @@ class StarsWidget extends StatelessWidget {
           const Icon(Icons.star, color: Colors.amber),
           Icon(
             Icons.star,
-            color: Colors.grey.withOpacity(0.4),
+            color: const Color.fromARGB(255, 79, 79, 79).withOpacity(0.4),
           )
         ],
       );

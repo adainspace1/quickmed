@@ -107,7 +107,7 @@ class _SignInScreenState extends State<SignInScreen>
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                            Image.network("https://res.cloudinary.com/damufjozr/image/upload/v1704920018/flag_hcd7g6.png", width: 25, height: 25),
+                                  Image.asset('images/flag.png', width: 20, height: 20,),
                                 const SizedBox(height: 20,),
                                 const Text(" +234")
                                 ],                        
@@ -116,7 +116,7 @@ class _SignInScreenState extends State<SignInScreen>
                             labelText: "Enter your phone number",
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(32)),
-                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+                                contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
                                 
                                 ),
 
@@ -248,7 +248,8 @@ class _SignInScreenState extends State<SignInScreen>
                             });
                           }
                         },
-                        style: ElevatedButton.styleFrom(
+                        style:ElevatedButton.styleFrom(
+                          
                           backgroundColor: COLOR_ACCENT,
                           foregroundColor: Colors.white,
                         ),
