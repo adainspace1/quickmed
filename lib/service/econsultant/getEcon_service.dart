@@ -3,7 +3,7 @@ import 'package:quickmed/model/ambulance/driver/driver_model.dart';
 import 'package:quickmed/model/e-consultant/econsultant_model.dart';
 
 class DriverService {
-  String collection = "econsultants";
+  String collection = "econsultant";
 
   Stream<List<EconsultantModel>> getDrivers() {
     return FirebaseFirestore.instance.collection(collection).snapshots().map(

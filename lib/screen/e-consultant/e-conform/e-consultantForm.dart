@@ -8,9 +8,9 @@ import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/global/global.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/model/e-consultant/econsultant_model.dart';
-import 'package:quickmed/screen/e-consultant/econ_homeScreen.dart';
-import 'package:quickmed/screen/e-consultant/service/econsultant_service.dart';
+import 'package:quickmed/screen/e-consultant/dashboard/econ_homeScreen.dart';
 import 'package:quickmed/screen/signin_screen.dart';
+import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/util/constant.dart';
 
 class EconsultantForm extends StatefulWidget {

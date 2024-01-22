@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:quickmed/screen/user/service/user_databaseservice.dart';
+import 'package:quickmed/service/user/user_service.dart';
 //import 'package:quickmed/model/user/user_model.dart';
 
 class Search extends StatefulWidget {
@@ -25,7 +25,7 @@ initiateSearch() async {
     });
 
     try {
-      var snapshot = await UserServices().searchByName(searchEditingController.text);
+      var snapshot = await UserDataBaseServices().searchByName(searchEditingController.text);
       if (snapshot.docs.isNotEmpty) {
         setState(() {
           searchResultSnapshot = snapshot;

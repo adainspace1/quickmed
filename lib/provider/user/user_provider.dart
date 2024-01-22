@@ -1,30 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/model/user/user_model.dart';
+import 'package:quickmed/service/user/user_service.dart';
 
 class UserProvider extends ChangeNotifier {
   UserModel? _user;
 
-  final AuthService _authService = AuthService();
+  final UserDataBaseServices _userDataBaseService = UserDataBaseServices();
 
   UserModel get getUser => _user!;
 
 
-  int _rating = 0;
 
-  int get rating => _rating;
 
   Future<void> refreshUser() async {
-    UserModel user = await _authService.getUserByUid();
+    UserModel user = await _userDataBaseService.getUserByUid();
     _user = user;
     notifyListeners();
   }
 
 
 
-  void updateVotesAndRating( int newRating) {   
-      _rating = newRating;
-      notifyListeners();
-    
-  }
 }

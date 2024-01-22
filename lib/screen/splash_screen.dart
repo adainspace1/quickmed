@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual);
-    Future.delayed(const Duration(seconds: 10), () {
+    Future.delayed(const Duration(seconds: 6), () {
       changeScreenReplacement(context, const SignInScreen());
     });
   }

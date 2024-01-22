@@ -1,10 +1,12 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/screen/account_type.dart';
 import 'package:quickmed/controller/auth_service.dart';
+import 'package:quickmed/screen/ambulance/dashboard/ambulance_homescreen.dart';
+import 'package:quickmed/screen/user/dashboard/user_home_screen.dart';
 import 'package:quickmed/util/constant.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -103,24 +105,28 @@ class _SignInScreenState extends State<SignInScreen>
                         controller: _phoneContoller,
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
-                            prefix: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Image.asset('images/flag.png', width: 20, height: 20,),
-                                const SizedBox(height: 20,),
-                                const Text(" +234")
-                                ],                        
-                            ),                            
-                            // prefixText: "+234 ",
-                            labelText: "Enter your phone number",
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(32)),
-                                contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
-                                
-                                ),
-
-                                
+                          prefix: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'images/flag.png',
+                                width: 20,
+                                height: 20,
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const Text(" +234")
+                            ],
+                          ),
+                          // prefixText: "+234 ",
+                          labelText: "Enter your phone number",
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(32)),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 16),
+                        ),
                         validator: (value) {
                           if (value!.length != 10) {
                             return "Invalid phone number";
@@ -136,15 +142,14 @@ class _SignInScreenState extends State<SignInScreen>
                       height: 50,
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: ()  {
+                        onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             // Proceed with OTP
                             setState(() {
                               isLoading = true; // Set loading to true
                             });
 
-                          
-                              AuthService.sentOtp(
+                            AuthService.sentOtp(
                               phone: _phoneContoller.text,
                               errorStep: () {
                                 setState(() {
@@ -205,11 +210,29 @@ class _SignInScreenState extends State<SignInScreen>
                                               .validate()) {
                                             AuthService.loginWithOtp(
                                               otp: _otpContoller.text,
-                                            ).then((value) {
+                                            ).then((value) async {
                                               if (value == "Success") {
+                                                // Get account type after successful login
+                                                String? accountType =
+                                                    await AuthService
+                                                        .getAccountType();
                                                 Navigator.pop(context);
-                                                changeScreenReplacement(context,
-                                                    const AccountSelect());
+                                                if (accountType != null) {
+                                                  switch (accountType) {
+                                                    case "User":
+                                                      changeScreenReplacement(context, const UserHomeScreen());
+                                                      break;
+
+                                                    case "ambulance":
+                                                      changeScreenReplacement(context, const AmbulanceHomeScreen());
+                                                      break;
+     
+                                                  }
+                                                }else{
+                                                  changeScreenReplacement(context,const AccountSelect()); 
+
+                                                }
+                                               
                                               } else {
                                                 Navigator.pop(context);
                                                 setState(() {
@@ -238,9 +261,6 @@ class _SignInScreenState extends State<SignInScreen>
                                 );
                               },
                             );
-                            
-
-                            
                           } else {
                             // Validation failed, set loading to false
                             setState(() {
@@ -248,8 +268,7 @@ class _SignInScreenState extends State<SignInScreen>
                             });
                           }
                         },
-                        style:ElevatedButton.styleFrom(
-                          
+                        style: ElevatedButton.styleFrom(
                           backgroundColor: COLOR_ACCENT,
                           foregroundColor: Colors.white,
                         ),

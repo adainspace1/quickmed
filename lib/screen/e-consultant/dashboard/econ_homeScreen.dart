@@ -9,10 +9,11 @@ import 'package:provider/provider.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/provider/user/user_provider.dart';
-import 'package:quickmed/screen/e-consultant/map/econ_map.dart';
+import 'package:quickmed/screen/e-consultant/tabPages/home.dart';
+import 'package:quickmed/screen/e-consultant/tabPages/treatment.dart';
 import 'package:quickmed/screen/signin_screen.dart';
 import 'package:quickmed/screen/user/user_wallet/wallet_screen.dart';
-import 'package:quickmed/widget/serviceProvider_widget.dart';
+import 'package:quickmed/util/constant.dart';
 
 class EconsultantHomeScreen extends StatefulWidget {
   const EconsultantHomeScreen({
@@ -23,17 +24,29 @@ class EconsultantHomeScreen extends StatefulWidget {
   State<EconsultantHomeScreen> createState() => _EconsultantHomeScreenState();
 }
 
-class _EconsultantHomeScreenState extends State<EconsultantHomeScreen> {
+class _EconsultantHomeScreenState extends State<EconsultantHomeScreen> with SingleTickerProviderStateMixin{
   var scaffoldState = GlobalKey<ScaffoldState>();
 
   var currentUser = FirebaseAuth.instance.currentUser;
 // Variable to track selected index
+
+  TabController? tabController;
+  int selectedScreen = 0;
+
+  onItemClicked(int index) {
+    setState(() {
+      selectedScreen = index;
+      tabController!.index = selectedScreen;
+    });
+  }
 
   
 
   @override
   void initState() {
     super.initState();
+    tabController = TabController(length: 3, vsync: this);
+
   }
 
   @override
@@ -136,15 +149,33 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen> {
           ),
         );
       }),
-      body: Stack(
-        children: [
-          EconsultantMapScreen(scaffoldState),
-          const Visibility(
-              child: SpWidget(),
+      body: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: tabController,
+          children: [
+               EconsultantMapScreen(scaffoldState),
+               EconsultantTreatMent()
 
-          )
-        ],
-      ),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.healing), label: 'Treatment'),
+            BottomNavigationBarItem(icon: Icon(Icons.wallet), label: 'Wallet'),
+
+
+
+          ],
+          unselectedItemColor: COLOR_BACKGROUND,
+          selectedItemColor: COLOR_PRIMARY,
+          backgroundColor: COLOR_ACCENT,
+          type: BottomNavigationBarType.fixed,
+          showUnselectedLabels: true,
+          currentIndex: selectedScreen,
+          onTap: onItemClicked,
+        ),
    
     );
   }

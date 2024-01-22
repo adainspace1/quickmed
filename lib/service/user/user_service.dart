@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickmed/model/user/user_model.dart' as model;
 
-class UserServices {
+class UserDataBaseServices {
+  static final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   // this function adds user to realtime database
   static Future addtoRealtime(model.UserModel user) async {
     try {
@@ -48,7 +51,19 @@ class UserServices {
   }
 
     Stream<QuerySnapshot> econsultantStream(String text) {
-    CollectionReference reference = FirebaseFirestore.instance.collection("econsultant");
+    CollectionReference reference = FirebaseFirestore.instance.collection("econsultants");
     return reference.snapshots();
   }
+
+    //this function gets user UID
+  Future<model.UserModel> getUserByUid() async {
+    User currentUser = _firebaseAuth.currentUser!;
+    DocumentSnapshot snap =
+        await _firestore.collection("users").doc(currentUser.uid).get();
+
+    return model.UserModel.fromSnapshot(snap);
+  }
+
+
+ 
 }

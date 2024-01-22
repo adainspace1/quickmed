@@ -7,9 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:quickmed/component/util.dart';
 import 'package:quickmed/controller/storage.dart';
 import 'package:quickmed/global/global.dart';
-import 'package:quickmed/screen/user/user_home_screen.dart';
+import 'package:quickmed/helpers/screen_navigation.dart';
+import 'package:quickmed/screen/user/dashboard/user_home_screen.dart';
 import 'package:quickmed/model/user/user_model.dart';
-import 'package:quickmed/screen/user/service/user_databaseservice.dart';
+import 'package:quickmed/service/user/user_service.dart';
 import 'package:quickmed/util/constant.dart';
 
 class UserForm extends StatefulWidget {
@@ -61,6 +62,24 @@ class _UserFormState extends State<UserForm> {
         _isSubmitting = true;
       });
 
+      // Check if the profile photo is empty
+      if (_image == null) {
+        // Show a Snackbar message if profile photo is empty
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: red,
+            content: Text('Please select a profile photo.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        setState(() {
+          _isSubmitting = false;
+        });
+
+        return;
+      }
+
       // Check if any field is empty
       if (nameTextEditingController.text.isEmpty ||
           emailTextEditingController.text.isEmpty ||
@@ -71,9 +90,8 @@ class _UserFormState extends State<UserForm> {
           nextOfKinTextEditingController.text.isEmpty ||
           addressOfNextOfKinTextEditingController.text.isEmpty ||
           heightTextEditingController.text.isEmpty ||
-          weightTextEditingController.text.isEmpty||
-          genderTextEditingController.text.isEmpty
-          ) {
+          weightTextEditingController.text.isEmpty ||
+          genderTextEditingController.text.isEmpty) {
         // Display an error message or handle the empty fields as needed
         // For now, we'll just return without further processing
         setState(() {
@@ -89,29 +107,24 @@ class _UserFormState extends State<UserForm> {
             'user_profile_images/${user.uid}.jpg', _image!, false);
 
         UserModel user1 = UserModel(
-          id: currentUser?.uid,
-          name: nameTextEditingController.text.trim(),
-          email: emailTextEditingController.text.trim(),
-          address: addressTextEditingController.text.trim(),
-          nin: ninTextEditingController.text.trim(),
-          genotype: genotypeTextEditingController.text.trim(),
-          nextOfKin: nextOfKinTextEditingController.text.trim(),
-          addressOfKin: addressOfNextOfKinTextEditingController.text.trim(),
-          height: heightTextEditingController.text.trim(),
-          weight: weightTextEditingController.text.trim(),
-          phone: currentUser?.phoneNumber,
-          bloodGroup: bloodGroupTextEditingController.text.trim(),
-          profileImageUrl: photoUrl,
-          gender: genderTextEditingController.text.trim()
-        );
-        //await UserServices.addUserToDatabase(user1);
-        await UserServices.addUserToDatabase(user1);
-      }
+            id: currentUser?.uid,
+            name: nameTextEditingController.text.trim(),
+            email: emailTextEditingController.text.trim(),
+            address: addressTextEditingController.text.trim(),
+            nin: ninTextEditingController.text.trim(),
+            genotype: genotypeTextEditingController.text.trim(),
+            nextOfKin: nextOfKinTextEditingController.text.trim(),
+            addressOfKin: addressOfNextOfKinTextEditingController.text.trim(),
+            height: heightTextEditingController.text.trim(),
+            weight: weightTextEditingController.text.trim(),
+            phone: currentUser?.phoneNumber,
+            bloodGroup: bloodGroupTextEditingController.text.trim(),
+            profileImageUrl: photoUrl,
+            gender: genderTextEditingController.text.trim());
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => UserHomeScreen()),
-      );
+            await UserDataBaseServices.addUserToDatabase(user1);
+      }
+      changeScreenReplacement(context, UserHomeScreen());
     } else {
       // Validation failed, handle it as needed
     }
@@ -492,9 +505,11 @@ class _UserFormState extends State<UserForm> {
                                 });
                               },
                             ),
-                              const SizedBox(height: 10,),
-                              //gender selection
-                             TextFormField(
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            //gender selection
+                            TextFormField(
                               inputFormatters: [
                                 LengthLimitingTextInputFormatter(100)
                               ],

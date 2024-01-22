@@ -22,7 +22,6 @@ class UserModel {
   String? addressOfKin;
   double? latitude;
   double? longitude;
-  int? rating;
   
 
   UserModel(
@@ -44,7 +43,6 @@ class UserModel {
       this.nin,
       this.latitude,
       this.longitude,
-      this.rating,
       });
 
   factory UserModel.fromSnapshot(DocumentSnapshot snapshot) {
@@ -68,7 +66,6 @@ class UserModel {
         nin: userData['nin'] ?? "",
         latitude: userData['latitude'] ?? "",
         longitude: userData['longitude'] ?? "",
-        rating: userData["rating"] ?? "",
         );
   }
 
@@ -91,7 +88,6 @@ class UserModel {
       "nin": nin,
       "latitude": 0.0,
       "longitude": 0.0,
-      "rating": 0,
       
     };
   }

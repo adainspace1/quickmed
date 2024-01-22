@@ -2,11 +2,9 @@
 //import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:quickmed/model/user/user_model.dart' as model;
 
 class AuthService {
   static final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static String verifyId = "";
   // to sent and otp to user
@@ -68,12 +66,68 @@ class AuthService {
     return user != null;
   }
 
-  //this function gets user UID
-  Future<model.UserModel> getUserByUid() async {
-    User currentUser = _firebaseAuth.currentUser!;
-    DocumentSnapshot snap =
-        await _firestore.collection("users").doc(currentUser.uid).get();
+  //THIS FUNCTION AUTHENTICATE ALREADY REGISTERED USERS
+  static Future<String?> getAccountType() async {
+  try {
+    User? user = _firebaseAuth.currentUser;
 
-        return model.UserModel.fromSnapshot(snap);
+    if (user != null) {
+      // Check each collection for the user's account type
+      List<String> collections = ['users', 'ambulance', 'econsultant'];
+
+      for (String collection in collections) {
+        DocumentSnapshot userProfileDoc = await FirebaseFirestore.instance
+            .collection(collection)
+            .doc(user.uid)
+            .get();
+
+        if (userProfileDoc.exists) {
+          return userProfileDoc.get('accountType');
+        }
+      }
+    }
+
+    return null;
+  } catch (e) {
+    print("Error getting account type: $e");
+    return null;
   }
+}
+
+
+
+
+
+
+
+
+  // static Future<String?> getAccountType() async {
+  //   try {
+  //     User? user = _firebaseAuth.currentUser;
+
+  //     if (user != null) {
+  //       // Check each collection for the user's account type
+  //     List<String> collections = ['users', 'ambulances', 'hospitals'];
+  //       // Fetch additional user information from Firestore using UID
+  //       DocumentSnapshot userProfileDoc = await FirebaseFirestore.instance
+  //           .collection('users')
+  //           .doc(user.uid)
+  //           .get();
+
+  //       if (userProfileDoc.exists) {
+  //         return userProfileDoc.get('accountType');
+  //       }
+  //     }
+
+  //     return null;
+  //   } catch (e) {
+  //     print("Error getting account type: $e");
+  //     return null;
+  //   }
+  // }
+
+
+ 
+
+ 
 }

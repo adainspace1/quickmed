@@ -8,7 +8,7 @@ import 'package:quickmed/model/user/user_model.dart' as model;
 import 'package:quickmed/provider/user/user_provider.dart';
 import 'package:quickmed/screen/signin_screen.dart';
 import 'package:quickmed/screen/user/map/user_mapscreen.dart';
-import 'package:quickmed/screen/user/profile_screen.dart';
+import 'package:quickmed/screen/user/dashboard/profile_screen.dart';
 import 'package:quickmed/screen/user/user_wallet/wallet_screen.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/user_draggable.dart';
@@ -100,7 +100,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               title: const Text("Insurance"),
               onTap: () {
                 // Navigate to ProfileScreen with user data
-                changeScreen(context, const ProfileScreen());
               },
             ),
             const SizedBox(
@@ -143,7 +142,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       body: Stack(
         children: [
           UserMapScreen(scaffoldState),
-          const Visibility(
+           const Visibility(
             child: UserWidget(),
           )
         ],

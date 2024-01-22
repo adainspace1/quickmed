@@ -45,7 +45,7 @@ class CardWidget extends StatelessWidget {
                 'https://res.cloudinary.com/damufjozr/image/upload/v1703326116/imgbin_computer-icons-avatar-user-login-png_t9t5b9.png', // Replace with the path to your logo image
             text: 'User',
             onPress: () {
-              changeScreen(context, const UserForm());
+              changeScreenReplacement(context, const UserForm());
             },
           ),
           const SizedBox(
@@ -56,7 +56,7 @@ class CardWidget extends StatelessWidget {
                 'https://res.cloudinary.com/damufjozr/image/upload/v1701804678/useraccount_lhxmmx.png', // Replace with the path to your logo image
             text: 'Medical Service\n     Providers',
             onPress: () {
-              changeScreen(context, const MedicalServiceScreen());
+              changeScreenReplacement(context, const MedicalServiceScreen());
             },
           )
         ],

@@ -1,4 +1,3 @@
-
 class RouteModel {
   final String points;
   final Distance distance;

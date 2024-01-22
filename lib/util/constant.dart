@@ -11,6 +11,12 @@ const COLOR_BACKGROUND = Colors.white;
 const COLOR_BACKGROUND_LIGHT = Color(0xFFF1F3F6);
 const COLOR_BLUE = Colors.blue;
 
+const Color primary = Colors.black;
+const  red = Colors.red;
+const Color white = Colors.white;
+const Color black = Colors.black;
+const Color grey = Colors.grey;
+const Color green = Colors.green;
 // Custom Fonts
 const TextStyle customTextStyle = TextStyle(
   fontFamily: 'Montserrat',
@@ -31,7 +37,3 @@ final TextStyle customGoogleFontBoldStyle = GoogleFonts.montserrat(
   textStyle: customBoldTextStyle,
 );
 
-class Constants{
-
-  static String myName = "";
-}

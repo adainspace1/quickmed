@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:quickmed/model/user/user_model.dart';
 import 'package:quickmed/provider/user/user_provider.dart';
 import 'package:quickmed/util/constant.dart';
-import 'package:quickmed/widget/stars.dart';
 import 'package:quickmed/model/user/user_model.dart' as model;
 
 class ProfileScreen extends StatefulWidget {
@@ -57,9 +56,6 @@ Widget buildProfile(BuildContext context, UserModel user) {
                 backgroundImage: NetworkImage(user.profileImageUrl ?? ""),
               ),
             ),
-            Container(
-                padding: const EdgeInsets.fromLTRB(20.0, 20.0, 25.0, 20.0),
-                child: StarsWidget( numberOfStars: user.rating!)),
           ],
         ),
 

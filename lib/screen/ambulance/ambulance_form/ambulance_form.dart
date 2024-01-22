@@ -3,10 +3,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:quickmed/component/util.dart';
+import 'package:quickmed/controller/storage.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/model/ambulance/driver/driver_model.dart';
-import 'package:quickmed/screen/ambulance/ambulance_homescreen.dart';
-import 'package:quickmed/screen/ambulance/service/ambulance_service.dart';
+import 'package:quickmed/screen/ambulance/dashboard/ambulance_homescreen.dart';
+import 'package:quickmed/service/ambulance/ambulance_service.dart';
 import 'package:quickmed/util/constant.dart';
 
 class AmbulanceForm extends StatefulWidget {
@@ -80,6 +83,9 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
 
       var currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser?.uid != null) {
+        // Upload image to Firebase Storage
+        String photoUrl = await StorageMethod().uploadImageToStorage('user_profile_images/${currentUser}.jpg', _image!, false);
+            
         DriverModel user1 = DriverModel(
           id: currentUser?.uid,
           phone: currentUser?.phoneNumber,
@@ -94,6 +100,7 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
           name: nameTextEditingController.text.trim(),
           email: emailTextEditingController.text.trim(),
           nin: ninTextEditingController.text.trim(),
+          uploadMedicalLicense: photoUrl
         );
 
         await AmbulanceDatabaseService.addUserToDatabase(user1);
@@ -106,6 +113,18 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
 
     setState(() {
       _isSubmitting = false;
+    });
+  }
+
+
+  Uint8List? _image;
+
+  //function to handle selected images
+  void _selectImage() async {
+    Uint8List? img = await pickImage(ImageSource.gallery, context);
+
+    setState(() {
+      _image = img;
     });
   }
 
@@ -540,34 +559,38 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
                               height: 10,
                             ),
                             TextFormField(
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(11)
-                              ],
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                hintText: "Plate Number",
-                                hintStyle: TextStyle(color: Colors.grey),
-                                filled: true,
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        width: 0, style: BorderStyle.none)),
-                              ),
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              validator: (text) {
-                                if (text == null || text.isEmpty) {
-                                  return "Plate Number cannot be empty";
-                                }
-
-                                return null;
-                              },
-                              onChanged: (text) {
-                                setState(() {
-                                  plateNumberTextEditingController.text =
-                                      text;
-                                });
-                              },
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(11)
+                            ],
+                            keyboardType: TextInputType.text, 
+                            decoration: const InputDecoration(
+                              hintText: "Plate Number",
+                              hintStyle: TextStyle(color: Colors.grey),
+                              filled: true,
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                  width: 0, style: BorderStyle.none)),
                             ),
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: (text) {
+                              if (text == null || text.isEmpty) {
+                                return "Plate Number cannot be empty";
+                              }
+                              // Use RegExp for alphanumeric validation
+                              final alphanumericRegex = RegExp(r'^[a-zA-Z0-9]+$');
+                              if (!alphanumericRegex.hasMatch(text)) {
+                                return "Enter a valid alphanumeric plate number";
+                              }
+
+                              return null;
+                            },
+                            onChanged: (text) {
+                              setState(() {
+                                plateNumberTextEditingController.text = text;
+                              });
+                            },
+                          ),
 
                             const SizedBox(
                               height: 10,

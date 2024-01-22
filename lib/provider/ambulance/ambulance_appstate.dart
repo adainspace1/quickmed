@@ -10,10 +10,10 @@ import 'package:quickmed/model/ambulance/driver/driver_model.dart';
 import 'package:quickmed/model/ride_request.dart';
 import 'package:quickmed/model/route/route_model.dart';
 import 'package:quickmed/model/user/user_model.dart';
-import 'package:quickmed/screen/user/service/econsultant.dart';
-import 'package:quickmed/screen/user/service/map_request.dart';
-import 'package:quickmed/screen/user/service/ride_request_service.dart';
-import 'package:quickmed/screen/user/service/user_databaseservice.dart';
+import 'package:quickmed/service/econsultant/getEcon_service.dart';
+import 'package:quickmed/service/map_request.dart';
+import 'package:quickmed/service/ride_request.dart';
+import 'package:quickmed/service/user/user_service.dart';
 
 enum Show {
   DESTINATION_SELECTION,
@@ -53,9 +53,9 @@ class AmbulanceAppProvider extends ChangeNotifier {
   //  Position position;
 
   RideRequest _requestServices = RideRequest();
-  UserServices _userServices = UserServices();
+  UserDataBaseServices _userServices = UserDataBaseServices();
 
-  UserServices get userServices => _userServices;
+  UserDataBaseServices get userServices => _userServices;
 
   BitmapDescriptor? _carPin;
   BitmapDescriptor? get carpin => _carPin;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
-import 'package:quickmed/screen/ambulance/ambulance_form.dart';
+import 'package:quickmed/screen/ambulance/ambulance_form/ambulance_form.dart';
 import 'package:quickmed/screen/e-consultant/e-conform/e-consultantForm.dart';
 
 class MedicalServiceScreen extends StatefulWidget {
@@ -44,7 +44,7 @@ class CardWidget extends StatelessWidget {
             text: 'E-consultant',
 
             onPress: () {
-              changeScreen(context, const EconsultantForm());
+              changeScreenReplacement(context, const EconsultantForm());
             },
           ),
           const SizedBox(height: 16.0),
@@ -59,7 +59,7 @@ class CardWidget extends StatelessWidget {
                   'https://res.cloudinary.com/damufjozr/image/upload/v1701760812/amb2_gpa3lp.jpg', // Replace with the path to your logo image
               text: 'Ambulance',
               onPress: () {
-                changeScreen(context, const AmbulanceForm());
+                changeScreenReplacement(context, const AmbulanceForm());
               }),
         ],
       ),

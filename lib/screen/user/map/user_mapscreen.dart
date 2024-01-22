@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quickmed/provider/user/user_appstate.dart';
+import 'package:quickmed/provider/user/user_provider.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/loading.dart';
+import 'package:quickmed/model/user/user_model.dart' as model;
 
 class UserMapScreen extends StatefulWidget {
 
@@ -24,11 +26,18 @@ class _UserMapScreenState extends State<UserMapScreen> {
   @override
   void initState() {
     super.initState();
+    addData();
+  }
+
+  addData() async {
+    UserProvider userProvider = Provider.of(context, listen: false);
+    await userProvider.refreshUser();
   }
 
   @override
   Widget build(BuildContext context) {
     UserAppProvider appState = Provider.of<UserAppProvider>(context);
+    model.UserModel? user = Provider.of<UserProvider>(context).getUser;
 
     // ignore: unnecessary_null_comparison
     return appState.center == null
@@ -46,7 +55,7 @@ class _UserMapScreenState extends State<UserMapScreen> {
                 onCameraMove: appState.onCameraMove,
                 markers: appState.markers,
               ),
-                        Positioned(
+            Positioned(
             top: 40,
             left: 15,
             child: CircleAvatar(
@@ -56,11 +65,10 @@ class _UserMapScreenState extends State<UserMapScreen> {
               child: IconButton(
                 alignment: Alignment.center,
               
-                icon: const Icon(
-                  Icons.menu,
-                  
-                  color: Colors.white, // Set the desired icon color
-                  size: 20,
+                icon: CircleAvatar(
+                        radius: 55,
+                        backgroundImage: NetworkImage(
+                        user.profileImageUrl ?? ""),
                 ),
                 onPressed: () {
                   if (widget.scaffoldState.currentState != null) {

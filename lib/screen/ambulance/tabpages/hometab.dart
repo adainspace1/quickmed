@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quickmed/provider/ambulance/ambulance_appstate.dart';
+import 'package:quickmed/provider/ambulance/ambulance_user_provider.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/loading.dart';
+import 'package:quickmed/model/ambulance/driver/driver_model.dart' as model;
 
 class AmbulanceMapScreen extends StatefulWidget {
 
@@ -22,9 +24,7 @@ class AmbulanceMapScreen extends StatefulWidget {
 }
 
 class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
-  TextEditingController destinationController = TextEditingController();
-  Color darkBlue = Colors.black;
-  Color grey = Colors.grey;
+  String? statusText = '';
   GlobalKey<ScaffoldState> scaffoldSate = GlobalKey<ScaffoldState>();
 
   @override
@@ -35,6 +35,7 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
   @override
   Widget build(BuildContext context) {
     AmbulanceAppProvider appState = Provider.of<AmbulanceAppProvider>(context);
+    model.DriverModel? user = Provider.of<AmbulanceProvider>(context).getUser;
 
     // ignore: unnecessary_null_comparison
     return appState.center == null
@@ -51,22 +52,20 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
                 rotateGesturesEnabled: true,
                 markers: appState.markers,
               ),
-
-                Positioned(
+        
+            Positioned(
             top: 40,
             left: 15,
             child: CircleAvatar(
               backgroundColor:
-                  COLOR_ACCENT, // Set your desired background color
-              radius: 20, // Set the desired radius
+                  COLOR_ACCENT, 
+              radius: 20, 
               child: IconButton(
                 alignment: Alignment.center,
               
-                icon: const Icon(
-                  Icons.menu,
-                  
-                  color: Colors.white, // Set the desired icon color
-                  size: 20,
+                icon: CircleAvatar(
+                  radius: 10,
+                  backgroundImage: NetworkImage(user.profileImageUrl ?? ""),
                 ),
                 onPressed: () {
                   if (widget.scaffoldState.currentState != null) {
@@ -76,8 +75,6 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
               ),
             ),
           ),
-           
-   
             ],
           );
   }

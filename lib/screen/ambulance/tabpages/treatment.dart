@@ -10,6 +10,6 @@ class TreatMent extends StatefulWidget {
 class _TreatMentState extends State<TreatMent> {
   @override
   Widget build(BuildContext context) {
-    return  const Scaffold();
+    return const Scaffold();
   }
 }

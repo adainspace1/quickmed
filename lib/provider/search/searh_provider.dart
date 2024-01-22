@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:quickmed/screen/user/service/user_databaseservice.dart';
+import 'package:quickmed/service/user/user_service.dart';
 
 class SearchResultProvider extends ChangeNotifier {
   QuerySnapshot? _searchResultSnapshot;
@@ -10,7 +10,7 @@ class SearchResultProvider extends ChangeNotifier {
   Future<void> setSearchResult(String text) async {
     try {
       // ignore: await_only_futures
-      var snapshot = await UserServices().econsultantStream(text);
+      var snapshot = await UserDataBaseServices().econsultantStream(text);
       _searchResultSnapshot = snapshot as QuerySnapshot<Object?>?;
       notifyListeners();
     

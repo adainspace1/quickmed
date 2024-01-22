@@ -11,20 +11,20 @@ class EconsultantModel {
   bool? verified;
   int? vote;
   int? rating;
+  String? accontType;
 
   EconsultantModel(
-      {
-      this.id,
+      {this.id,
       this.medicalField,
       this.name,
+      this.accontType,
       this.email,
       this.profileImage,
       this.rating,
       this.vote,
       this.verified,
       this.latitude,
-      this.longitude
-      });
+      this.longitude});
 
   factory EconsultantModel.fromSnapshot(DocumentSnapshot snapshot) {
     var userData = snapshot.data() as Map<String, dynamic>;
@@ -38,9 +38,9 @@ class EconsultantModel {
         latitude: userData["latitude"] ?? "",
         longitude: userData["longitude"] ?? "",
         rating: userData["rating"] ?? "",
-        vote: userData["votes"] ?? ""
+        vote: userData["votes"] ?? "",
+        accontType: userData["accountType"] ?? ""
         );
-        
 
   }
 
@@ -55,7 +55,8 @@ class EconsultantModel {
       "longitude": 0.0,
       "rating": 0,
       "votes": 0,
-      "verified": false
+      "verified": false,
+      "accountType": "econsultant"
     };
   }
 }

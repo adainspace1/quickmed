@@ -7,8 +7,7 @@ import 'package:quickmed/model/route/route_model.dart';
 
 class GoogleMapServices {
   Future<RouteModel> getRouteByCoordinate(LatLng l1, LatLng l2) async {
-    String url =
-        "https://maps.googleapis.com/maps/api/directions/json?origin=${l1.latitude},${l1.longitude}&destination=${l2.latitude},${l2.longitude}&key=$mapKey";
+    String url ="https://maps.googleapis.com/maps/api/directions/json?origin=${l1.latitude},${l1.longitude}&destination=${l2.latitude},${l2.longitude}&key=$mapKey";
     var response = await RequestAssistant.receiveRequest(url);
     Map values = jsonDecode(response.body);
     Map routes = values["routes"][0];

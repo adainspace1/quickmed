@@ -10,17 +10,13 @@ import 'package:quickmed/model/e-consultant/econsultant_model.dart';
 import 'package:quickmed/model/ride_request.dart';
 import 'package:quickmed/model/route/route_model.dart';
 import 'package:quickmed/model/user/user_model.dart';
-import 'package:quickmed/screen/user/service/econsultant.dart';
-import 'package:quickmed/screen/user/service/map_request.dart';
-import 'package:quickmed/screen/user/service/ride_request_service.dart';
-import 'package:quickmed/screen/user/service/user_databaseservice.dart';
+import 'package:quickmed/service/econsultant/getEcon_service.dart';
+import 'package:quickmed/service/map_request.dart';
+import 'package:quickmed/service/ride_request.dart';
+import 'package:quickmed/service/user/user_service.dart';
 
 enum Show {
-  DESTINATION_SELECTION,
-  PICKUP_SELECTION,
-  PAYMENT_METHOD_SELECTION,
-  DRIVER_FOUND,
-  TRIP
+  SP_FOUND,
 }
 
 class UserAppProvider extends ChangeNotifier {
@@ -53,9 +49,9 @@ class UserAppProvider extends ChangeNotifier {
   //  Position position;
 
   RideRequest _requestServices = RideRequest();
-  UserServices _userServices = UserServices();
+  UserDataBaseServices _userServices = UserDataBaseServices();
 
-  UserServices get userServices => _userServices;
+  UserDataBaseServices get userServices => _userServices;
 
   BitmapDescriptor? _carPin;
   BitmapDescriptor? get carpin => _carPin;
@@ -81,7 +77,7 @@ class UserAppProvider extends ChangeNotifier {
   //  RouteModel routeModel;
 
   //  draggable to show
-  Show show = Show.DESTINATION_SELECTION;
+  Show show = Show.SP_FOUND;
 
   // //  Driver request related variables
   bool lookingForDriver = false;
@@ -144,10 +140,9 @@ class UserAppProvider extends ChangeNotifier {
       return Future.error('Location permissions are permanently denied');
     }
 
-    Position position = await Geolocator.getCurrentPosition();
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
     _center = LatLng(position.latitude, position.longitude);
-
     addMarker(_center!);
     notifyListeners();
     return position;
@@ -164,8 +159,21 @@ class UserAppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _addDriverMarker(LatLng position) {
+    _markers.add(Marker(
+        markerId: const MarkerId('driver'),
+        position: position,
+        anchor: const Offset(0, 0.85),
+        icon: carpin!
+        // Add other marker properties if needed
+        ));
+    notifyListeners();
+  }
+
   // add the markers of the current location
-  addMarker(LatLng position) {
+  addMarker(
+    LatLng position,
+  ) {
     _markers.add(
       Marker(
           markerId: const MarkerId(LOCATION_MARKER_ID),
@@ -185,116 +193,17 @@ class UserAppProvider extends ChangeNotifier {
   }
 
   // this function listen to all the drivers available
-_listemToDrivers() {
-
-  allDriversStream = _driverService?.getDrivers().listen(_updateMarkers);
-  show = Show.DRIVER_FOUND;
-  notifyListeners();
-}
-
-
-_updateMarkers(List<EconsultantModel> drivers) {
-  // Extract the names of the drivers
-  //List<String?> driverNames = drivers.map((driver) => driver.name).toList();
-
-  // Print the driver names
-  //print('Driver Names: $driverNames');
-
-}
-
-
-
-
-
-showDriverBottomSheet(BuildContext context) {
-    if (alertsOnUi) Navigator.pop(context);
-
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc) {
-          return SizedBox(
-              height: 400,
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "7 MIN AWAY",
-   
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Visibility(
-                        visible: driverModel?.name == null,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(40)),
-                          child: const CircleAvatar(
-                            backgroundColor: Colors.transparent,
-                            radius: 45,
-                            child: Icon(
-                              Icons.person,
-                              size: 65,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Visibility(
-                        visible: driverModel?.email != null,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.deepOrange,
-                              borderRadius: BorderRadius.circular(40)),
-                          child: const CircleAvatar(
-                            radius: 45,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(driverModel?.name ?? "null"),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text(
-                        driverModel?.name ?? "null",
-                      )
-                    ],
-                  ),
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(
-                        onPressed: (){},
-                        child: const Text("call"),
-                      ),
-                      ElevatedButton(
-                        onPressed: (){},
-                        child: const Text("Cancel"),
-  
-                      ),
-                    ],
-                  )
-                ],
-              ));
-        });
+  _listemToDrivers() {
+    allDriversStream = _driverService?.getDrivers().listen(_updateMarkers);
+    show = Show.SP_FOUND;
+    notifyListeners();
   }
 
+  _updateMarkers(List<EconsultantModel> drivers) {
+    // Extract the names of the drivers
+    List<String?> driverNames = drivers.map((driver) => driver.name).toList();
+
+    //Print the driver names
+    print('Driver Names: $driverNames');
+  }
 }

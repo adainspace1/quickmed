@@ -21,37 +21,35 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-   const MyApp({super.key});
-
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+    SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     //these are my mobile app proiders
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context)=> AmbulanceProvider()),
+        ChangeNotifierProvider(create: (context) => AmbulanceProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
-        ChangeNotifierProvider(create: (context)=> SearchResultProvider()),
-        ChangeNotifierProvider(create: (context)=> RatingVotesNotifier()),
-        ChangeNotifierProvider(create: (context)=> UserAppProvider()),
-        ChangeNotifierProvider(create: (context)=> AmbulanceAppProvider()),
-        ChangeNotifierProvider(create: (context)=> EconsultantAppProvider())
-
-
+        ChangeNotifierProvider(create: (context) => SearchResultProvider()),
+        ChangeNotifierProvider(create: (context) => RatingVotesNotifier()),
+        ChangeNotifierProvider(create: (context) => UserAppProvider()),
+        ChangeNotifierProvider(create: (context) => AmbulanceAppProvider()),
+        ChangeNotifierProvider(create: (context) => EconsultantAppProvider())
       ],
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
-        home: const SplashScreen()
-      ),
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+            useMaterial3: true,
+          ),
+          home: const SplashScreen()),
     );
-    
   }
 }
+
+
+
 
 
