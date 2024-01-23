@@ -1,4 +1,4 @@
-// ignore_for_file: sort_child_properties_last, unused_field, duplicate_ignore
+// ignore_for_file: sort_child_properties_last, unused_field, duplicate_ignore, sized_box_for_whitespace
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quickmed/component/util.dart';
 import 'package:quickmed/controller/storage.dart';
+import 'package:quickmed/global/global.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/model/ambulance/driver/driver_model.dart';
 import 'package:quickmed/screen/ambulance/dashboard/ambulance_homescreen.dart';
@@ -59,6 +60,24 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
         _isSubmitting = true;
       });
 
+            // Check if the profile photo is empty
+      if (_image == null || _uploadmedicallicence == null) {
+        // Show a Snackbar message if profile photo is empty
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: red,
+            content: Text('Please select a profile photo.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        setState(() {
+          _isSubmitting = false;
+        });
+
+        return;
+      }
+
       // Check if any field is empty
       if (nameTextEditingController.text.isEmpty ||
           emailTextEditingController.text.isEmpty ||
@@ -81,11 +100,15 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
         return;
       }
 
-      var currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser?.uid != null) {
+      var user = firebaseAuth.currentUser;
+
+      if (user != null) {
         // Upload image to Firebase Storage
-        String photoUrl = await StorageMethod().uploadImageToStorage('user_profile_images/${currentUser}.jpg', _image!, false);
-            
+        String photoUrl = await StorageMethod().uploadImageToStorage('Ambulance_profile_images/${user.uid}.jpg', _image!, false);
+        String medicalLicence = await StorageMethod().uploadImageToStorage('Ambulance_medicalLicence_images/${user.uid}.jpg', _uploadmedicallicence!, false);
+        String proofaddress = await StorageMethod().uploadImageToStorage('Ambulance_proofaddress_images/${user.uid}.jpg', _uploadproofaddress!, false);
+        String frontview = await StorageMethod().uploadImageToStorage('Ambulance_frontView_images/${user.uid}.jpg', _uploadfrontview!, false);
+
         DriverModel user1 = DriverModel(
           id: currentUser?.uid,
           phone: currentUser?.phoneNumber,
@@ -100,7 +123,10 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
           name: nameTextEditingController.text.trim(),
           email: emailTextEditingController.text.trim(),
           nin: ninTextEditingController.text.trim(),
-          uploadMedicalLicense: photoUrl
+          profileImageUrl: photoUrl,
+          uploadMedicalLicense: medicalLicence,
+          uploadProofOfAddress: proofaddress,
+          uploadFrontViewOfCompany: frontview
         );
 
         await AmbulanceDatabaseService.addUserToDatabase(user1);
@@ -117,7 +143,10 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
   }
 
 
-  Uint8List? _image;
+Uint8List? _image;
+Uint8List? _uploadmedicallicence;
+Uint8List? _uploadproofaddress;
+Uint8List? _uploadfrontview;
 
   //function to handle selected images
   void _selectImage() async {
@@ -125,6 +154,35 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
 
     setState(() {
       _image = img;
+    });
+  }
+
+  //function to handle medicallicence images
+  void _uploadMedicalLicence() async {
+    Uint8List? img = await pickImage(ImageSource.gallery, context);
+
+    setState(() {
+      _uploadmedicallicence = img;
+    });
+  }
+
+    //function to handle proofaddress images
+  void _uploadProofAddress() async {
+    Uint8List? img = await pickImage(ImageSource.gallery, context);
+
+    setState(() {
+      _uploadproofaddress = img;
+    });
+  }
+
+
+
+      //function to handle proofaddress images
+  void _uploadFrontView() async {
+    Uint8List? img = await pickImage(ImageSource.gallery, context);
+
+    setState(() {
+      _uploadfrontview = img;
     });
   }
 
@@ -140,7 +198,110 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
           children: [
             Column(
               children: [
-                const SizedBox(
+                _image != null
+                    ? CircleAvatar(
+                        radius: 64,
+                        backgroundImage: MemoryImage(_image!),
+                      )
+                    : const  CircleAvatar(
+                        radius: 55,
+                        backgroundImage: NetworkImage(
+                            "https://res.cloudinary.com/damufjozr/image/upload/v1703326116/imgbin_computer-icons-avatar-user-login-png_t9t5b9.png"),
+                      ),
+                Positioned(
+                  child: IconButton(
+                    onPressed: _selectImage,
+                    icon: const  Icon(Icons.add_a_photo),
+                  ),
+                  bottom: -10,
+                  left: 80,
+                ),
+                //row containing licenses
+                  SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Card(
+                       child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+                        child: Column(
+                          children: [
+                            // ignore: sized_box_for_whitespace
+                            Container(
+                              width: 100,
+                              height: 100,
+                              child: _uploadmedicallicence != null ? Image.memory(_uploadmedicallicence!):Image.asset("images/cam.jpg", width: 50, height: 50),
+                            ),
+                             Positioned(
+                          child: IconButton(
+                            onPressed: _uploadMedicalLicence,
+                            icon: const  Icon(Icons.add_a_photo),
+                          ),
+                          bottom: -10,
+                          left: 80,
+                        ),
+                        const Text("upload medicallicence")
+                            
+                          ],
+                        ),
+                       ), 
+                       
+                      ),
+                      const SizedBox(width: 20,),
+                      Card(
+                       child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 100,
+                              child: _uploadproofaddress !=null ? Image.memory(_uploadproofaddress!): Image.asset("images/cam.jpg", width: 50, height: 50),
+                            ),
+                          Positioned(
+                          child: IconButton(
+                            onPressed: _uploadProofAddress,
+                            icon: const  Icon(Icons.add_a_photo),
+                          ),
+                          bottom: -10,
+                          left: 80,
+                        ),
+                        const Text("upload proof of address")
+                          ],
+                        ),
+                       ), 
+                       
+                      ),
+                      const SizedBox(width: 20,),
+                      Card(
+                       child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 100,
+                              child: _uploadfrontview != null ? Image.memory(_uploadfrontview!): Image.asset("images/cam.jpg", width: 50, height: 50),
+                            ),
+                          Positioned(
+                          child: IconButton(
+                            onPressed: _uploadFrontView,
+                            icon: const  Icon(Icons.add_a_photo),
+                          ),
+                          bottom: -10,
+                          left: 80,
+                        ),
+                        const Text("upload front view of company")
+                          ],
+                        ),
+                       ), 
+                       
+                      )],
+                  ),
+                 ),
+                  const SizedBox(
                   height: 20,
                 ),
                 Column(

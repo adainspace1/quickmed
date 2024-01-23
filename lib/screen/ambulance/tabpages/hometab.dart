@@ -8,10 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quickmed/provider/ambulance/ambulance_appstate.dart';
-import 'package:quickmed/provider/ambulance/ambulance_user_provider.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/loading.dart';
-import 'package:quickmed/model/ambulance/driver/driver_model.dart' as model;
 
 class AmbulanceMapScreen extends StatefulWidget {
 
@@ -35,7 +33,6 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
   @override
   Widget build(BuildContext context) {
     AmbulanceAppProvider appState = Provider.of<AmbulanceAppProvider>(context);
-    model.DriverModel? user = Provider.of<AmbulanceProvider>(context).getUser;
 
     // ignore: unnecessary_null_comparison
     return appState.center == null
@@ -63,10 +60,7 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
               child: IconButton(
                 alignment: Alignment.center,
               
-                icon: CircleAvatar(
-                  radius: 10,
-                  backgroundImage: NetworkImage(user.profileImageUrl ?? ""),
-                ),
+                icon: const Icon(Icons.menu, color: COLOR_BACKGROUND,),
                 onPressed: () {
                   if (widget.scaffoldState.currentState != null) {
                     widget.scaffoldState.currentState!.openDrawer();

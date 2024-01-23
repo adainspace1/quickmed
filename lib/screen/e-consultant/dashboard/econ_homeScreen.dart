@@ -154,7 +154,7 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen> with Sing
           controller: tabController,
           children: [
                EconsultantMapScreen(scaffoldState),
-               EconsultantTreatMent()
+               const EconsultantTreatMent()
 
           ],
         ),

@@ -43,7 +43,7 @@ class _AmbulanceProfileScreenState extends State<AmbulanceProfileScreen> {
           ),
           backgroundColor: COLOR_ACCENT,
         ),
-        body: buildProfile(context, user));
+        body: buildProfile(context, user!));
   }
 }
 
@@ -166,10 +166,24 @@ Widget buildProfile(BuildContext context, DriverModel user) {
                     'Company PhoneNumber: ${user.companyPhoneNumber ?? ''}',
                     style: customGoogleFontStyle,
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-             
+                  Divider(),
+                  Column(
+                    children: [
+                      const Text("uploaded Front View of Company"),
+                      const SizedBox(height: 10,),
+                      Image.network(user.uploadFrontViewOfCompany ?? ""),
+
+                      const SizedBox(height: 20,),
+                      const Text("uploaded Medical Licence"),
+                      const SizedBox(height: 10,),
+                      Image.network(user.uploadMedicalLicense ?? ""),
+                      const SizedBox(height: 20,),
+
+                      const Text("uploaded proof address"),
+                      const SizedBox(height: 10,),
+                      Image.network(user.uploadProofOfAddress ?? ""),
+                    ],
+                  )
              
                 ],
               ),

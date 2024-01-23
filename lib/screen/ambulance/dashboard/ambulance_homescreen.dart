@@ -59,14 +59,14 @@ class _AmbulanceHomeScreenState extends State<AmbulanceHomeScreen>
             child: ListView(
           children: [
             UserAccountsDrawerHeader(
-              accountName: Text(user.name ?? " "),
-              accountEmail: Text(user.email ?? " "),
+              accountName: Text(user?.name ?? " "),
+              accountEmail: Text(user?.email ?? " "),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage(user.profileImageUrl ?? ""),
+                backgroundImage: NetworkImage(user?.profileImageUrl ?? ""),
               ),
               decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: NetworkImage(user.profileImageUrl ?? ""),
+                    image: NetworkImage(user?.profileImageUrl ?? ""),
                     fit: BoxFit.cover),
               ),
             ),
@@ -85,9 +85,18 @@ class _AmbulanceHomeScreenState extends State<AmbulanceHomeScreen>
             const SizedBox(
               height: 10,
             ),
-            const SizedBox(
-              height: 10,
+             ListTile(
+              leading: const Icon(
+                Icons.health_and_safety,
+                size: 30,
+                color: COLOR_ACCENT,
+              ),
+              title: const Text("Insurance"),
+              onTap: () {
+              },
             ),
+            const SizedBox(height: 20,),
+
             ListTile(
               leading: const Icon(
                 Icons.exit_to_app,

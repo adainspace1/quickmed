@@ -6,7 +6,7 @@ class AmbulanceProvider extends ChangeNotifier {
   DriverModel? _user;
   final AmbulanceDatabaseService _databaseService = AmbulanceDatabaseService();
 
-  DriverModel get getUser => _user!;
+  DriverModel? get getUser => _user;
 
 
 

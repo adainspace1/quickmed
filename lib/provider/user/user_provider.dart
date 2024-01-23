@@ -7,7 +7,7 @@ class UserProvider extends ChangeNotifier {
 
   final UserDataBaseServices _userDataBaseService = UserDataBaseServices();
 
-  UserModel get getUser => _user!;
+  UserModel? get getUser => _user;
 
 
 

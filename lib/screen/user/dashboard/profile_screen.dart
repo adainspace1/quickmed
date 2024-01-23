@@ -38,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           backgroundColor: COLOR_ACCENT,
         ),
-        body: buildProfile(context, user));
+        body: buildProfile(context, user!));
   }
 }
 

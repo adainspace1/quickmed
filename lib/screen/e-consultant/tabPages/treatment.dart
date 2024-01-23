@@ -10,6 +10,6 @@ class EconsultantTreatMent extends StatefulWidget {
 class _EconsultantTreatMentState extends State<EconsultantTreatMent> {
   @override
   Widget build(BuildContext context) {
-    return  Scaffold();
+    return  const Scaffold();
   }
 }

@@ -49,13 +49,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           children: [
             UserAccountsDrawerHeader(
               accountName: Text(
-                user.name ?? "",
+                user?.name ?? "",
                 style: const TextStyle(color: Colors.white),
               ),
-              accountEmail: Text(user.email ?? "",
+              accountEmail: Text(user?.email ?? "",
                   style: const TextStyle(color: Colors.white)),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage(user.profileImageUrl ?? ""),
+                backgroundImage: NetworkImage(user?.profileImageUrl ?? ""),
               ),
               decoration: BoxDecoration(
                   gradient: const LinearGradient(
@@ -73,7 +73,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     ], // Gradient from https://learnui.design/tools/gradient-generator.html
                   ),
                   image: DecorationImage(
-                      image: NetworkImage(user.profileImageUrl ?? ""),
+                      image: NetworkImage(user?.profileImageUrl ?? ""),
                       fit: BoxFit.cover)),
             ),
             ListTile(

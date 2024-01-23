@@ -5,7 +5,6 @@ import 'package:quickmed/provider/user/user_appstate.dart';
 import 'package:quickmed/provider/user/user_provider.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/loading.dart';
-import 'package:quickmed/model/user/user_model.dart' as model;
 
 class UserMapScreen extends StatefulWidget {
 
@@ -37,7 +36,6 @@ class _UserMapScreenState extends State<UserMapScreen> {
   @override
   Widget build(BuildContext context) {
     UserAppProvider appState = Provider.of<UserAppProvider>(context);
-    model.UserModel? user = Provider.of<UserProvider>(context).getUser;
 
     // ignore: unnecessary_null_comparison
     return appState.center == null
@@ -65,11 +63,7 @@ class _UserMapScreenState extends State<UserMapScreen> {
               child: IconButton(
                 alignment: Alignment.center,
               
-                icon: CircleAvatar(
-                        radius: 55,
-                        backgroundImage: NetworkImage(
-                        user.profileImageUrl ?? ""),
-                ),
+                icon: const Icon(Icons.menu, color: COLOR_BACKGROUND,),
                 onPressed: () {
                   if (widget.scaffoldState.currentState != null) {
                     widget.scaffoldState.currentState!.openDrawer();
