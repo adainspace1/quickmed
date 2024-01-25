@@ -56,7 +56,7 @@ class CardWidget extends StatelessWidget {
                 'https://res.cloudinary.com/damufjozr/image/upload/v1701804678/useraccount_lhxmmx.png', // Replace with the path to your logo image
             text: 'Medical Service\n     Providers',
             onPress: () {
-              changeScreenReplacement(context, const MedicalServiceScreen());
+              changeScreen(context, const MedicalServiceScreen());
             },
           )
         ],

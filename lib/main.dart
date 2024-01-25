@@ -5,9 +5,8 @@ import 'package:quickmed/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:quickmed/provider/ambulance/ambulance_user_provider.dart';
 import 'package:quickmed/provider/ambulance/ambulance_appstate.dart';
+import 'package:quickmed/provider/econsultant/econ_user.dart';
 import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
-import 'package:quickmed/provider/rating/rating.dart';
-import 'package:quickmed/provider/search/searh_provider.dart';
 import 'package:quickmed/provider/user/user_appstate.dart';
 import 'package:quickmed/provider/user/user_provider.dart';
 import 'package:quickmed/screen/splash_screen.dart';
@@ -16,6 +15,7 @@ void main() async {
   // initialized firebase.
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  //await FirebaseAPi().initNotification();
 
   runApp(const MyApp());
 }
@@ -32,11 +32,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => AmbulanceProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
-        ChangeNotifierProvider(create: (context) => SearchResultProvider()),
-        ChangeNotifierProvider(create: (context) => RatingVotesNotifier()),
         ChangeNotifierProvider(create: (context) => UserAppProvider()),
         ChangeNotifierProvider(create: (context) => AmbulanceAppProvider()),
-        ChangeNotifierProvider(create: (context) => EconsultantAppProvider())
+        ChangeNotifierProvider(create: (context) => EconsultantAppProvider()),
+        ChangeNotifierProvider(create: (context) => EconsultantProvider()),
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -48,8 +47,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-
-
-

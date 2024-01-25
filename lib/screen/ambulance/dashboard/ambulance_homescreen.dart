@@ -129,7 +129,7 @@ class _AmbulanceHomeScreenState extends State<AmbulanceHomeScreen>
 
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.healing), label: 'Treatment'),
+            BottomNavigationBarItem(icon: Icon(Icons.health_and_safety), label: 'Treatment'),
             BottomNavigationBarItem(icon: Icon(Icons.wallet), label: 'Wallet'),
 
 

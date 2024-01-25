@@ -6,6 +6,7 @@ import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/screen/account_type.dart';
 import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/screen/ambulance/dashboard/ambulance_homescreen.dart';
+import 'package:quickmed/screen/e-consultant/dashboard/econ_homeScreen.dart';
 import 'package:quickmed/screen/user/dashboard/user_home_screen.dart';
 import 'package:quickmed/util/constant.dart';
 
@@ -226,7 +227,9 @@ class _SignInScreenState extends State<SignInScreen>
                                                     case "ambulance":
                                                       changeScreenReplacement(context, const AmbulanceHomeScreen());
                                                       break;
-     
+                                                    case "econsultants":
+                                                      changeScreenReplacement(context, const EconsultantHomeScreen());
+                                                      break;     
                                                   }
                                                 }else{
                                                   changeScreenReplacement(context,const AccountSelect()); 

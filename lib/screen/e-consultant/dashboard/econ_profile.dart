@@ -1,41 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quickmed/model/ambulance/driver/driver_model.dart';
-import 'package:quickmed/provider/ambulance/ambulance_user_provider.dart';
+import 'package:quickmed/model/e-consultant/econsultant_model.dart';
+import 'package:quickmed/provider/econsultant/econ_user.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/stars.dart';
-import 'package:quickmed/model/ambulance/driver/driver_model.dart' as model;
+import 'package:quickmed/model/e-consultant/econsultant_model.dart' as model;
 
-
-class AmbulanceProfileScreen extends StatefulWidget {
-  const AmbulanceProfileScreen({
+class EconsultantProfileScreen extends StatefulWidget {
+  const EconsultantProfileScreen({
     super.key,
   });
 
   @override
-  State<AmbulanceProfileScreen> createState() => _AmbulanceProfileScreenState();
+  State<EconsultantProfileScreen> createState() =>
+      _EconsultantProfileScreenState();
 }
 
-class _AmbulanceProfileScreenState extends State<AmbulanceProfileScreen> {
-
+class _EconsultantProfileScreenState extends State<EconsultantProfileScreen>
+    with SingleTickerProviderStateMixin {
+  //updating editing controller
+  final updateTextEditingController = TextEditingController();
   @override
   void initState() {
     super.initState();
     addData();
-
   }
 
   addData() async {
-    AmbulanceProvider userProvider = Provider.of(context, listen: false);
-    await userProvider.refreshUser();
+    EconsultantProvider econsultantProvider =
+        Provider.of(context, listen: false);
+    await econsultantProvider.refreshUser();
+  }
 
+  void openBox() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: TextField(
+                controller: updateTextEditingController,
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Update"),
+                )
+              ],
+            ));
   }
 
   @override
   Widget build(BuildContext context) {
-  model.DriverModel? user = Provider.of<AmbulanceProvider>(context).getUser;
-  
-       return Scaffold(
+    model.EconsultantModel? user =
+        Provider.of<EconsultantProvider>(context).getUser;
+
+    return Scaffold(
         appBar: AppBar(
           title: const Text(
             "profile",
@@ -47,7 +67,7 @@ class _AmbulanceProfileScreenState extends State<AmbulanceProfileScreen> {
   }
 }
 
-Widget buildProfile(BuildContext context, DriverModel user) {
+Widget buildProfile(BuildContext context, EconsultantModel user) {
   return CustomScaffold(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,13 +78,12 @@ Widget buildProfile(BuildContext context, DriverModel user) {
               margin: const EdgeInsets.all(10.0),
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: NetworkImage(user.profileImageUrl ?? ""),
+                backgroundImage: NetworkImage(user.profileImage ?? ""),
               ),
             ),
             Container(
                 padding: const EdgeInsets.fromLTRB(20.0, 20.0, 25.0, 20.0),
-                child:
-                     StarsWidget(numberOfStars: user.rating!)),
+                child: StarsWidget(numberOfStars: user.rating!)),
           ],
         ),
 
@@ -110,81 +129,38 @@ Widget buildProfile(BuildContext context, DriverModel user) {
                     style: customGoogleFontStyle,
                   ),
                   const SizedBox(height: 10),
-                  // Display user email
+                  // Display user name
                   Text(
-                    'AccountType: ${user.accountType ?? ''}',
+                    'MedicalField: ${user.medicalField ?? ''}',
                     style: customGoogleFontStyle,
                   ),
                   const SizedBox(height: 10),
-
+                  // Display user name
                   Text(
-                    'PhoneNumber: ${user.phone ?? ''}',
+                    'Account Type: ${user.accontType ?? ''}',
                     style: customGoogleFontStyle,
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                              
+                  const SizedBox(height: 10),
                   Text(
-                    'Car Type: ${user.carType ?? ''}',
+                    'Gender: ${user.gender ?? ''}',
                     style: customGoogleFontStyle,
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-
-                  
+                  const SizedBox(height: 10),
                   Text(
-                    'Car Color: ${user.color ?? ''}',
+                    'Blood Group: ${user.bloodGroup ?? ''}',
                     style: customGoogleFontStyle,
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  
+                  const SizedBox(height: 10),
                   Text(
-                    'Company Address: ${user.companyAddress ?? ''}',
-                    style: customGoogleFontStyle,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),                
-                  Text(
-                    'Company Email: ${user.companyEmail ?? ''}',
+                    'NiN: ${user.nin ?? ''}',
                     style: customGoogleFontStyle,
                   ),
 
-                const SizedBox(height: 10,),
+                  const SizedBox(height: 10),
                   Text(
-                    'Company Reg Number: ${user.companyRegNumber ?? ''}',
+                    'Date of birth: ${user.dob ?? ''}',
                     style: customGoogleFontStyle,
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),           
-                  Text(
-                    'Company PhoneNumber: ${user.companyPhoneNumber ?? ''}',
-                    style: customGoogleFontStyle,
-                  ),
-                  const Divider(),
-                  Column(
-                    children: [
-                      const Text("uploaded Front View of Company"),
-                      const SizedBox(height: 10,),
-                      Image.network(user.uploadFrontViewOfCompany ?? ""),
-
-                      const SizedBox(height: 20,),
-                      const Text("uploaded Medical Licence"),
-                      const SizedBox(height: 10,),
-                      Image.network(user.uploadMedicalLicense ?? ""),
-                      const SizedBox(height: 20,),
-
-                      const Text("uploaded proof address"),
-                      const SizedBox(height: 10,),
-                      Image.network(user.uploadProofOfAddress ?? ""),
-                    ],
-                  )
-             
                 ],
               ),
             ),
@@ -212,5 +188,3 @@ class CustomScaffold extends StatelessWidget {
     );
   }
 }
-
-

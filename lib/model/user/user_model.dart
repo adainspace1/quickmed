@@ -88,6 +88,7 @@ class UserModel {
       "nin": nin,
       "latitude": 0.0,
       "longitude": 0.0,
+      "dob":dateOfBirth
       
     };
   }

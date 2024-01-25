@@ -25,7 +25,7 @@ class FirebaseAPi {
     final FCMToken = await _firebaseMessaging.getToken();
 
     // print the token we will send o the server
-    // print("Token:" + FCMToken.toString());
+     //print("Token:" + FCMToken.toString());
   }
 
   //function to handle receive message

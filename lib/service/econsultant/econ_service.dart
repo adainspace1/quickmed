@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:quickmed/model/e-consultant/econsultant_model.dart';
+import 'package:quickmed/model/e-consultant/econsultant_model.dart' as model;
 
 class EconsultantServices {
+  static final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   // this function adds user to realtime database
-static  Future addtoRealtime(EconsultantModel user) async {
+static  Future addtoRealtime(model.EconsultantModel user) async {
     try {
       DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
       databaseReference
@@ -16,7 +19,7 @@ static  Future addtoRealtime(EconsultantModel user) async {
   }
 
   // this function add user to the firestore database
-  static Future addUserToDatabase(EconsultantModel user) async {
+  static Future addUserToDatabase(model.EconsultantModel user) async {
     try {
       var db = FirebaseFirestore.instance;
       //await db.collection('users').add(user.toJson());
@@ -28,39 +31,33 @@ static  Future addtoRealtime(EconsultantModel user) async {
     } catch (e) {}
   }
 
-  //this function gets user UID
- static Future<EconsultantModel?> getUserByUid(String? userId) async {
-    try {
-      var db = FirebaseFirestore.instance;
-      var useRef = db.collection("econsultant").doc(userId);
-      var snapShot = await useRef.get();
+    //this function gets user UID
+  Future<model.EconsultantModel> getUserByUid() async {
+    User currentUser = _firebaseAuth.currentUser!;
+    DocumentSnapshot snap =
+        await _firestore.collection("econsultants").doc(currentUser.uid).get();
 
-      if (snapShot.exists) {
-        EconsultantModel? user = EconsultantModel.fromSnapshot(snapShot);
-        return user;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      return null;
-    }
+    return model.EconsultantModel.fromSnapshot(snap);
   }
 
-  Future<QuerySnapshot> searchByName(String searchField) {
-    return FirebaseFirestore.instance
-        .collection("user")
-        .where('userName', isEqualTo: searchField)
-        .limit(20)
-        .get();
+
+
+  // update online or last active status of user
+  Future<void> updateActiveStatus( bool isOnline) async {  
+   User currentUser = _firebaseAuth.currentUser!;
+   FirebaseFirestore.instance.collection('econsultants').doc(currentUser.uid).update({
+      'is_Online': isOnline,
+      'timeStamp': Timestamp.now()
+    });
+    
   }
 
-  Future<void> addChatRoom(
-      Map<String, dynamic> chatRoom, String chatRoomId) async {
-    // Implement logic to add chat room details to your database
-    // Example using Firestore:
-    await FirebaseFirestore.instance
-        .collection('chatRooms')
-        .doc(chatRoomId)
-        .set(chatRoom);
+   Future<void> updateLocation( double latitude, double longitude) async {  
+   User currentUser = _firebaseAuth.currentUser!;
+   FirebaseFirestore.instance.collection('econsultants').doc(currentUser.uid).update({
+      'latitude': latitude,
+      'longitude': longitude
+    });
+    
   }
 }

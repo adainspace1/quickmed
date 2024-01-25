@@ -1,192 +1,173 @@
-// ignore_for_file: file_names
+// ignore: duplicate_ignore
+// ignore: duplicate_ignore
+// ignore: duplicate_ignore
+// ignore: file_names
+// ignore: file_names
+// ignore_for_file: file_names, duplicate_ignore, library_private_types_in_public_api
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:quickmed/helpers/screen_navigation.dart';
-import 'package:quickmed/provider/search/searh_provider.dart';
-import 'package:quickmed/screen/user/search/searcheconsultant.dart';
+import 'package:quickmed/service/user/user_service.dart';
 import 'package:quickmed/util/constant.dart';
+import 'package:quickmed/widget/stars.dart';
 
-class Econsultant extends StatefulWidget {
-  const Econsultant({Key? key}) : super(key: key);
+class ListOfEcon extends StatefulWidget {
+  const ListOfEcon({super.key});
 
   @override
-  State<Econsultant> createState() => _EconsultantState();
+  State<ListOfEcon> createState() => _ListOfEconState();
 }
 
-class _EconsultantState extends State<Econsultant> {
-  TextEditingController searchEditingController = TextEditingController();
-
-  QuerySnapshot? searchResultSnapshot;
-  bool isLoading = false;
-  bool haveUserSearched = false;
-
-  Future<void> initSearch(String text) async {
-    if (text.isNotEmpty) {
-      setState(() {
-        isLoading = true;
-      });
-    }
-
-    try {
-      await Provider.of<SearchResultProvider>(context, listen: false).setSearchResult(text);
-      setState(() {
-        isLoading = true;
-        haveUserSearched = true;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        haveUserSearched = true;
-      });
-    }
-  }
-
-  void navigateToSearchResultScreen(String profession) {
-    changeScreen(context, SearchResultScreen(profession: profession));
-  }
-
-  void handleContainerTap(String profession) {
-    // Show modal when container is tapped
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                'Consulting with $profession',
-                style: const TextStyle(fontSize: 20.0),
-              ),
-              const SizedBox(height: 16.0),
-              Form(
-                child: TextFormField(
-                  keyboardType: TextInputType.text,
-                  decoration: const InputDecoration(
-                    labelText: "Describe the issue",
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: COLOR_ACCENT,
-                  ),
-                  onPressed: () {
-                    // Close the modal
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    'Close',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: COLOR_ACCENT),
-                  onPressed: () async {
-                    await initSearch(profession);
-                  },
-                  child: const Text(
-                    'Send',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-    // Handle tap event here
-  }
-
-  Widget buildConsultantContainer(String profession) {
-    return GestureDetector(
-      onTap: () {
-        handleContainerTap(profession);
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20.0),
-        width: 200,
-        height: 100,
-        decoration: BoxDecoration(
-          color: COLOR_ACCENT,
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Icon(
-              Icons.star,
-              color: Colors.white,
-              size: 30.0,
-            ),
-            const SizedBox(height: 10.0),
-            Text(
-              profession,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16.0,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+class _ListOfEconState extends State<ListOfEcon> {
+  UserDataBaseServices services = UserDataBaseServices();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(top: 20.0),
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                buildConsultantContainer('nurse'),
-                const SizedBox(height: 20),
-                buildConsultantContainer('Dentist'),
-                const SizedBox(height: 20),
-                buildConsultantContainer('Optician'),
-                const SizedBox(height: 20),
-                buildConsultantContainer('Cardiac'),
-                const SizedBox(height: 20),
-                buildConsultantContainer('Physician'),
-                const SizedBox(height: 20),
-                buildConsultantContainer('Osteologist'),
-                const SizedBox(height: 20),
-                buildConsultantContainer('Nepriology'),
-              ],
-            ),
-          ),
+      appBar: AppBar(
+        backgroundColor: COLOR_ACCENT,
+        title: const Text(
+          'Econsultant',
+          style: TextStyle(color: COLOR_BACKGROUND),
         ),
       ),
-      // bottomNavigationBar: Padding(
-      //   padding: const EdgeInsets.all(16.0),
-      //   child: ElevatedButton(
-      //     onPressed: () {
-      //       changeScreen(context, UserGoogleMapScreen());
-      //     },
-      //     child: const Text(
-      //       "cancle",
-      //       style: TextStyle(color: Colors.white),
-      //     ),
-      //     style: ElevatedButton.styleFrom(
-      //       backgroundColor: COLOR_ACCENT,
-      //       shape: RoundedRectangleBorder(),
-      //     ),
-      //   ),
-      // ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: services.econsultantStream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List sp = snapshot.data!.docs;
+
+            return ListView.builder(
+              itemCount: sp.length,
+              shrinkWrap: true,
+              padding: const EdgeInsets.only(top: 16),
+              itemBuilder: (context, index) {
+                DocumentSnapshot document = sp[index];
+                Map<String, dynamic> data =
+                    document.data() as Map<String, dynamic>;
+                String field = data['medicalField'];
+                bool isOnline = data['is_Online'] ?? false;
+                int starRating = data['rating'] ?? 0;
+                String imageUrl = data['img'] ?? '';
+                String son = data['name'] ?? '';
+
+                return ConversationList(
+                  name: son,
+                  imageUrl: imageUrl,
+                  star: starRating,
+                  isOnline: isOnline,
+                  messageText: field,
+                );
+                // return ListTile(
+                //   title: Text(son),
+                //   leading: CircleAvatar(
+                //     backgroundImage: NetworkImage(imageUrl),
+                //   ),
+                //   subtitle: Row(
+                //     mainAxisSize: MainAxisSize.min,
+                //     children: [
+                //       Text(
+                //        field
+                //       ),
+                //       const SizedBox(width: 20,),
+                //       Text(
+                //         isOnline ? 'Online' : 'Offline',
+                //         style: TextStyle(
+                //           color: isOnline ? Colors.green : Colors.red,
+                //         ),
+                //       ),
+                //       const SizedBox(width: 8),
+                //       StarsWidget(numberOfStars: starRating),
+
+                //     ],
+                //   ),
+                // );
+              },
+            );
+          } else {
+            return const Text("null");
+          }
+        },
+      ),
+    );
+  }
+}
+
+// ignore: must_be_immutable
+class ConversationList extends StatefulWidget {
+  String name;
+  String messageText;
+  String imageUrl;
+  bool isOnline;
+  int star;
+  ConversationList(
+      {super.key,
+      required this.name,
+      required this.messageText,
+      required this.imageUrl,
+      required this.star,
+      required this.isOnline});
+  @override
+  _ConversationListState createState() => _ConversationListState();
+}
+
+class _ConversationListState extends State<ConversationList> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        
+      },
+      child: Container(
+        padding:
+            const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(widget.imageUrl),
+                    maxRadius: 30,
+                  ),
+                  const SizedBox(
+                    width: 16,
+                  ),
+                  Expanded(
+                    child: Container(
+                      color: Colors.transparent,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            widget.name,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            widget.messageText,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(
+                            height: 6,
+                          ),
+                          Text(
+                            widget.isOnline ? 'Online' : 'Offline',
+                            style: TextStyle(
+                              color:
+                                  widget.isOnline ? Colors.green : Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            StarsWidget(numberOfStars: widget.star),
+          ],
+        ),
+      ),
     );
   }
 }

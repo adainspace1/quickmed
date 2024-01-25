@@ -9,9 +9,15 @@ class EconsultantModel {
   double? longitude;
   String? email;
   bool? verified;
+  bool? isOnline;
+  String? userIssue;
   int? vote;
   int? rating;
   String? accontType;
+  String? nin;
+  String? gender;
+  String? bloodGroup;
+  String? dob;
 
   EconsultantModel(
       {this.id,
@@ -22,9 +28,15 @@ class EconsultantModel {
       this.profileImage,
       this.rating,
       this.vote,
+      this.userIssue,
       this.verified,
       this.latitude,
-      this.longitude});
+      this.longitude,
+      this.gender,
+      this.nin,
+      this.dob,
+      this.isOnline,
+      this.bloodGroup});
 
   factory EconsultantModel.fromSnapshot(DocumentSnapshot snapshot) {
     var userData = snapshot.data() as Map<String, dynamic>;
@@ -39,9 +51,13 @@ class EconsultantModel {
         longitude: userData["longitude"] ?? "",
         rating: userData["rating"] ?? "",
         vote: userData["votes"] ?? "",
-        accontType: userData["accountType"] ?? ""
+        accontType: userData["accountType"] ?? "",
+        userIssue: userData['userIssue'] ?? "",
+        nin: userData['nin'] ?? "",
+        gender: userData['gender'] ?? "",
+        bloodGroup: userData['bloodGroup'] ?? "",
+        dob: userData['dob'] ?? ""
         );
-
   }
 
   Map<String, dynamic> toJson() {
@@ -56,7 +72,13 @@ class EconsultantModel {
       "rating": 0,
       "votes": 0,
       "verified": false,
-      "accountType": "econsultant"
+      "accountType": "econsultants",
+      "userIssues": "",
+      "nin": nin,
+      "gender": gender,
+      "bloodGroup": bloodGroup,
+      "dob": dob,
+      "is_Online": isOnline ?? false
     };
   }
 }

@@ -103,10 +103,10 @@ class UserAppProvider extends ChangeNotifier {
 // //  this stream is for all the driver on the app
   StreamSubscription<List<EconsultantModel>>? allDriversStream;
 
-  //  DriverModel driverModel;
-  //  LatLng pickupCoordinates;
-  //  LatLng destinationCoordinates;
-  // double ridePrice = 0;
+  //DriverModel driverModel;
+  LatLng? pickupCoordinates;
+  LatLng? destinationCoordinates;
+  double ridePrice = 0;
   // String notificationType = "";
 
   UserAppProvider() {
@@ -140,7 +140,8 @@ class UserAppProvider extends ChangeNotifier {
       return Future.error('Location permissions are permanently denied');
     }
 
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
 
     _center = LatLng(position.latitude, position.longitude);
     addMarker(_center!);
@@ -159,6 +160,7 @@ class UserAppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ignore: unused_element
   void _addDriverMarker(LatLng position) {
     _markers.add(Marker(
         markerId: const MarkerId('driver'),
@@ -201,9 +203,41 @@ class UserAppProvider extends ChangeNotifier {
 
   _updateMarkers(List<EconsultantModel> drivers) {
     // Extract the names of the drivers
-    List<String?> driverNames = drivers.map((driver) => driver.name).toList();
+    //List<String?> driverNames = drivers.map((driver) => driver.name).toList();
 
     //Print the driver names
-    print('Driver Names: $driverNames');
+    //print('Driver Names: $driverNames');
+  }
+
+  Future sendRequest({LatLng? origin, LatLng? destination}) async {
+    LatLng org;
+    LatLng dest;
+    if (origin == null && destination == null) {
+      org = pickupCoordinates!;
+      dest = destinationCoordinates!;
+    } else {
+      org = origin!;
+      dest = destination!;
+    }
+
+    RouteModel route =
+        await _googleMapServices.getRouteByCoordinate(org, dest);
+    routeModel = route;
+
+    if (origin == null) {
+      ridePrice =
+          double.parse((routeModel!.distance.value / 500).toStringAsFixed(2));
+    }
+
+    List<Marker> mks = _markers
+        .where((element) => element.markerId.value == "location")
+        .toList();
+
+    if (mks.isNotEmpty) {
+      _markers.remove(mks[0]);
+    }
+
+    addMarker(destinationCoordinates!);
+    _center = destinationCoordinates;
   }
 }

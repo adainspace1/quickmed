@@ -73,7 +73,7 @@ class AuthService {
 
     if (user != null) {
       // Check each collection for the user's account type
-      List<String> collections = ['users', 'ambulance', 'econsultant'];
+      List<String> collections = ['users', 'ambulance', 'econsultants'];
 
       for (String collection in collections) {
         DocumentSnapshot userProfileDoc = await FirebaseFirestore.instance

@@ -1,3 +1,7 @@
+// ignore: duplicate_ignore
+// ignore: file_names
+// ignore_for_file: file_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quickmed/model/ambulance/driver/driver_model.dart';
 import 'package:quickmed/model/e-consultant/econsultant_model.dart';

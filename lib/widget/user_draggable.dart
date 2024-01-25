@@ -95,7 +95,7 @@ class _UserWidgetState extends State<UserWidget> {
                   )),
               ListTile(
                   onTap: () {
-                    changeScreen(context,const Econsultant());
+                    changeScreen(context, const ListOfEcon());
                   },
                   leading: Image.network(
                     "https://res.cloudinary.com/damufjozr/image/upload/v1701761216/pers_jfroff.png",
