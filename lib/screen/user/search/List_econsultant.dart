@@ -4,7 +4,7 @@
 // ignore: file_names
 // ignore: file_names
 // ignore_for_file: file_names, duplicate_ignore, library_private_types_in_public_api
-
+import 'package:quickmed/widget/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quickmed/service/user/user_service.dart';
@@ -50,42 +50,20 @@ class _ListOfEconState extends State<ListOfEcon> {
                 int starRating = data['rating'] ?? 0;
                 String imageUrl = data['img'] ?? '';
                 String son = data['name'] ?? '';
+                String id = data['id'] ?? '';
 
                 return ConversationList(
+                  id: id,
                   name: son,
                   imageUrl: imageUrl,
                   star: starRating,
                   isOnline: isOnline,
                   messageText: field,
                 );
-                // return ListTile(
-                //   title: Text(son),
-                //   leading: CircleAvatar(
-                //     backgroundImage: NetworkImage(imageUrl),
-                //   ),
-                //   subtitle: Row(
-                //     mainAxisSize: MainAxisSize.min,
-                //     children: [
-                //       Text(
-                //        field
-                //       ),
-                //       const SizedBox(width: 20,),
-                //       Text(
-                //         isOnline ? 'Online' : 'Offline',
-                //         style: TextStyle(
-                //           color: isOnline ? Colors.green : Colors.red,
-                //         ),
-                //       ),
-                //       const SizedBox(width: 8),
-                //       StarsWidget(numberOfStars: starRating),
-
-                //     ],
-                //   ),
-                // );
               },
             );
           } else {
-            return const Text("null");
+            return const Loading();
           }
         },
       ),
@@ -95,6 +73,7 @@ class _ListOfEconState extends State<ListOfEcon> {
 
 // ignore: must_be_immutable
 class ConversationList extends StatefulWidget {
+  String? id;
   String name;
   String messageText;
   String imageUrl;
@@ -102,6 +81,7 @@ class ConversationList extends StatefulWidget {
   int star;
   ConversationList(
       {super.key,
+      required this.id,
       required this.name,
       required this.messageText,
       required this.imageUrl,
@@ -116,7 +96,6 @@ class _ConversationListState extends State<ConversationList> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        
       },
       child: Container(
         padding:

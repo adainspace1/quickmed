@@ -122,7 +122,7 @@ class _UserFormState extends State<UserForm> {
             profileImageUrl: photoUrl,
             gender: genderTextEditingController.text.trim());
 
-            await UserDataBaseServices.addUserToDatabase(user1);
+        await UserDataBaseServices.addUserToDatabase(user1);
       }
       changeScreenReplacement(context, UserHomeScreen());
     } else {
@@ -135,6 +135,7 @@ class _UserFormState extends State<UserForm> {
   }
 
   Uint8List? _image;
+  String? selectedGender; //add a variable to store selecte gender
 
   //function to handle selected images
   void _selectImage() async {
@@ -373,6 +374,9 @@ class _UserFormState extends State<UserForm> {
                                 if (text == null || text.isEmpty) {
                                   return "NIN cannot be empty";
                                 }
+                                if (text.length < 11) {
+                                  return "NIN must be 11 numbers";
+                                }
 
                                 return null;
                               },
@@ -508,31 +512,28 @@ class _UserFormState extends State<UserForm> {
                             const SizedBox(
                               height: 10,
                             ),
-                            //gender selection
-                            TextFormField(
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(100)
-                              ],
-                              decoration: InputDecoration(
-                                hintText: "Select Gender eg male or female ",
-                                hintStyle: TextStyle(color: Colors.grey),
-                                filled: true,
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        width: 0, style: BorderStyle.none)),
-                              ),
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              validator: (text) {
-                                if (text == null || text.isEmpty) {
-                                  return "Next of Kin cannot be empty";
+                            //gender form field..........
+                            DropdownButtonFormField<String>(
+                              value: selectedGender,
+                              hint: const Text('Select Gender'),
+                              items: ['Male', 'Female', 'Other'].map((gender) {
+                                return DropdownMenuItem<String>(
+                                  value: gender,
+                                  child: Text(gender),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedGender = value;
+                                  genderTextEditingController.text =
+                                      value ?? '';
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please select a gender';
                                 }
                                 return null;
-                              },
-                              onChanged: (text) {
-                                setState(() {
-                                  genderTextEditingController.text = text;
-                                });
                               },
                             ),
                             // address of next of kin

@@ -1,6 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:quickmed/model/user/user_model.dart' as model;
+import 'package:quickmed/provider/user/user_appstate.dart';
 import 'package:quickmed/util/constant.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -11,9 +14,22 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
+
+  //this code is exceuted at the start of the app.....
+  @override
+  void initState() {
+    super.initState();
+    addData();
+  }
+
+  addData() async {
+    UserAppProvider userProvider = Provider.of(context, listen: false);
+    await userProvider.refreshUser();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+   return Scaffold(
       appBar: AppBar(
         backgroundColor: COLOR_ACCENT,
         title: const Text("Wallet",style: TextStyle(color: COLOR_BACKGROUND),),
@@ -63,6 +79,9 @@ class _WalletScreenState extends State<WalletScreen> {
   }
 
   Widget _contentOverView() {
+
+    model.UserModel? user = Provider.of<UserAppProvider>(context).getUser;
+
     return Container(
       padding: const EdgeInsets.only(left: 18, right: 18, top: 22, bottom: 22),
       decoration: BoxDecoration(
@@ -75,7 +94,7 @@ class _WalletScreenState extends State<WalletScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('20,600', style: customBoldTextStyle),
+              Text(user?.amount as String, style: customBoldTextStyle),
               const SizedBox(
                 height: 12,
               ),

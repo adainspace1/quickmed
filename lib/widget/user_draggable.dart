@@ -18,6 +18,7 @@ class _UserWidgetState extends State<UserWidget> {
 //  is for the draggable widget
   @override
   Widget build(BuildContext context) {
+
     return DraggableScrollableSheet(
         initialChildSize: 0.3,
         minChildSize: 0.3,
@@ -115,7 +116,8 @@ class _UserWidgetState extends State<UserWidget> {
                     ],
                   )),
               ListTile(
-                  onTap: () async {},
+                  onTap: () {
+                  },
                   leading: Image.network(
                     "https://res.cloudinary.com/damufjozr/image/upload/v1701760812/amb2_gpa3lp.jpg",
                     width: 40,
@@ -175,7 +177,6 @@ class _UserWidgetState extends State<UserWidget> {
   }
 }
 
-  /// 1.create a chatroom, send user to the chatroom, other userdetails
   
 
 

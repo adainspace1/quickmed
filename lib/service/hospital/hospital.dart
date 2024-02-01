@@ -5,17 +5,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/services.dart';
 import 'package:quickmed/controller/storage.dart';
-import 'package:quickmed/model/e-consultant/econsultant_model.dart' as model;
+import 'package:quickmed/model/hospital/hospital_model.dart' as model;
 
-class EconsultantServices {
+class HospitalServices {
   static final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   // this function adds user to realtime database
-  static Future addtoRealtime(model.EconsultantModel user) async {
+  static Future addtoRealtime(model.HospitalModel user) async {
     try {
       DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
       databaseReference
-          .child("${user.name}")
-          .child("${user.name}")
+          .child("${user.hospitalName}")
+          .child("${user.hospitalName}")
           .update(user.toJson());
       // ignore: empty_catches
     } catch (e) {}
@@ -24,12 +24,12 @@ class EconsultantServices {
   
 
   // this function add user to the firestore database
-  static Future addUserToDatabase(model.EconsultantModel user) async {
+  static Future addUserToDatabase(model.HospitalModel user) async {
     try {
       var db = FirebaseFirestore.instance;
       //await db.collection('users').add(user.toJson());
       await db
-          .collection('econsultants')
+          .collection('hospital')
           .doc(user.id)
           .set(user.toJson(), SetOptions(merge: true));
       // ignore: empty_catches
@@ -37,16 +37,16 @@ class EconsultantServices {
   }
 
   //this function gets the econsultant stream stream
-  Stream<model.EconsultantModel> getUserStreamByUid() {
+  Stream<model.HospitalModel> getUserStreamByUid() {
     User currentUser = _firebaseAuth.currentUser!;
 
     return FirebaseFirestore.instance
-        .collection('econsultants')
+        .collection('hospital')
         .doc(currentUser.uid)
         .snapshots()
         .map((doc) {
       if (doc.exists) {
-        return model.EconsultantModel.fromSnapshot(doc);
+        return model.HospitalModel.fromSnapshot(doc);
       } else {
         return null!;
       }
@@ -57,7 +57,7 @@ class EconsultantServices {
   Future<void> updateActiveStatus(bool isOnline) async {
     User currentUser = _firebaseAuth.currentUser!;
     FirebaseFirestore.instance
-        .collection('econsultants')
+        .collection('hospital')
         .doc(currentUser.uid)
         .update({'is_Online': isOnline, 'timeStamp': Timestamp.now()});
   }
@@ -65,14 +65,14 @@ class EconsultantServices {
   //this function update the econsultant collection...........
   Future<void> updateData(String docId, String name, 
       String address, String email) async {
-    FirebaseFirestore.instance.collection('econsultants').doc(docId).update(
+    FirebaseFirestore.instance.collection('hospital').doc(docId).update(
         {'name': name,  'address': address, 'email': email});
   }
 
   //this function update the econsultant location...........
   Future<void> updateLocation(double latitude, double longitude ) async {
         User currentUser = _firebaseAuth.currentUser!;
-        FirebaseFirestore.instance.collection('econsultants').doc(currentUser.uid).update(
+        FirebaseFirestore.instance.collection('hospital').doc(currentUser.uid).update(
         {  'latitude': latitude, 'longitude': longitude});
   }
 
@@ -97,7 +97,7 @@ class EconsultantServices {
 
       // Update the Firestore user document with the new image URL
       await FirebaseFirestore.instance
-          .collection('econsultants')
+          .collection('hospital')
           .doc(currentUser.uid)
           .update({'img': downloadUrl});
     } catch (e) {
@@ -107,7 +107,7 @@ class EconsultantServices {
 
 
 Stream<QuerySnapshot> econsultantStream() {
-    CollectionReference reference = FirebaseFirestore.instance.collection("econsultants");
+    CollectionReference reference = FirebaseFirestore.instance.collection("hospital");
     return reference.snapshots();
   }
 

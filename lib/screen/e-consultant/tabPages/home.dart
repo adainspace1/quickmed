@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
@@ -28,14 +27,11 @@ class _EconsultantMapScreenState extends State<EconsultantMapScreen> {
 
   //this funtion set the online status of the econsultant
   econIsNowOnline() async {
-    Geofire.initialize("activeDrivers");
-
     EconsultantServices services = EconsultantServices();
     services.updateActiveStatus(true);
   }
 
   //read econsultant current location
-  
 
   //this makes the econsultant go offline
   econIsOffline() {
@@ -111,19 +107,19 @@ class _EconsultantMapScreenState extends State<EconsultantMapScreen> {
                   ],
                 ),
               ),
+
+              //for the circular avatar
               Positioned(
                 top: 40,
                 left: 15,
                 child: CircleAvatar(
-                  backgroundColor:
-                      COLOR_ACCENT, // Set your desired background color
-                  radius: 20, // Set the desired radius
+                  backgroundColor: COLOR_ACCENT,
+                  radius: 20,
                   child: IconButton(
                     alignment: Alignment.center,
                     icon: const Icon(
                       Icons.menu,
-
-                      color: Colors.white, // Set the desired icon color
+                      color: Colors.white,
                       size: 20,
                     ),
                     onPressed: () {
@@ -134,6 +130,24 @@ class _EconsultantMapScreenState extends State<EconsultantMapScreen> {
                   ),
                 ),
               ),
+              // for the verification barge............
+              Positioned(
+                bottom: 25,
+                left: 15,
+                child: CircleAvatar(
+                  backgroundColor: Colors.blueAccent,
+                  radius: 20,
+                  child: IconButton(
+                    alignment: Alignment.center,
+                    icon: const Icon(
+                      Icons.verified,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    onPressed: () {},
+                  ),
+                ),
+              )
             ],
           );
   }

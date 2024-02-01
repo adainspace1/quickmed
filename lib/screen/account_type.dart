@@ -70,11 +70,13 @@ class CustomCard extends StatelessWidget {
   final String text;
   final VoidCallback onPress;
 
-  const CustomCard(
-      {super.key,
+  const CustomCard
+     ({
+      super.key,
       required this.logo,
       required this.text,
-      required this.onPress});
+      required this.onPress
+      });
 
   @override
   Widget build(BuildContext context) {

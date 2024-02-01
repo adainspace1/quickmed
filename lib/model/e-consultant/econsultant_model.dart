@@ -18,6 +18,7 @@ class EconsultantModel {
   String? gender;
   String? bloodGroup;
   String? dob;
+  String? phone;
 
   EconsultantModel(
       {this.id,
@@ -34,6 +35,7 @@ class EconsultantModel {
       this.longitude,
       this.gender,
       this.nin,
+      this.phone,
       this.dob,
       this.isOnline,
       this.bloodGroup});
@@ -56,8 +58,9 @@ class EconsultantModel {
         nin: userData['nin'] ?? "",
         gender: userData['gender'] ?? "",
         bloodGroup: userData['bloodGroup'] ?? "",
-        dob: userData['dob'] ?? ""
-        );
+        dob: userData['dob'] ?? "",
+        phone: userData['phone'] ?? ""
+         );
   }
 
   Map<String, dynamic> toJson() {
@@ -78,6 +81,7 @@ class EconsultantModel {
       "gender": gender,
       "bloodGroup": bloodGroup,
       "dob": dob,
+      "phone": phone,
       "is_Online": isOnline ?? false
     };
   }

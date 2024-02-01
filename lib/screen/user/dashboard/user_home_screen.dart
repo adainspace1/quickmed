@@ -2,15 +2,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quickmed/component/current_location.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/model/user/user_model.dart' as model;
-import 'package:quickmed/provider/user/user_provider.dart';
+import 'package:quickmed/provider/user/user_appstate.dart';
 import 'package:quickmed/screen/signin_screen.dart';
-import 'package:quickmed/screen/user/map/user_mapscreen.dart';
 import 'package:quickmed/screen/user/dashboard/profile_screen.dart';
 import 'package:quickmed/screen/user/user_wallet/wallet_screen.dart';
+import 'package:quickmed/service/user/user_service.dart';
 import 'package:quickmed/util/constant.dart';
+import 'package:quickmed/widget/loading.dart';
 import 'package:quickmed/widget/user_draggable.dart';
 
 class UserHomeScreen extends StatefulWidget {
@@ -24,31 +26,36 @@ class UserHomeScreen extends StatefulWidget {
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
   var scaffoldState = GlobalKey<ScaffoldState>();
+    UserDataBaseServices services = UserDataBaseServices();
 
 
   @override
   void initState() {
     super.initState();
-    addData();
   }
 
-  addData() async {
-    UserProvider userProvider = Provider.of(context, listen: false);
-    await userProvider.refreshUser();
-  }
 
   @override
   Widget build(BuildContext context) {
-    model.UserModel? user = Provider.of<UserProvider>(context).getUser;
+      UserAppProvider appState = Provider.of<UserAppProvider>(context);
 
     return Scaffold(
       key: scaffoldState,
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: Text(
+        child: StreamBuilder<model.UserModel>(
+          stream: services.getUserStreamByUid(), // Add your user stream here
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const  Loading(); // You can show a loading indicator while waiting for data
+            }
+
+            model.UserModel? user = snapshot.data;
+
+            return ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                UserAccountsDrawerHeader(
+                   accountName: Text(
                 user?.name ?? "",
                 style: const TextStyle(color: Colors.white),
               ),
@@ -75,8 +82,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   image: DecorationImage(
                       image: NetworkImage(user?.profileImageUrl ?? ""),
                       fit: BoxFit.cover)),
-            ),
-            ListTile(
+            
+                ),
+                ListTile(
               leading: const Icon(
                 Icons.person_3,
                 size: 30,
@@ -85,7 +93,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               title: const Text("Profile"),
               onTap: () {
                 // Navigate to ProfileScreen with user data
-                changeScreen(context, const ProfileScreen());
+                changeScreen(context, const UserProfileScreen());
               },
             ),
             const SizedBox(
@@ -135,15 +143,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 // ignore: use_build_context_synchronously
                 changeScreenReplacement(context, const SignInScreen());
               },
-            )
-          ],
+            ) 
+              ],
+            );
+          },
         ),
       ),
+
       body: Stack(
         children: [
-          UserMapScreen(scaffoldState),
-           const Visibility(
-            child: UserWidget(),
+          CurrentLocationScreen(scaffoldState),
+            Visibility(
+            visible: appState.show == Show.SP_FOUND,
+            child: const UserWidget(),
           )
         ],
       ),

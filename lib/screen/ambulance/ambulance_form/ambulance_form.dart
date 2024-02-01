@@ -60,7 +60,7 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
         _isSubmitting = true;
       });
 
-            // Check if the profile photo is empty
+      // Check if the profile photo is empty
       if (_image == null || _uploadmedicallicence == null) {
         // Show a Snackbar message if profile photo is empty
         ScaffoldMessenger.of(context).showSnackBar(
@@ -88,10 +88,9 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
           companyPhoneNumberTextEditingController.text.isEmpty ||
           companyRegNumberTextEditingController.text.isEmpty ||
           companyAddressTextEditingController.text.isEmpty ||
-          carTypeTextEditingController.text.isEmpty||
-          colorTextEditingController.text.isEmpty||
-          plateNumberTextEditingController.text.isEmpty
-          ) {
+          carTypeTextEditingController.text.isEmpty ||
+          colorTextEditingController.text.isEmpty ||
+          plateNumberTextEditingController.text.isEmpty) {
         // Display an error message or handle the empty fields as needed
 
         setState(() {
@@ -104,30 +103,40 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
 
       if (user != null) {
         // Upload image to Firebase Storage
-        String photoUrl = await StorageMethod().uploadImageToStorage('Ambulance_profile_images/${user.uid}.jpg', _image!, false);
-        String medicalLicence = await StorageMethod().uploadImageToStorage('Ambulance_medicalLicence_images/${user.uid}.jpg', _uploadmedicallicence!, false);
-        String proofaddress = await StorageMethod().uploadImageToStorage('Ambulance_proofaddress_images/${user.uid}.jpg', _uploadproofaddress!, false);
-        String frontview = await StorageMethod().uploadImageToStorage('Ambulance_frontView_images/${user.uid}.jpg', _uploadfrontview!, false);
+        String photoUrl = await StorageMethod().uploadImageToStorage(
+            'Ambulance_profile_images/${user.uid}.jpg', _image!, false);
+        String medicalLicence = await StorageMethod().uploadImageToStorage(
+            'Ambulance_medicalLicence_images/${user.uid}.jpg',
+            _uploadmedicallicence!,
+            false);
+        String proofaddress = await StorageMethod().uploadImageToStorage(
+            'Ambulance_proofaddress_images/${user.uid}.jpg',
+            _uploadproofaddress!,
+            false);
+        String frontview = await StorageMethod().uploadImageToStorage(
+            'Ambulance_frontView_images/${user.uid}.jpg',
+            _uploadfrontview!,
+            false);
 
         DriverModel user1 = DriverModel(
-          id: currentUser?.uid,
-          phone: currentUser?.phoneNumber,
-          companyName: companyNameTextEditingController.text.trim(),
-          companyAddress: companyAddressTextEditingController.text.trim(),
-          companyEmail: companyEmailTextEditingController.text.trim(),
-          companyRegNumber: companyRegNumberTextEditingController.text.trim(),
-          carType: carTypeTextEditingController.text.trim(),
-          color: colorTextEditingController.text.trim(),
-          plateNumber: plateNumberTextEditingController.text.trim(),
-          companyPhoneNumber:companyPhoneNumberTextEditingController.text.trim(),
-          name: nameTextEditingController.text.trim(),
-          email: emailTextEditingController.text.trim(),
-          nin: ninTextEditingController.text.trim(),
-          profileImageUrl: photoUrl,
-          uploadMedicalLicense: medicalLicence,
-          uploadProofOfAddress: proofaddress,
-          uploadFrontViewOfCompany: frontview
-        );
+            id: currentUser?.uid,
+            phone: currentUser?.phoneNumber,
+            companyName: companyNameTextEditingController.text.trim(),
+            companyAddress: companyAddressTextEditingController.text.trim(),
+            companyEmail: companyEmailTextEditingController.text.trim(),
+            companyRegNumber: companyRegNumberTextEditingController.text.trim(),
+            carType: carTypeTextEditingController.text.trim(),
+            color: colorTextEditingController.text.trim(),
+            plateNumber: plateNumberTextEditingController.text.trim(),
+            companyPhoneNumber:
+                companyPhoneNumberTextEditingController.text.trim(),
+            name: nameTextEditingController.text.trim(),
+            email: emailTextEditingController.text.trim(),
+            nin: ninTextEditingController.text.trim(),
+            profileImageUrl: photoUrl,
+            uploadMedicalLicense: medicalLicence,
+            uploadProofOfAddress: proofaddress,
+            uploadFrontViewOfCompany: frontview);
 
         await AmbulanceDatabaseService.addUserToDatabase(user1);
       }
@@ -142,11 +151,10 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
     });
   }
 
-
-Uint8List? _image;
-Uint8List? _uploadmedicallicence;
-Uint8List? _uploadproofaddress;
-Uint8List? _uploadfrontview;
+  Uint8List? _image;
+  Uint8List? _uploadmedicallicence;
+  Uint8List? _uploadproofaddress;
+  Uint8List? _uploadfrontview;
 
   //function to handle selected images
   void _selectImage() async {
@@ -166,7 +174,7 @@ Uint8List? _uploadfrontview;
     });
   }
 
-    //function to handle proofaddress images
+  //function to handle proofaddress images
   void _uploadProofAddress() async {
     Uint8List? img = await pickImage(ImageSource.gallery, context);
 
@@ -175,9 +183,7 @@ Uint8List? _uploadfrontview;
     });
   }
 
-
-
-      //function to handle proofaddress images
+  //function to handle proofaddress images
   void _uploadFrontView() async {
     Uint8List? img = await pickImage(ImageSource.gallery, context);
 
@@ -203,7 +209,7 @@ Uint8List? _uploadfrontview;
                         radius: 64,
                         backgroundImage: MemoryImage(_image!),
                       )
-                    : const  CircleAvatar(
+                    : const CircleAvatar(
                         radius: 55,
                         backgroundImage: NetworkImage(
                             "https://res.cloudinary.com/damufjozr/image/upload/v1703326116/imgbin_computer-icons-avatar-user-login-png_t9t5b9.png"),
@@ -211,97 +217,110 @@ Uint8List? _uploadfrontview;
                 Positioned(
                   child: IconButton(
                     onPressed: _selectImage,
-                    icon: const  Icon(Icons.add_a_photo),
+                    icon: const Icon(Icons.add_a_photo),
                   ),
                   bottom: -10,
                   left: 80,
                 ),
                 //row containing licenses
-                  SingleChildScrollView(
+                SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                   child: Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Card(
-                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-                        child: Column(
-                          children: [
-                            // ignore: sized_box_for_whitespace
-                            Container(
-                              width: 100,
-                              height: 100,
-                              child: _uploadmedicallicence != null ? Image.memory(_uploadmedicallicence!):Image.asset("images/cam.jpg", width: 50, height: 50),
-                            ),
-                             Positioned(
-                          child: IconButton(
-                            onPressed: _uploadMedicalLicence,
-                            icon: const  Icon(Icons.add_a_photo),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+                          child: Column(
+                            children: [
+                              // ignore: sized_box_for_whitespace
+                              Container(
+                                width: 100,
+                                height: 100,
+                                child: _uploadmedicallicence != null
+                                    ? Image.memory(_uploadmedicallicence!)
+                                    : Image.asset("images/cam.jpg",
+                                        width: 50, height: 50),
+                              ),
+                              Positioned(
+                                child: IconButton(
+                                  onPressed: _uploadMedicalLicence,
+                                  icon: const Icon(Icons.add_a_photo),
+                                ),
+                                bottom: -10,
+                                left: 80,
+                              ),
+                              const Text("upload medicallicence")
+                            ],
                           ),
-                          bottom: -10,
-                          left: 80,
                         ),
-                        const Text("upload medicallicence")
-                            
-                          ],
-                        ),
-                       ), 
-                       
                       ),
-                      const SizedBox(width: 20,),
-                      Card(
-                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 100,
-                              height: 100,
-                              child: _uploadproofaddress !=null ? Image.memory(_uploadproofaddress!): Image.asset("images/cam.jpg", width: 50, height: 50),
-                            ),
-                          Positioned(
-                          child: IconButton(
-                            onPressed: _uploadProofAddress,
-                            icon: const  Icon(Icons.add_a_photo),
-                          ),
-                          bottom: -10,
-                          left: 80,
-                        ),
-                        const Text("upload proof of address")
-                          ],
-                        ),
-                       ), 
-                       
+                      const SizedBox(
+                        width: 20,
                       ),
-                      const SizedBox(width: 20,),
                       Card(
-                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 100,
-                              height: 100,
-                              child: _uploadfrontview != null ? Image.memory(_uploadfrontview!): Image.asset("images/cam.jpg", width: 50, height: 50),
-                            ),
-                          Positioned(
-                          child: IconButton(
-                            onPressed: _uploadFrontView,
-                            icon: const  Icon(Icons.add_a_photo),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 100,
+                                height: 100,
+                                child: _uploadproofaddress != null
+                                    ? Image.memory(_uploadproofaddress!)
+                                    : Image.asset("images/cam.jpg",
+                                        width: 50, height: 50),
+                              ),
+                              Positioned(
+                                child: IconButton(
+                                  onPressed: _uploadProofAddress,
+                                  icon: const Icon(Icons.add_a_photo),
+                                ),
+                                bottom: -10,
+                                left: 80,
+                              ),
+                              const Text("upload proof of address")
+                            ],
                           ),
-                          bottom: -10,
-                          left: 80,
                         ),
-                        const Text("upload front view of company")
-                          ],
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Card(
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 100,
+                                height: 100,
+                                child: _uploadfrontview != null
+                                    ? Image.memory(_uploadfrontview!)
+                                    : Image.asset("images/cam.jpg",
+                                        width: 50, height: 50),
+                              ),
+                              Positioned(
+                                child: IconButton(
+                                  onPressed: _uploadFrontView,
+                                  icon: const Icon(Icons.add_a_photo),
+                                ),
+                                bottom: -10,
+                                left: 80,
+                              ),
+                              const Text("upload front view of company")
+                            ],
+                          ),
                         ),
-                       ), 
-                       
-                      )],
+                      )
+                    ],
                   ),
-                 ),
-                  const SizedBox(
+                ),
+                const SizedBox(
                   height: 20,
                 ),
                 Column(
@@ -449,6 +468,9 @@ Uint8List? _uploadfrontview;
                               validator: (text) {
                                 if (text == null || text.isEmpty) {
                                   return "NIN cannot be empty";
+                                }
+                                if (text.length < 11) {
+                                  return "NIN cannot be less than 11 charater";
                                 }
 
                                 return null;
@@ -716,42 +738,42 @@ Uint8List? _uploadfrontview;
                               },
                             ),
 
-                             const SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
                             TextFormField(
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(11)
-                            ],
-                            keyboardType: TextInputType.text, 
-                            decoration: const InputDecoration(
-                              hintText: "Plate Number",
-                              hintStyle: TextStyle(color: Colors.grey),
-                              filled: true,
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                  width: 0, style: BorderStyle.none)),
-                            ),
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            validator: (text) {
-                              if (text == null || text.isEmpty) {
-                                return "Plate Number cannot be empty";
-                              }
-                              // Use RegExp for alphanumeric validation
-                              final alphanumericRegex = RegExp(r'^[a-zA-Z0-9]+$');
-                              if (!alphanumericRegex.hasMatch(text)) {
-                                return "Enter a valid alphanumeric plate number";
-                              }
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(11)
+                              ],
+                              keyboardType: TextInputType.text,
+                              decoration: const InputDecoration(
+                                hintText: "Plate Number",
+                                hintStyle: TextStyle(color: Colors.grey),
+                                filled: true,
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 0, style: BorderStyle.none)),
+                              ),
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: (text) {
+                                if (text == null || text.isEmpty) {
+                                  return "Plate Number cannot be empty";
+                                }
+                                // Use RegExp for alphanumeric validation
+                                final alphanumericRegex = RegExp(r'^[a-zA-Z0-9]+$');
+                                if (!alphanumericRegex.hasMatch(text)) {
+                                  return "Enter a valid alphanumeric plate number";
+                                }
 
-                              return null;
-                            },
-                            onChanged: (text) {
-                              setState(() {
-                                plateNumberTextEditingController.text = text;
-                              });
-                            },
-                          ),
+                                return null;
+                              },
+                              onChanged: (text) {
+                                setState(() {
+                                  plateNumberTextEditingController.text = text;
+                                });
+                              },
+                            ),
 
                             const SizedBox(
                               height: 10,

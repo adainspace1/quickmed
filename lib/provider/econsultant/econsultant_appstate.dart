@@ -116,7 +116,7 @@ class EconsultantAppProvider extends ChangeNotifier {
   //this is to set a custom marker
   _setCustomMapPin() async {
     _locationPin = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(devicePixelRatio: 2.5), 'images/you2.png');
+        const ImageConfiguration(devicePixelRatio: 2.5), 'images/pin.png');
   }
 
 

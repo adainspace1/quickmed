@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+
+// this is the start widget use to add to the number of star each service provider will get....
 class StarsWidget extends StatelessWidget {
   final int numberOfStars;
 

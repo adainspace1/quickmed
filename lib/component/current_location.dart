@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:quickmed/service/user/user_service.dart';
 import 'package:quickmed/util/constant.dart';
 
 class CurrentLocationScreen extends StatefulWidget {
@@ -15,8 +16,10 @@ class CurrentLocationScreen extends StatefulWidget {
 
 class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   late GoogleMapController googleMapController;
+  UserDataBaseServices services = UserDataBaseServices();
 
-  static const CameraPosition initialCameraPosition =CameraPosition(target: LatLng(9.0537984, 7.4612736), zoom: 14);
+  static const CameraPosition initialCameraPosition =
+      CameraPosition(target: LatLng(9.0537984, 7.4612736), zoom: 14);
 
   Set<Marker> markers = {};
 
@@ -28,7 +31,6 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Stack(
         children: <Widget>[
@@ -51,10 +53,9 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
               radius: 20, // Set the desired radius
               child: IconButton(
                 alignment: Alignment.center,
-              
                 icon: Icon(
                   Icons.menu,
-                  
+
                   color: Colors.white, // Set the desired icon color
                   size: 20,
                 ),
@@ -112,6 +113,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
     }
 
     Position position = await Geolocator.getCurrentPosition();
+    await services.updateLocation(position.latitude, position.longitude);
 
     return position;
   }

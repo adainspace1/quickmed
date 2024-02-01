@@ -22,51 +22,53 @@ class UserModel {
   String? addressOfKin;
   double? latitude;
   double? longitude;
-  
+  double? amount;
 
-  UserModel(
-      {this.id,
-      this.phone,
-      this.address,
-      this.name,
-      this.weight,
-      this.genotype,
-      this.email,
-      this.gender,
-      this.height,
-      this.nextOfKin,
-      this.addressOfKin,
-      this.dateOfBirth,
-      this.accountType,
-      this.bloodGroup,
-      this.profileImageUrl,
-      this.nin,
-      this.latitude,
-      this.longitude,
-      });
+  UserModel({
+    this.id,
+    this.phone,
+    this.address,
+    this.name,
+    this.weight,
+    this.genotype,
+    this.email,
+    this.gender,
+    this.height,
+    this.nextOfKin,
+    this.addressOfKin,
+    this.dateOfBirth,
+    this.accountType,
+    this.bloodGroup,
+    this.profileImageUrl,
+    this.nin,
+    this.latitude,
+    this.longitude,
+    this.amount
+  });
 
   factory UserModel.fromSnapshot(DocumentSnapshot snapshot) {
     var userData = snapshot.data() as Map<String, dynamic>;
     return UserModel(
-        id: snapshot.id,
-        phone: userData['phone'] ?? "",
-        address: userData['address'] ?? "",
-        genotype: userData['genotype'] ?? "",
-        name: userData['name'] ?? "",
-        email: userData['email'] ?? "",
-        weight: userData['weight'] ?? "",
-        height: userData['height'] ?? "",
-        nextOfKin: userData['nextOfKin'] ?? "",
-        addressOfKin: userData['addressOfKin'] ?? "",
-        dateOfBirth: userData['dateOfBirth'] ?? "",
-        accountType: userData['accountType'] ?? "",
-        bloodGroup: userData['bloodGroup'] ?? "",
-        gender: userData['gender'] ?? "",
-        profileImageUrl: userData['profileImageUrl'] ?? "",
-        nin: userData['nin'] ?? "",
-        latitude: userData['latitude'] ?? "",
-        longitude: userData['longitude'] ?? "",
-        );
+      id: snapshot.id,
+      phone: userData['phone'] ?? "",
+      address: userData['address'] ?? "",
+      genotype: userData['genotype'] ?? "",
+      name: userData['name'] ?? "",
+      email: userData['email'] ?? "",
+      weight: userData['weight'] ?? "",
+      height: userData['height'] ?? "",
+      nextOfKin: userData['nextOfKin'] ?? "",
+      addressOfKin: userData['addressOfKin'] ?? "",
+      dateOfBirth: userData['dateOfBirth'] ?? "",
+      accountType: userData['accountType'] ?? "",
+      bloodGroup: userData['bloodGroup'] ?? "",
+      gender: userData['gender'] ?? "",
+      profileImageUrl: userData['profileImageUrl'] ?? "",
+      nin: userData['nin'] ?? "",
+      latitude: userData['latitude'] ?? "",
+      longitude: userData['longitude'] ?? "",
+      amount: userData['amount'] ?? ""
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -88,12 +90,10 @@ class UserModel {
       "nin": nin,
       "latitude": 0.0,
       "longitude": 0.0,
-      "dob":dateOfBirth
-      
+      "dob": dateOfBirth,
+      "amount": 0.0 
     };
   }
-
-
 }
 
 

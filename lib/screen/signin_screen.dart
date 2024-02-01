@@ -205,7 +205,7 @@ class _SignInScreenState extends State<SignInScreen>
                                       ],
                                     ),
                                     actions: [
-                                      TextButton(
+                                       TextButton(
                                         onPressed: () {
                                           if (_formKey1.currentState!
                                               .validate()) {
@@ -282,7 +282,7 @@ class _SignInScreenState extends State<SignInScreen>
                                 ),
                               )
                             : Text(
-                                "Send OTP",
+                                "Sign In",
                                 style: GoogleFonts.lato(
                                   color: Colors.white,
                                   fontSize: 14,

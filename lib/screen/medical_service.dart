@@ -76,7 +76,8 @@ class CustomCard extends StatelessWidget {
       {super.key,
       required this.logo,
       required this.text,
-      required this.onPress});
+      required this.onPress}
+      );
 
   @override
   Widget build(BuildContext context) {

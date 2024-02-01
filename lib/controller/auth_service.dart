@@ -31,7 +31,7 @@ class AuthService {
         return;
       },
     )
-        .onError((error, stackTrace) {
+      .onError((error, stackTrace) {
       errorStep();
     });
   }
@@ -73,7 +73,7 @@ class AuthService {
 
     if (user != null) {
       // Check each collection for the user's account type
-      List<String> collections = ['users', 'ambulance', 'econsultants'];
+      List<String> collections = ['users', 'ambulance', 'econsultants', 'hospital'];
 
       for (String collection in collections) {
         DocumentSnapshot userProfileDoc = await FirebaseFirestore.instance
@@ -92,42 +92,5 @@ class AuthService {
     print("Error getting account type: $e");
     return null;
   }
-}
-
-
-
-
-
-
-
-
-  // static Future<String?> getAccountType() async {
-  //   try {
-  //     User? user = _firebaseAuth.currentUser;
-
-  //     if (user != null) {
-  //       // Check each collection for the user's account type
-  //     List<String> collections = ['users', 'ambulances', 'hospitals'];
-  //       // Fetch additional user information from Firestore using UID
-  //       DocumentSnapshot userProfileDoc = await FirebaseFirestore.instance
-  //           .collection('users')
-  //           .doc(user.uid)
-  //           .get();
-
-  //       if (userProfileDoc.exists) {
-  //         return userProfileDoc.get('accountType');
-  //       }
-  //     }
-
-  //     return null;
-  //   } catch (e) {
-  //     print("Error getting account type: $e");
-  //     return null;
-  //   }
-  // }
-
-
- 
-
- 
+} 
 }
