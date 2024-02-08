@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/screen/ambulance/ambulance_form/ambulance_form.dart';
 import 'package:quickmed/screen/e-consultant/e-conform/e-consultantForm.dart';
+import 'package:quickmed/screen/hospital/hopitalform/hospital.dart';
 
 class MedicalServiceScreen extends StatefulWidget {
   const MedicalServiceScreen({super.key});
@@ -52,7 +53,9 @@ class CardWidget extends StatelessWidget {
               logo:
                   'https://res.cloudinary.com/damufjozr/image/upload/v1701761462/hos2_qtpkzs.png', // Replace with the path to your logo image
               text: 'Hospital',
-              onPress: () {}),
+              onPress: () {
+                changeScreenReplacement(context,const HospitalForm());
+              }),
           const SizedBox(height: 16.0),
           CustomCard(
               logo:
@@ -76,8 +79,7 @@ class CustomCard extends StatelessWidget {
       {super.key,
       required this.logo,
       required this.text,
-      required this.onPress}
-      );
+      required this.onPress});
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable, use_build_context_synchronously
 
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
@@ -9,6 +10,7 @@ import 'package:quickmed/screen/ambulance/dashboard/ambulance_homescreen.dart';
 import 'package:quickmed/screen/e-consultant/dashboard/econ_homeScreen.dart';
 import 'package:quickmed/screen/user/dashboard/user_home_screen.dart';
 import 'package:quickmed/util/constant.dart';
+import 'package:quickmed/util/notification.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -23,6 +25,8 @@ class _SignInScreenState extends State<SignInScreen>
   final TextEditingController _phoneContoller = TextEditingController();
   final TextEditingController _otpContoller = TextEditingController();
   bool isLoading = false; // Add this boolean variable
+
+  NotificationMessage notify = NotificationMessage();
 
   final _formKey = GlobalKey<FormState>();
   final _formKey1 = GlobalKey<FormState>();
@@ -157,15 +161,8 @@ class _SignInScreenState extends State<SignInScreen>
                                   isLoading =
                                       false; // Set loading to false on error
                                 });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      "Error in sending OTP",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
+
+                                notify.OtpError();
                               },
                               nextStep: () {
                                 showDialog(
@@ -205,7 +202,7 @@ class _SignInScreenState extends State<SignInScreen>
                                       ],
                                     ),
                                     actions: [
-                                       TextButton(
+                                      TextButton(
                                         onPressed: () {
                                           if (_formKey1.currentState!
                                               .validate()) {
@@ -221,21 +218,27 @@ class _SignInScreenState extends State<SignInScreen>
                                                 if (accountType != null) {
                                                   switch (accountType) {
                                                     case "User":
-                                                      changeScreenReplacement(context, const UserHomeScreen());
+                                                      changeScreenReplacement(
+                                                          context,
+                                                          const UserHomeScreen());
                                                       break;
 
                                                     case "ambulance":
-                                                      changeScreenReplacement(context, const AmbulanceHomeScreen());
+                                                      changeScreenReplacement(
+                                                          context,
+                                                          const AmbulanceHomeScreen());
                                                       break;
                                                     case "econsultants":
-                                                      changeScreenReplacement(context, const EconsultantHomeScreen());
-                                                      break;     
+                                                      changeScreenReplacement(
+                                                          context,
+                                                          const EconsultantHomeScreen());
+                                                      break;
                                                   }
-                                                }else{
-                                                  changeScreenReplacement(context,const AccountSelect()); 
-
+                                                } else {
+                                                  changeScreenReplacement(
+                                                      context,
+                                                      const AccountSelect());
                                                 }
-                                               
                                               } else {
                                                 Navigator.pop(context);
                                                 setState(() {
@@ -272,7 +275,7 @@ class _SignInScreenState extends State<SignInScreen>
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: COLOR_ACCENT,
+                          backgroundColor: COLOR_PRIMARY,
                           foregroundColor: Colors.white,
                         ),
                         child: isLoading

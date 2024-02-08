@@ -1,10 +1,15 @@
-import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quickmed/component/util.dart';
+import 'package:quickmed/controller/storage.dart';
+import 'package:quickmed/global/global.dart';
+import 'package:quickmed/helpers/screen_navigation.dart';
+import 'package:quickmed/model/hospital/hospital_model.dart';
+import 'package:quickmed/screen/hospital/dashboard/hospitalHomescreen.dart';
+import 'package:quickmed/service/hospital/hospital.dart';
 import 'package:quickmed/util/constant.dart';
 
 class HospitalForm extends StatefulWidget {
@@ -35,6 +40,12 @@ class _HospitalFormState extends State<HospitalForm> {
   //onsitDoctor textcontroller
   final onsitDoctorTextEditingController = TextEditingController();
 
+  // Document
+  final uploadMedicalLicenseTextEditingController = TextEditingController();
+  final uploadClearProofAddressTextEditingController = TextEditingController();
+  final uploadFrontViewOfHospitalTextEditingController =
+      TextEditingController();
+
   //boolean variable for the submitted form
   bool _isSubmitting = false;
 
@@ -43,23 +54,100 @@ class _HospitalFormState extends State<HospitalForm> {
 
   //function to handle submit
 
-  void _submit()async{
+// function to handle submit
+  void _submit() async {
+    if (_formKey.currentState!.validate()) {
+      // set the state for the progress
+      setState(() {
+        _isSubmitting = true;
+      });
 
+      // Check if the profile photo is empty
+      if (_uploadfrontview == null || _uploadmedicallicence == null || _uploadmedicallicence == null) {
+        // Show a Snackbar message if profile photo is empty
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: red,
+            content: Text('Please select a profile photo.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        setState(() {
+          _isSubmitting = false;
+        });
+
+        return;
+      }
+
+      // Check if any field is empty
+      if (hospitalNameTextEditingController.text.isEmpty ||
+          hospitalAddressTextEditingController.text.isEmpty ||
+          hospitalEmergencyNumberTextEditingController.text.isEmpty ||
+          hospitalRegNumberTextEditingController.text.isEmpty ||
+          onsitDoctorTextEditingController.text.isEmpty) {
+        // Display an error message or handle the empty fields as needed
+
+        setState(() {
+          _isSubmitting = false;
+        });
+        return;
+      }
+
+      var user = firebaseAuth.currentUser;
+
+      if (user != null) {
+        // Upload image to Firebase Storage
+        String medicalLicence = await StorageMethod().uploadImageToStorage(
+            'Hospital_medicalLicence_images/${user.uid}.jpg',
+            _uploadmedicallicence!,
+            false);
+        String proofaddress = await StorageMethod().uploadImageToStorage(
+            'Hospital_proofaddress_images/${user.uid}.jpg',
+            _uploadproofaddress!,
+            false);
+        String frontview = await StorageMethod().uploadImageToStorage(
+            'Hospital_frontView_images/${user.uid}.jpg',
+            _uploadfrontview!,
+            false);
+
+        HospitalModel user1 = HospitalModel(
+            id: currentUser?.uid,
+            hospitalEmergencyNumber:hospitalEmergencyNumberTextEditingController.text.trim(),
+            hospitalName: hospitalNameTextEditingController.text.trim(),
+            hospitaladdress: hospitalAddressTextEditingController.text.trim(),
+            hospitalRegNumber:hospitalRegNumberTextEditingController.text.trim(),
+            hospitalemail: hospitalEmailTextEditingController.text.trim(),
+            uploadMedicalLicence: medicalLicence,
+            uploadfrontviewofhospital: frontview,
+            uploadclearProofofaddress: proofaddress            
+            );
+
+            await HospitalServices.addUserToDatabase(user1);
+      }
+      // ignore: use_build_context_synchronously
+      changeScreenReplacement(context, const HospitalScreen());
+    } else {
+      // Validation failed, handle it as needed
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: red,
+            content: Text('Registration Failed please try again.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+    }
+
+    setState(() {
+      _isSubmitting = false;
+    });
   }
 
-  Uint8List? _image;
   Uint8List? _uploadmedicallicence;
   Uint8List? _uploadproofaddress;
   Uint8List? _uploadfrontview;
 
-  //function to handle selected images
-  void _selectImage() async {
-    Uint8List? img = await pickImage(ImageSource.gallery, context);
 
-    setState(() {
-      _image = img;
-    });
-  }
 
   //function to handle medicallicence images
   void _uploadMedicalLicence() async {
@@ -69,7 +157,6 @@ class _HospitalFormState extends State<HospitalForm> {
       _uploadmedicallicence = img;
     });
   }
-
   //function to handle proofaddress images
   void _uploadProofAddress() async {
     Uint8List? img = await pickImage(ImageSource.gallery, context);
@@ -78,7 +165,6 @@ class _HospitalFormState extends State<HospitalForm> {
       _uploadproofaddress = img;
     });
   }
-
   //function to handle proofaddress images
   void _uploadFrontView() async {
     Uint8List? img = await pickImage(ImageSource.gallery, context);
@@ -88,11 +174,10 @@ class _HospitalFormState extends State<HospitalForm> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
@@ -101,24 +186,7 @@ class _HospitalFormState extends State<HospitalForm> {
           children: [
             Column(
               children: [
-                _image != null
-                    ? CircleAvatar(
-                        radius: 64,
-                        backgroundImage: MemoryImage(_image!),
-                      )
-                    : const CircleAvatar(
-                        radius: 55,
-                        backgroundImage: NetworkImage(
-                            "https://res.cloudinary.com/damufjozr/image/upload/v1703326116/imgbin_computer-icons-avatar-user-login-png_t9t5b9.png"),
-                      ),
-                Positioned(
-                  child: IconButton(
-                    onPressed: _selectImage,
-                    icon: const Icon(Icons.add_a_photo),
-                  ),
-                  bottom: -10,
-                  left: 80,
-                ),
+   
                 //row containing licenses
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -142,12 +210,12 @@ class _HospitalFormState extends State<HospitalForm> {
                                         width: 50, height: 50),
                               ),
                               Positioned(
+                                bottom: -10,
+                                left: 80,
                                 child: IconButton(
                                   onPressed: _uploadMedicalLicence,
                                   icon: const Icon(Icons.add_a_photo),
                                 ),
-                                bottom: -10,
-                                left: 80,
                               ),
                               const Text("upload medicallicence")
                             ],
@@ -163,6 +231,7 @@ class _HospitalFormState extends State<HospitalForm> {
                               const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
                           child: Column(
                             children: [
+                              // ignore: sized_box_for_whitespace
                               Container(
                                 width: 100,
                                 height: 100,
@@ -172,6 +241,7 @@ class _HospitalFormState extends State<HospitalForm> {
                                         width: 50, height: 50),
                               ),
                               Positioned(
+                                // ignore: sort_child_properties_last
                                 child: IconButton(
                                   onPressed: _uploadProofAddress,
                                   icon: const Icon(Icons.add_a_photo),
@@ -193,6 +263,7 @@ class _HospitalFormState extends State<HospitalForm> {
                               const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
                           child: Column(
                             children: [
+                              // ignore: sized_box_for_whitespace
                               Container(
                                 width: 100,
                                 height: 100,
@@ -202,6 +273,7 @@ class _HospitalFormState extends State<HospitalForm> {
                                         width: 50, height: 50),
                               ),
                               Positioned(
+                                // ignore: sort_child_properties_last
                                 child: IconButton(
                                   onPressed: _uploadFrontView,
                                   icon: const Icon(Icons.add_a_photo),
@@ -302,7 +374,8 @@ class _HospitalFormState extends State<HospitalForm> {
                               },
                               onChanged: (text) {
                                 setState(() {
-                                  hospitalEmailTextEditingController.text = text;
+                                  hospitalEmailTextEditingController.text =
+                                      text;
                                 });
                               },
                             ),
@@ -339,7 +412,8 @@ class _HospitalFormState extends State<HospitalForm> {
                               },
                               onChanged: (text) {
                                 setState(() {
-                                  hospitalAddressTextEditingController.text = text;
+                                  hospitalAddressTextEditingController.text =
+                                      text;
                                 });
                               },
                             ),
@@ -366,13 +440,13 @@ class _HospitalFormState extends State<HospitalForm> {
                                 if (text == null || text.isEmpty) {
                                   return "Hospital Emergency Number cannot be empty";
                                 }
-                               
 
                                 return null;
                               },
                               onChanged: (text) {
                                 setState(() {
-                                  hospitalEmergencyNumberTextEditingController.text = text;
+                                  hospitalEmergencyNumberTextEditingController
+                                      .text = text;
                                 });
                               },
                             ),
@@ -417,14 +491,15 @@ class _HospitalFormState extends State<HospitalForm> {
                               },
                               onChanged: (text) {
                                 setState(() {
-                                  hospitalEmailTextEditingController.text = text;
+                                  hospitalEmailTextEditingController.text =
+                                      text;
                                 });
                               },
                             ),
 
                             const SizedBox(
                               height: 10,
-                            ),   
+                            ),
 
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(

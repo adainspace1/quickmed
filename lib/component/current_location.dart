@@ -15,6 +15,7 @@ class CurrentLocationScreen extends StatefulWidget {
 }
 
 class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
+  
   late GoogleMapController googleMapController;
   UserDataBaseServices services = UserDataBaseServices();
 
@@ -28,6 +29,8 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
     super.initState();
     _getUserLocation();
   }
+
+
 
   @override
   Widget build(BuildContext context) {

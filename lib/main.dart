@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:quickmed/controller/messanging_api.dart';
 import 'package:quickmed/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:quickmed/provider/ambulance/ambulance_appstate.dart';
@@ -12,10 +13,10 @@ void main() async {
   // initialized firebase.
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  //await FirebaseAPi().initNotification();
+  await FirebaseAPi().initNotification();
   runApp(const MyApp());
 }
-//this is the root directory of the entire application....
+//this is the root directory of the entire application
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

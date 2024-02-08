@@ -9,6 +9,8 @@ import 'package:quickmed/model/e-consultant/econsultant_model.dart' as model;
 
 class EconsultantServices {
   static final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   // this function adds user to realtime database
   static Future addtoRealtime(model.EconsultantModel user) async {
     try {
@@ -34,6 +36,16 @@ class EconsultantServices {
           .set(user.toJson(), SetOptions(merge: true));
       // ignore: empty_catches
     } catch (e) {}
+  }
+
+
+   //get user by the id
+  Future<model.EconsultantModel> getUserByUid() async {
+    User currentUser = _firebaseAuth.currentUser!;
+    DocumentSnapshot snap =
+        await _firestore.collection("econsultants").doc(currentUser.uid).get();
+
+      return model.EconsultantModel.fromSnapshot(snap);
   }
 
   //this function gets the econsultant stream stream

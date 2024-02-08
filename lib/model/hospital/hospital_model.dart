@@ -12,10 +12,12 @@ class HospitalModel {
   String? uploadclearProofofaddress;
   String? uploadfrontviewofhospital;
   String? accontType;
+  double? latitude;
+  double? longitude;
+  double? amount;
 
   HospitalModel(
-      {
-      this.id,
+      {this.id,
       this.hospitalName,
       this.hospitalEmergencyNumber,
       this.hospitalRegNumber,
@@ -25,6 +27,9 @@ class HospitalModel {
       this.onSitDoctor,
       this.uploadMedicalLicence,
       this.uploadclearProofofaddress,
+      this.latitude,
+      this.longitude,
+      this.amount,
       this.uploadfrontviewofhospital});
 
   factory HospitalModel.fromSnapshot(DocumentSnapshot snapshot) {
@@ -41,23 +46,31 @@ class HospitalModel {
         onSitDoctor: userData['onSitDoctor'] ?? "",
         uploadMedicalLicence: userData['uploadMedicalLicence'] ?? "",
         uploadclearProofofaddress: userData['uploadclearProofofaddress'] ?? "",
-        uploadfrontviewofhospital: userData['uploadfrontviewofhospital'] ?? "");
+        uploadfrontviewofhospital: userData['uploadfrontviewofhospital'] ?? "",
+        latitude: userData['latitude'] ?? "",
+        longitude: userData['longitude'] ?? "",
+        amount: userData['amount'] ?? ""
+        
+        
+        );
   }
 
   Map<String, dynamic> toJson() {
     return {
       "id": id,
       "hospitalName": hospitalName,
-      "hospitalEmergencyNumber":hospitalEmergencyNumber,
-      "hospitalRegNumber":hospitalRegNumber,
+      "hospitalEmergencyNumber": hospitalEmergencyNumber,
+      "hospitalRegNumber": hospitalRegNumber,
       "hospitaladdress": hospitaladdress,
-      "hospitalemail":hospitalemail,
-      "onSitDoctor":onSitDoctor,
-      "uploadMedicalLicence":uploadMedicalLicence,
-      "uploadclearProofofaddress":uploadclearProofofaddress,
-      "uploadfrontviewofhospital":uploadfrontviewofhospital,
+      "hospitalemail": hospitalemail,
+      "onSitDoctor": onSitDoctor,
+      "uploadMedicalLicence": uploadMedicalLicence,
+      "uploadclearProofofaddress": uploadclearProofofaddress,
+      "uploadfrontviewofhospital": uploadfrontviewofhospital,
       "accountType": "hospital",
-
+      "latitude": 0.0,
+      "longitude": 0.0,
+      "amount": 0.0
     };
   }
 }

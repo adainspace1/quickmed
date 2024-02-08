@@ -1,9 +1,11 @@
 // ignore_for_file: sort_child_properties_last, file_names
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/model/e-consultant/econsultant_model.dart' as model;
+import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
 import 'package:quickmed/screen/e-consultant/dashboard/econ_profile.dart';
 import 'package:quickmed/screen/e-consultant/tabPages/treatment.dart';
 import 'package:quickmed/screen/e-consultant/tabPages/wallet.dart';
@@ -12,6 +14,8 @@ import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/loading.dart';
 import 'package:quickmed/screen/e-consultant/tabPages/home.dart';
+import 'package:quickmed/widget/user_reqwidget/user_found.dart';
+
 class EconsultantHomeScreen extends StatefulWidget {
   const EconsultantHomeScreen({
     Key? key,
@@ -40,11 +44,13 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 3, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
+    EconsultantAppProvider appProvider = Provider.of<EconsultantAppProvider>(context);
+
     return Scaffold(
       key: scaffoldState,
       drawer: Drawer(
@@ -98,7 +104,7 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
                   title: const Text("Profile"),
                   onTap: () {
                     // Navigate to ProfileScreen with user data
-                    changeScreen(context,const EconsultantProfileScreen());
+                    changeScreen(context, const EconsultantProfileScreen());
                   },
                 ),
                 const SizedBox(
@@ -160,8 +166,19 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
         physics: const NeverScrollableScrollPhysics(),
         controller: tabController,
         children: [
-          EconsultantMapScreen(scaffoldState),
-          const EconsultantTreatMent()
+          Visibility(
+            child: EconsultantMapScreen(scaffoldState),
+          ),
+          const Visibility(
+            child: EconsultantTreatMent(),
+          ),
+
+          Visibility(
+          visible: appProvider.show == Show.User_Loading,
+            child:const UserFoundWidget(),
+          ),
+
+          
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -169,6 +186,8 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Home'),
           BottomNavigationBarItem(
               icon: Icon(Icons.health_and_safety), label: 'Treatment'),
+        BottomNavigationBarItem(
+              icon: Icon(Icons.person_add), label: 'User'),
         ],
         unselectedItemColor: COLOR_BACKGROUND,
         selectedItemColor: COLOR_PRIMARY,

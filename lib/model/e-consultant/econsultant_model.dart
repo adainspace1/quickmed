@@ -19,6 +19,7 @@ class EconsultantModel {
   String? bloodGroup;
   String? dob;
   String? phone;
+  double? amount;
 
   EconsultantModel(
       {this.id,
@@ -37,6 +38,7 @@ class EconsultantModel {
       this.nin,
       this.phone,
       this.dob,
+      this.amount,
       this.isOnline,
       this.bloodGroup});
 
@@ -59,8 +61,9 @@ class EconsultantModel {
         gender: userData['gender'] ?? "",
         bloodGroup: userData['bloodGroup'] ?? "",
         dob: userData['dob'] ?? "",
-        phone: userData['phone'] ?? ""
-         );
+        phone: userData['phone'] ?? "",
+        amount: userData['amount'] ?? ""
+        );
   }
 
   Map<String, dynamic> toJson() {
@@ -82,7 +85,8 @@ class EconsultantModel {
       "bloodGroup": bloodGroup,
       "dob": dob,
       "phone": phone,
-      "is_Online": isOnline ?? false
+      "is_Online": isOnline ?? false,
+      "amount": 0.0
     };
   }
 }

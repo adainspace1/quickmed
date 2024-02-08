@@ -1,12 +1,10 @@
 // ignore_for_file: sort_child_properties_last
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:quickmed/component/current_location.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/model/user/user_model.dart' as model;
-import 'package:quickmed/provider/user/user_appstate.dart';
 import 'package:quickmed/screen/signin_screen.dart';
 import 'package:quickmed/screen/user/dashboard/profile_screen.dart';
 import 'package:quickmed/screen/user/user_wallet/wallet_screen.dart';
@@ -37,7 +35,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-      UserAppProvider appState = Provider.of<UserAppProvider>(context);
 
     return Scaffold(
       key: scaffoldState,
@@ -153,9 +150,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       body: Stack(
         children: [
           CurrentLocationScreen(scaffoldState),
-            Visibility(
-            visible: appState.show == Show.SP_FOUND,
-            child: const UserWidget(),
+            const Visibility(
+            child: UserWidget(),
           )
         ],
       ),

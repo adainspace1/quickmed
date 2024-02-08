@@ -110,7 +110,7 @@ class UserDataBaseServices {
       // Reload the user to get the updated information
       await _firebaseAuth.currentUser!.reload();
 
-      // Update the Firestore user document with the new image URL
+      // Update the Firestore user document with the new image URL....    
       await FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser.uid)

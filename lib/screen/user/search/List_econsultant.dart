@@ -4,12 +4,19 @@
 // ignore: file_names
 // ignore: file_names
 // ignore_for_file: file_names, duplicate_ignore, library_private_types_in_public_api
+
+import 'package:provider/provider.dart';
+import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
+import 'package:quickmed/provider/user/user_appstate.dart' hide Show;
+import 'package:quickmed/util/notification.dart';
 import 'package:quickmed/widget/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quickmed/service/user/user_service.dart';
 import 'package:quickmed/util/constant.dart';
+import 'package:quickmed/widget/requestloader/loader.dart';
 import 'package:quickmed/widget/stars.dart';
+import 'package:quickmed/model/user/user_model.dart' as model;
 
 class ListOfEcon extends StatefulWidget {
   const ListOfEcon({super.key});
@@ -23,6 +30,7 @@ class _ListOfEconState extends State<ListOfEcon> {
 
   @override
   Widget build(BuildContext context) {
+    EconsultantAppProvider appProvider = Provider.of<EconsultantAppProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: COLOR_ACCENT,
@@ -52,14 +60,31 @@ class _ListOfEconState extends State<ListOfEcon> {
                 String son = data['name'] ?? '';
                 String id = data['id'] ?? '';
 
-                return ConversationList(
-                  id: id,
-                  name: son,
-                  imageUrl: imageUrl,
-                  star: starRating,
-                  isOnline: isOnline,
-                  messageText: field,
-                );
+                return Stack(children: [
+                  
+                  Visibility(
+                    child: ConversationList(
+                      id: id,
+                      name: son,
+                      imageUrl: imageUrl,
+                      star: starRating,
+                      isOnline: isOnline,
+                      messageText: field,
+                    ),
+                  ),
+
+                   Visibility(
+                    visible: appProvider.show == Show.User_Loading,
+                    child: const SpLoading(),
+                  ),
+                  //FOR CANCELLED REQUESTS..
+                  Visibility(
+                    visible: appProvider.show == Show.Request_Cancelled,
+                    child: const SpLoading(),
+                  ),
+                  
+                 
+                ]);
               },
             );
           } else {
@@ -92,11 +117,74 @@ class ConversationList extends StatefulWidget {
 }
 
 class _ConversationListState extends State<ConversationList> {
+  final issueTextEditingController = TextEditingController();
+
+  NotificationMessage notify = NotificationMessage();
+
+  @override
+  void initState() {
+    super.initState();
+    addData();
+  }
+
+  addData() async {
+    UserAppProvider userProvider = Provider.of(context, listen: false);
+    await userProvider.refreshUser();
+  }
+
+  void openModal() {
+    UserAppProvider appState =
+        Provider.of<UserAppProvider>(context, listen: false);
+    model.UserModel? user =
+        Provider.of<UserAppProvider>(context, listen: false).getUser;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Describe Your Issue"),
+        content: Container(
+          height: 200, // Set the desired height
+          decoration: BoxDecoration(
+            color: Colors.white, // Set the background color to white
+            borderRadius:
+                BorderRadius.circular(8.0), // Optional: add border radius
+          ),
+          child: TextField(
+            controller: issueTextEditingController,
+            decoration: const InputDecoration(
+              hintText: "Describe the issue",
+              hintStyle: TextStyle(color: Colors.grey),
+              border: InputBorder.none, // Remove border
+            ),
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: COLOR_ACCENT),
+            onPressed: () async {
+              if (issueTextEditingController.text.isEmpty) {
+                notify.error();
+              } else {
+                appState.createRequest(
+                    issueTextEditingController.text, context, user!);
+              }
+
+              Navigator.pop(context);
+            },
+            child: const Text(
+              "Proceed",
+              style: TextStyle(color: COLOR_BACKGROUND),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-      },
+      onTap: () => openModal(),
       child: Container(
         padding:
             const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),

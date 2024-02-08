@@ -6,6 +6,7 @@ import 'package:quickmed/component/util.dart';
 import 'package:quickmed/service/user/user_service.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/model/user/user_model.dart' as model;
+import 'package:quickmed/util/notification.dart';
 import 'package:quickmed/widget/loading.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final emailTextEditingController = TextEditingController();
 
   UserDataBaseServices services = UserDataBaseServices();
+  NotificationMessage notification = NotificationMessage();
 
   @override
   void initState() {
@@ -39,7 +41,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       });
     } catch (e) {
       // Handle any errors
-      
     }
   }
 
@@ -55,8 +56,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               controller: nameTextEditingController,
               decoration: const InputDecoration(labelText: "Name"),
             ),
-           
-            
             TextField(
               controller: addressTextEditingController,
               decoration: const InputDecoration(
@@ -91,18 +90,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     emailTextEditingController.text
                     // Add additional parameters for other fields
                     );
+                  notification.success();
+
               }
               // Clear the controllers after a successful update
               nameTextEditingController.clear();
               addressTextEditingController.clear();
               emailTextEditingController.clear();
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  backgroundColor: Colors.green,
-                  content: Text('Updated'),
-                ),
-              );
               Navigator.pop(context);
             },
             child: const Text(
@@ -115,21 +110,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-Uint8List? _image;
+  Uint8List? _image;
 
 // Function to handle selected images
-Future<void> _selectImage() async {
-  Uint8List? img = await pickImage(ImageSource.gallery, context);
+  Future<void> _selectImage() async {
+    Uint8List? img = await pickImage(ImageSource.gallery, context);
 
-  if (img != null) {
-    setState(() {
-      _image = img;
-    });
+    if (img != null) {
+      setState(() {
+        _image = img;
+      });
 
-    // Update profile image after image selection
-    await _updateProfileImage(_image!);
+      // Update profile image after image selection
+      await _updateProfileImage(_image!);
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -167,21 +162,23 @@ Future<void> _selectImage() async {
                                 NetworkImage(user.profileImageUrl ?? ""),
                           ),
                         ),
-                       Expanded(
-                           child: Row(
+                        Expanded(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                             children:[ Positioned(
-                              bottom: -20,
-                              right: 20,
-                              child: IconButton(
-                                onPressed: () async {
-                                await  _selectImage();
-                                },
-                                icon: const Icon(Icons.add_a_photo_rounded),
-                              ),
-                            )],
-                           ),
-                         ),
+                            children: [
+                              Positioned(
+                                bottom: -20,
+                                right: 20,
+                                child: IconButton(
+                                  onPressed: () async {
+                                    await _selectImage();
+                                  },
+                                  icon: const Icon(Icons.add_a_photo_rounded),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                     const Expanded(
@@ -327,7 +324,7 @@ class CustomScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: COLOR_ACCENT,
+      backgroundColor: COLOR_PRIMARY,
       extendBody: true,
       body: Stack(
         children: [SafeArea(child: child!)],

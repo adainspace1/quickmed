@@ -6,13 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quickmed/component/util.dart';
-import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/controller/storage.dart';
 import 'package:quickmed/global/global.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/model/e-consultant/econsultant_model.dart';
 import 'package:quickmed/screen/e-consultant/dashboard/econ_homeScreen.dart';
-import 'package:quickmed/screen/signin_screen.dart';
 import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/util/constant.dart';
 
@@ -115,8 +113,13 @@ class _EconsultantFormState extends State<EconsultantForm> {
       changeScreenReplacement(context, const EconsultantHomeScreen());
     } else {
       // Validation failed, handle it as needed
-      AuthService.logout();
-      changeScreenReplacement(context, const SignInScreen());
+       ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: red,
+            content: Text('Registration Failed please try again.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
     }
 
     setState(() {

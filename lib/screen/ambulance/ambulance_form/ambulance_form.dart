@@ -144,6 +144,14 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
       changeScreenReplacement(context, const AmbulanceHomeScreen());
     } else {
       // Validation failed, handle it as needed
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: red,
+            content: Text('Registration Failed Please Try again.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
     }
 
     setState(() {

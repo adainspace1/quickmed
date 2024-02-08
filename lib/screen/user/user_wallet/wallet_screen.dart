@@ -94,7 +94,7 @@ class _WalletScreenState extends State<WalletScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(user?.amount as String, style: customBoldTextStyle),
+              Text('${user?.amount}', style: customBoldTextStyle),
               const SizedBox(
                 height: 12,
               ),
