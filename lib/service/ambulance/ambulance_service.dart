@@ -53,6 +53,14 @@ class AmbulanceDatabaseService {
     });
   }
 
+    Future<void> updateLocation(double latitude, double longitude) async {
+    User currentUser = _firebaseAuth.currentUser!;
+    FirebaseFirestore.instance
+        .collection('ambulance')
+        .doc(currentUser.uid)
+        .update({'latitude': latitude, 'longitude': longitude});
+  }
+
 
 
   //this function update the user collection...........
@@ -91,6 +99,15 @@ class AmbulanceDatabaseService {
     } catch (e) {
       // Handle any errors
     }
+  }
+
+    // update online or last active status of user
+  Future<void> updateActiveStatus(bool isOnline) async {
+    User currentUser = _firebaseAuth.currentUser!;
+    FirebaseFirestore.instance
+        .collection('econsultants')
+        .doc(currentUser.uid)
+        .update({'is_Online': isOnline, 'timeStamp': Timestamp.now()});
   }
   
 }

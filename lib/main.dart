@@ -25,8 +25,7 @@ void main() async {
         options: const FirebaseOptions(
             apiKey: "AIzaSyAgI5gBiZpxrqGDRvrLso3EW1aEL1jxRiM",
             authDomain: "quickmedapp-68e93.firebaseapp.com",
-            databaseURL:
-                "https://quickmedapp-68e93-default-rtdb.firebaseio.com",
+            databaseURL:"https://quickmedapp-68e93-default-rtdb.firebaseio.com",
             projectId: "quickmedapp-68e93",
             storageBucket: "quickmedapp-68e93.appspot.com",
             messagingSenderId: "200709773011",

@@ -65,7 +65,6 @@ class EconsultantServices {
     });
   }
 
-  
 
   // update online or last active status of user
   Future<void> updateActiveStatus(bool isOnline) async {

@@ -1,26 +1,14 @@
 // ignore_for_file: prefer_final_fields, unused_field, constant_identifier_names
 
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:quickmed/model/ambulance/driver/driver_model.dart';
-import 'package:quickmed/model/ride_request.dart';
-import 'package:quickmed/model/route/route_model.dart';
-import 'package:quickmed/model/user/user_model.dart';
+import 'package:quickmed/service/ambulance/ambulance_service.dart';
 import 'package:quickmed/service/map_request.dart';
 import 'package:quickmed/service/ride_request.dart';
-import 'package:quickmed/service/user/user_service.dart';
 
-enum Show {
-  DESTINATION_SELECTION,
-  PICKUP_SELECTION,
-  PAYMENT_METHOD_SELECTION,
-  DRIVER_FOUND,
-  TRIP
-}
+//enum Show {}
 
 class AmbulanceAppProvider extends ChangeNotifier {
   static const ACCEPTED = 'accepted';
@@ -34,12 +22,6 @@ class AmbulanceAppProvider extends ChangeNotifier {
   static const TRIP_STARTED_NOTIFICATION = 'TRIP_STARTED';
 
   Set<Marker> _markers = {};
-  //  this polys will be displayed on the map
-  // Set<Polyline> _poly = {};
-  // // this polys temporarely store the polys to destination
-  // Set<Polyline> _routeToDestinationPolys = {};
-  // // this polys temporarely store the polys to driver
-  // Set<Polyline> _routeToDriverpoly = {};
 
   GoogleMapServices _googleMapServices = GoogleMapServices();
   GoogleMapController? _mapController;
@@ -52,16 +34,14 @@ class AmbulanceAppProvider extends ChangeNotifier {
   //  Position position;
 
   RideRequest _requestServices = RideRequest();
-  UserDataBaseServices _userServices = UserDataBaseServices();
 
-  UserDataBaseServices get userServices => _userServices;
+  AmbulanceDatabaseService _ambulanceDatabaseService =
+      AmbulanceDatabaseService();
+  AmbulanceDatabaseService get ambulanceservice => _ambulanceDatabaseService;
 
   BitmapDescriptor? _carPin;
   BitmapDescriptor? get carpin => _carPin;
 
-  DriverModel? driverModel;
-  RouteModel? routeModel;
-  UserModel? _userModel;
   // //   location pin
   BitmapDescriptor? _locationPin;
 
@@ -76,45 +56,10 @@ class AmbulanceAppProvider extends ChangeNotifier {
   // Set<Polyline> get poly => _poly;
 
   GoogleMapController? get mapController => _mapController;
-  //  RouteModel routeModel;
-
-  //  draggable to show
-  Show show = Show.DESTINATION_SELECTION;
-
-  // //  Driver request related variables
-  bool lookingForDriver = false;
-  bool alertsOnUi = false;
-  bool driverFound = false;
-  bool driverArrived = false;
-  int timeCounter = 0;
-  double percentage = 0;
-  Timer? periodicTimer;
-  String? requestedDestination;
-
-  String requestStatus = "";
-  double? requestedDestinationLat;
-
-  double? requestedDestinationLng;
-  RideRequestModel? rideRequestModel;
-  BuildContext? mainContext;
-
-//   //  this variable will listen to the status of the ride request
-  StreamSubscription<QuerySnapshot>? requestStream;
-//   // this variable will keep track of the drivers position before and during the ride
-  StreamSubscription<QuerySnapshot>? driverStream;
-// //  this stream is for all the driver on the app
-  StreamSubscription<List<DriverModel>>? allDriversStream;
-
-  //  DriverModel driverModel;
-  //  LatLng pickupCoordinates;
-  //  LatLng destinationCoordinates;
-  // double ridePrice = 0;
-  // String notificationType = "";
 
   AmbulanceAppProvider() {
     _setCustomMapPin();
     _getUserLocation();
-   
   }
 
   //gets the current location
@@ -143,6 +88,9 @@ class AmbulanceAppProvider extends ChangeNotifier {
     }
 
     Position position = await Geolocator.getCurrentPosition();
+    _ambulanceDatabaseService.updateLocation(
+        position.latitude, position.longitude);
+        
 
     _center = LatLng(position.latitude, position.longitude);
     addMarker(_center!);
@@ -155,8 +103,6 @@ class AmbulanceAppProvider extends ChangeNotifier {
     _mapController = controller;
     notifyListeners();
   }
-
-
 
   // add the markers of the current location
   addMarker(LatLng position) {
@@ -174,10 +120,7 @@ class AmbulanceAppProvider extends ChangeNotifier {
 
   //this is to set a custom marker
   _setCustomMapPin() async {
-
     _locationPin = await BitmapDescriptor.fromAssetImage(
         const ImageConfiguration(devicePixelRatio: 2.5), 'images/taxi.png');
   }
-
-
 }

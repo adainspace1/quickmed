@@ -27,20 +27,10 @@ class _AmbulanceHomeScreenState extends State<AmbulanceHomeScreen>
 
   AmbulanceDatabaseService services = AmbulanceDatabaseService();
 
-  TabController? tabController;
-  int selectedScreen = 0;
-
-  onItemClicked(int index) {
-    setState(() {
-      selectedScreen = index;
-      tabController!.index = selectedScreen;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 2, vsync: this);
   }
 
 
