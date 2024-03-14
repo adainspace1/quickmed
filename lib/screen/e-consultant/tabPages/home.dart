@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
-import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/util/constant.dart';
+import 'package:quickmed/widget/subscription.dart';
 import 'package:quickmed/widget/loading.dart';
+
 
 class EconsultantMapScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldState;
@@ -17,26 +19,10 @@ class EconsultantMapScreen extends StatefulWidget {
 
 class _EconsultantMapScreenState extends State<EconsultantMapScreen> {
   GlobalKey<ScaffoldState> scaffoldSate = GlobalKey<ScaffoldState>();
-  String statusText = 'Now offline';
-  bool isEconsultantActive = false;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  //this funtion set the online status of the econsultant
-  econIsNowOnline() async {
-    EconsultantServices services = EconsultantServices();
-    services.updateActiveStatus(true);
-  }
-
-  //read econsultant current location
-
-  //this makes the econsultant go offline
-  econIsOffline() {
-    EconsultantServices services = EconsultantServices();
-    services.updateActiveStatus(false);
   }
 
   @override
@@ -46,7 +32,7 @@ class _EconsultantMapScreenState extends State<EconsultantMapScreen> {
     // ignore: unnecessary_null_comparison
     return appState.center == null
         ? const Loading()
-        : Stack(
+        :  Stack(
             children: <Widget>[
               GoogleMap(
                 initialCameraPosition:
@@ -58,54 +44,6 @@ class _EconsultantMapScreenState extends State<EconsultantMapScreen> {
                 rotateGesturesEnabled: true,
                 onCameraMove: appState.onCameraMove,
                 markers: appState.markers,
-              ),
-              statusText != "Now online"
-                  ? Container(
-                      height: MediaQuery.of(context).size.height,
-                      width: double.infinity,
-                      color: Colors.black87,
-                    )
-                  : Container(),
-              //button for driver
-              Positioned(
-                top: statusText != "Now online"
-                    ? MediaQuery.of(context).size.height * 0.45
-                    : 40,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        if (isEconsultantActive != true) {
-                          econIsNowOnline();
-                          setState(() {
-                            statusText = "Now online";
-                            isEconsultantActive = true;
-                          });
-                        } else {
-                          econIsOffline();
-                          setState(() {
-                            statusText = "Now offline";
-                            isEconsultantActive = false;
-                          });
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue),
-                      child: statusText == "Now offline"
-                          ? Text(
-                              statusText,
-                              style: const TextStyle(color: COLOR_BACKGROUND),
-                            )
-                          : const Icon(
-                              Icons.phonelink_ring_sharp,
-                              color: COLOR_BACKGROUND,
-                            ),
-                    )
-                  ],
-                ),
               ),
 
               //for the circular avatar
@@ -132,19 +70,73 @@ class _EconsultantMapScreenState extends State<EconsultantMapScreen> {
               ),
               // for the verification barge............
               Positioned(
-                bottom: 25,
-                left: 15,
-                child: CircleAvatar(
-                  backgroundColor: Colors.blueAccent,
-                  radius: 20,
-                  child: IconButton(
-                    alignment: Alignment.center,
-                    icon: const Icon(
-                      Icons.verified,
-                      color: Colors.white,
-                      size: 20,
+                top: 25,
+                right: 15,
+                child: Container(
+                  padding: const EdgeInsets.all(8), // Adjust padding as needed
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.circular(20), // Make it circular
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.verified,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      SizedBox(
+                          width: 5), // Add some space between the icon and text
+                      Text(
+                        'Not Verified',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Positioned(
+                top: 470,
+                right: 15,
+                child: GestureDetector(
+                  onTap: () {
+                    changeScreen(context,const Subscription());
+                  },
+                  child: Container(
+                    padding:
+                        const EdgeInsets.all(8), // Adjust padding as needed
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius:
+                          BorderRadius.circular(20), // Make it circular
                     ),
-                    onPressed: () {},
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.verified,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        SizedBox(
+                            width:
+                                5), // Add some space between the icon and text
+                        Text(
+                          'Go Premium',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               )

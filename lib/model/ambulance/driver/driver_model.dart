@@ -22,62 +22,62 @@ class DriverModel {
   String? accountType;
   String? profileImageUrl;
   double? amount;
-
+  bool? verified;
   int? rating;
 
   // the driver model constructors..........
-  DriverModel({
-    this.id,
-    this.phone,
-    this.companyAddress,
-    this.companyName,
-    this.companyPhoneNumber,
-    this.companyEmail,
-    this.companyRegNumber,
-    this.carType,
-    this.latitude,
-    this.longitude,
-    this.plateNumber,
-    this.color,
-    this.uploadProofOfAddress,
-    this.uploadFrontViewOfCompany,
-    this.uploadMedicalLicense,
-    this.nin,
-    this.name,
-    this.email,
-    this.profileImageUrl,
-    this.accountType,
-    this.rating,
-    this.amount
-  });
+  DriverModel(
+      {this.id,
+      this.phone,
+      this.companyAddress,
+      this.companyName,
+      this.companyPhoneNumber,
+      this.companyEmail,
+      this.companyRegNumber,
+      this.carType,
+      this.latitude,
+      this.longitude,
+      this.plateNumber,
+      this.color,
+      this.verified,
+      this.uploadProofOfAddress,
+      this.uploadFrontViewOfCompany,
+      this.uploadMedicalLicense,
+      this.nin,
+      this.name,
+      this.email,
+      this.profileImageUrl,
+      this.accountType,
+      this.rating,
+      this.amount});
 
   // this data is heading to the firestore database.....
   factory DriverModel.fromSnapshot(DocumentSnapshot snapshot) {
     var userData = snapshot.data() as Map<String, dynamic>;
     return DriverModel(
-      id: snapshot.id,
-      phone: userData['phone'] ?? "",
-      companyName: userData['companyName'] ?? "",
-      companyAddress: userData['companyAddress'] ?? "",
-      companyPhoneNumber: userData['companyPhoneNumber'] ?? "",
-      companyEmail: userData["companyEmail"] ?? "",
-      companyRegNumber: userData["companyRegNumber"] ?? "",
-      carType: userData['carType'] ?? "",
-      plateNumber: userData['plateNumber'] ?? "",
-      color: userData['color'] ?? "",
-      uploadProofOfAddress: userData['proofOfAddress'] ?? "",
-      uploadFrontViewOfCompany: userData['frontViewOfCompany'] ?? "",
-      uploadMedicalLicense: userData['medicalLicense'] ?? "",
-      name: userData['name'] ?? "",
-      accountType: userData['accountType'] ?? "",
-      email: userData['email'] ?? "",
-      nin: userData["nin"] ?? "",
-      profileImageUrl: userData['profileImageUrl'] ?? "",
-      latitude: userData["latitude"] ?? "",
-      longitude: userData["longitude"] ?? "",
-      rating: userData["rating"] ?? "",
-      amount: userData['amount'] ?? ""
-    );
+        id: snapshot.id,
+        phone: userData['phone'] ?? "",
+        companyName: userData['companyName'] ?? "",
+        companyAddress: userData['companyAddress'] ?? "",
+        companyPhoneNumber: userData['companyPhoneNumber'] ?? "",
+        companyEmail: userData["companyEmail"] ?? "",
+        companyRegNumber: userData["companyRegNumber"] ?? "",
+        carType: userData['carType'] ?? "",
+        plateNumber: userData['plateNumber'] ?? "",
+        color: userData['color'] ?? "",
+        uploadProofOfAddress: userData['proofOfAddress'] ?? "",
+        uploadFrontViewOfCompany: userData['frontViewOfCompany'] ?? "",
+        uploadMedicalLicense: userData['medicalLicense'] ?? "",
+        name: userData['name'] ?? "",
+        accountType: userData['accountType'] ?? "",
+        email: userData['email'] ?? "",
+        nin: userData["nin"] ?? "",
+        profileImageUrl: userData['profileImageUrl'] ?? "",
+        latitude: userData["latitude"] ?? "",
+        longitude: userData["longitude"] ?? "",
+        rating: userData["rating"] ?? "",
+        verified: userData['verified'] ?? "",
+        amount: userData['amount'] ?? "");
   }
 
   // this is the maped string that would be displayed ont the firestore database......
@@ -104,7 +104,8 @@ class DriverModel {
       "latitude": 0.0,
       "longitude": 0.0,
       "rating": 0,
-      "amount": 0.0
+      "amount": 0.0,
+      "verified": false
     };
   }
 }

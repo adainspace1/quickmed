@@ -18,7 +18,6 @@ class _UserWidgetState extends State<UserWidget> {
 //  is for the draggable widget
   @override
   Widget build(BuildContext context) {
-
     return DraggableScrollableSheet(
         initialChildSize: 0.3,
         minChildSize: 0.3,
@@ -176,8 +175,3 @@ class _UserWidgetState extends State<UserWidget> {
         });
   }
 }
-
-  
-
-
-

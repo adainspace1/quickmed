@@ -68,6 +68,17 @@ dependencies:
   google_maps_webservice: ^0.0.20-nullsafety.5
   flutter_launcher_icons: ^0.13.1
   fluttertoast: ^8.2.4
+  flutter_local_notifications: ^16.3.2
+  rxdart: ^0.26.0
+  timezone: ^0.9.2
+  geocoding: ^2.2.0
+  pull_to_refresh: ^2.0.0
+  shimmer: ^3.0.0
+  flutter_svg: ^2.0.9
+  flutterwave_standard: ^1.0.4
+  ade_flutterwave_working_version: ^0.0.2+2
+  
+
 
 dev_dependencies:
   flutter_test:

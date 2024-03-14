@@ -13,6 +13,10 @@ import 'package:quickmed/global/global.dart';
 import 'package:quickmed/provider/ambulance/ambulance_appstate.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/loading.dart';
+import 'package:quickmed/widget/subscription.dart';
+import 'package:quickmed/helpers/screen_navigation.dart';
+
+
 
 class AmbulanceMapScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldState;
@@ -117,6 +121,77 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
                   ),
                 ),
               ),
+
+              Positioned(
+                top: 25,
+                right: 15,
+                child: Container(
+                  padding: const EdgeInsets.all(8), // Adjust padding as needed
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.circular(20), // Make it circular
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.verified,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      SizedBox(
+                          width: 5), // Add some space between the icon and text
+                      Text(
+                        'Not Verified',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Positioned(
+                top: 470,
+                right: 15,
+                child: GestureDetector(
+                  onTap: () {
+                    changeScreen(context,const Subscription());
+                  },
+                  child: Container(
+                    padding:
+                        const EdgeInsets.all(8), // Adjust padding as needed
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius:
+                          BorderRadius.circular(20), // Make it circular
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.verified,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        SizedBox(
+                            width: 5), // Add some space between the icon and text
+                        Text(
+                          'Go Premium',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
             ],
           );
   }

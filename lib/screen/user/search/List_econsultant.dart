@@ -51,8 +51,7 @@ class _ListOfEconState extends State<ListOfEcon> {
               padding: const EdgeInsets.only(top: 16),
               itemBuilder: (context, index) {
                 DocumentSnapshot document = sp[index];
-                Map<String, dynamic> data =
-                    document.data() as Map<String, dynamic>;
+                Map<String, dynamic> data = document.data() as Map<String, dynamic>;
                 String field = data['medicalField'];
                 bool isOnline = data['is_Online'] ?? false;
                 int starRating = data['rating'] ?? 0;
@@ -133,10 +132,8 @@ class _ConversationListState extends State<ConversationList> {
   }
 
   void openModal() {
-    UserAppProvider appState =
-        Provider.of<UserAppProvider>(context, listen: false);
-    model.UserModel? user =
-        Provider.of<UserAppProvider>(context, listen: false).getUser;
+    UserAppProvider appState = Provider.of<UserAppProvider>(context, listen: false);
+    model.UserModel? user = Provider.of<UserAppProvider>(context, listen: false).getUser;
 
     showDialog(
       context: context,

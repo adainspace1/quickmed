@@ -7,13 +7,12 @@ import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/model/e-consultant/econsultant_model.dart' as model;
 import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
 import 'package:quickmed/screen/e-consultant/dashboard/econ_profile.dart';
-import 'package:quickmed/screen/e-consultant/tabPages/treatment.dart';
-import 'package:quickmed/screen/e-consultant/tabPages/wallet.dart';
+import 'package:quickmed/screen/e-consultant/tabPages/home.dart';
 import 'package:quickmed/screen/signin_screen.dart';
+import 'package:quickmed/screen/user/user_wallet/wallet_new.dart';
 import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/util/constant.dart';
-import 'package:quickmed/widget/loading.dart';
-import 'package:quickmed/screen/e-consultant/tabPages/home.dart';
+import 'package:quickmed/widget/draggable/econ_draggable.dart';
 import 'package:quickmed/widget/user_reqwidget/user_found.dart';
 
 class EconsultantHomeScreen extends StatefulWidget {
@@ -31,39 +30,27 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
 
   EconsultantServices services = EconsultantServices();
 
-  TabController? tabController;
-  int selectedScreen = 0;
-
-  onItemClicked(int index) {
-    setState(() {
-      selectedScreen = index;
-      tabController!.index = selectedScreen;
-    });
-  }
 
   @override
   void initState() {
+    addData();
     super.initState();
-    tabController = TabController(length: 3, vsync: this);
   }
 
-  @override
+  addData() async {
+    EconsultantAppProvider appProvider = Provider.of<EconsultantAppProvider>(context, listen: false);
+    await appProvider.refreshUser();
+  }
+
+   @override
   Widget build(BuildContext context) {
-    EconsultantAppProvider appProvider = Provider.of<EconsultantAppProvider>(context);
+
+     model.EconsultantModel? user = Provider.of<EconsultantAppProvider>(context).getUser;
 
     return Scaffold(
       key: scaffoldState,
       drawer: Drawer(
-        child: StreamBuilder<model.EconsultantModel>(
-          stream: services.getUserStreamByUid(), // Add your user stream here
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Loading(); // You can show a loading indicator while waiting for data
-            }
-
-            model.EconsultantModel? user = snapshot.data;
-
-            return ListView(
+        child: ListView(
               padding: EdgeInsets.zero,
               children: [
                 UserAccountsDrawerHeader(
@@ -133,7 +120,7 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
                   title: const Text("Wallet"),
                   onTap: () {
                     // Navigate to ProfileScreen with user data
-                    changeScreen(context, const EconsultantWalletScreen());
+                    changeScreen(context, const WalletNew());
                   },
                 ),
                 const SizedBox(
@@ -158,45 +145,24 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
 
                 // ... (add more ListTile widgets for other drawer items)
               ],
-            );
-          },
-        ),
-      ),
-      body: TabBarView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: tabController,
-        children: [
-          Visibility(
-            child: EconsultantMapScreen(scaffoldState),
-          ),
-          const Visibility(
-            child: EconsultantTreatMent(),
-          ),
-
-          Visibility(
-          visible: appProvider.show == Show.User_Loading,
-            child:const UserFoundWidget(),
-          ),
-
+            )
           
-        ],
+        
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.health_and_safety), label: 'Treatment'),
-        BottomNavigationBarItem(
-              icon: Icon(Icons.person_add), label: 'User'),
-        ],
-        unselectedItemColor: COLOR_BACKGROUND,
-        selectedItemColor: COLOR_PRIMARY,
-        backgroundColor: COLOR_ACCENT,
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        currentIndex: selectedScreen,
-        onTap: onItemClicked,
-      ),
-    );
+
+        body: Stack(
+          children: [
+            Visibility(
+              child: EconsultantMapScreen(scaffoldState),
+            ),
+            const Visibility(
+              child: EconsultantWidget(),
+            ),
+            Visibility(
+              visible: user?.show == Show.User_Loading,
+              child: const UserFoundWidget(),
+            ),
+          ],
+        ));
   }
 }

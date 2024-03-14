@@ -16,6 +16,11 @@ const Color white = Colors.white;
 const Color black = Colors.black;
 const Color grey = Colors.grey;
 const Color green = Colors.green;
+var appBgGradient = const LinearGradient(
+  begin: Alignment(0.0, 0.0),
+  end: Alignment(0, -1),
+  colors: [Color(0xffDB9B3A),Color(0xffFE8664)],
+);
 // Custom Fonts
 const TextStyle customTextStyle = TextStyle(fontFamily: 'Montserrat',fontSize: 16.0,fontWeight: FontWeight.normal,);
 final TextStyle customBoldTextStyle = customTextStyle.copyWith(fontWeight: FontWeight.bold,);

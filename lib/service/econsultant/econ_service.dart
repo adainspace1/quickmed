@@ -65,6 +65,8 @@ class EconsultantServices {
     });
   }
 
+  
+
   // update online or last active status of user
   Future<void> updateActiveStatus(bool isOnline) async {
     User currentUser = _firebaseAuth.currentUser!;
@@ -82,10 +84,13 @@ class EconsultantServices {
   }
 
   //this function update the econsultant location...........
-  Future<void> updateLocation(double latitude, double longitude ) async {
-        User currentUser = _firebaseAuth.currentUser!;
-        FirebaseFirestore.instance.collection('econsultants').doc(currentUser.uid).update(
-        {  'latitude': latitude, 'longitude': longitude});
+  //this function update the user location...........
+  Future<void> updateLocation(double latitude, double longitude) async {
+    User currentUser = _firebaseAuth.currentUser!;
+    FirebaseFirestore.instance
+        .collection('econsultants')
+        .doc(currentUser.uid)
+        .update({'latitude': latitude, 'longitude': longitude});
   }
 
   // Update user's profile image

@@ -15,7 +15,6 @@ class CurrentLocationScreen extends StatefulWidget {
 }
 
 class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
-  
   late GoogleMapController googleMapController;
   UserDataBaseServices services = UserDataBaseServices();
 
@@ -29,8 +28,6 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
     super.initState();
     _getUserLocation();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +67,38 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
               ),
             ),
           ),
+          //not verified button
+           Positioned(
+                top: 25,
+                right: 15,
+                child: Container(
+                  padding: const EdgeInsets.all(8), // Adjust padding as needed
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.circular(20), // Make it circular
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.verified,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      SizedBox(
+                          width: 5), // Add some space between the icon and text
+                      Text(
+                        'Not Verified',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
         ],
       ),
     );

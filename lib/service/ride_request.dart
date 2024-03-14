@@ -46,6 +46,7 @@ class RideRequest {
   return '${ids[0]}_${ids[1]}';
 }
 
+  // ignore: non_constant_identifier_names
   Future<void> upDateRequest(String Status, String id) async {
     FirebaseFirestore.instance
         .collection(collection)

@@ -15,6 +15,7 @@ class HospitalModel {
   double? latitude;
   double? longitude;
   double? amount;
+  bool? verified;
 
   HospitalModel(
       {this.id,
@@ -30,6 +31,7 @@ class HospitalModel {
       this.latitude,
       this.longitude,
       this.amount,
+      this.verified,
       this.uploadfrontviewofhospital});
 
   factory HospitalModel.fromSnapshot(DocumentSnapshot snapshot) {
@@ -49,10 +51,8 @@ class HospitalModel {
         uploadfrontviewofhospital: userData['uploadfrontviewofhospital'] ?? "",
         latitude: userData['latitude'] ?? "",
         longitude: userData['longitude'] ?? "",
-        amount: userData['amount'] ?? ""
-        
-        
-        );
+        verified: userData['verified'] ?? "",
+        amount: userData['amount'] ?? "");
   }
 
   Map<String, dynamic> toJson() {
@@ -70,7 +70,8 @@ class HospitalModel {
       "accountType": "hospital",
       "latitude": 0.0,
       "longitude": 0.0,
-      "amount": 0.0
+      "amount": 0.0,
+      "verified": false
     };
   }
 }

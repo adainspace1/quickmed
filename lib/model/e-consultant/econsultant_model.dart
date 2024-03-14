@@ -62,9 +62,11 @@ class EconsultantModel {
         bloodGroup: userData['bloodGroup'] ?? "",
         dob: userData['dob'] ?? "",
         phone: userData['phone'] ?? "",
-        amount: userData['amount'] ?? ""
-        );
+        verified: userData['verified'] ?? "",
+        amount: userData['amount'] ?? "");
   }
+
+  get show => null;
 
   Map<String, dynamic> toJson() {
     return {
@@ -86,7 +88,9 @@ class EconsultantModel {
       "dob": dob,
       "phone": phone,
       "is_Online": isOnline ?? false,
-      "amount": 0.0
+      "amount": 0.0,
+      // ignore: equal_keys_in_map
+      "verified": false
     };
   }
 }

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quickmed/model/user/user_model.dart' as model;
+//import 'package:quickmed/model/user/user_model.dart' as model;
 import 'package:quickmed/provider/user/user_appstate.dart';
 import 'package:quickmed/util/constant.dart';
 
@@ -80,8 +80,6 @@ class _WalletScreenState extends State<WalletScreen> {
 
   Widget _contentOverView() {
 
-    model.UserModel? user = Provider.of<UserAppProvider>(context).getUser;
-
     return Container(
       padding: const EdgeInsets.only(left: 18, right: 18, top: 22, bottom: 22),
       decoration: BoxDecoration(
@@ -94,7 +92,7 @@ class _WalletScreenState extends State<WalletScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('${user?.amount}', style: customBoldTextStyle),
+              Text('0.0', style: customBoldTextStyle),
               const SizedBox(
                 height: 12,
               ),

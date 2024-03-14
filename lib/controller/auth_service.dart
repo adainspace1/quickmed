@@ -31,7 +31,7 @@ class AuthService {
         return;
       },
     )
-      .onError((error, stackTrace) {
+        .onError((error, stackTrace) {
       errorStep();
     });
   }
@@ -60,37 +60,37 @@ class AuthService {
     await _firebaseAuth.signOut();
   }
 
-  // check whether the user is logged in or not
-  static Future<bool> isLoggedIn() async {
-    var user = _firebaseAuth.currentUser;
-    return user != null;
-  }
 
   //THIS FUNCTION AUTHENTICATE ALREADY REGISTERED USERS
   static Future<String?> getAccountType() async {
-  try {
-    User? user = _firebaseAuth.currentUser;
+    try {
+      User? user = _firebaseAuth.currentUser;
 
-    if (user != null) {
-      // Check each collection for the user's account type
-      List<String> collections = ['users', 'ambulance', 'econsultants', 'hospital'];
+      if (user != null) {
+        // Check each collection for the user's account type
+        List<String> collections = [
+          'users',
+          'ambulance',
+          'econsultants',
+          'hospital'
+        ];
 
-      for (String collection in collections) {
-        DocumentSnapshot userProfileDoc = await FirebaseFirestore.instance
-            .collection(collection)
-            .doc(user.uid)
-            .get();
+        for (String collection in collections) {
+          DocumentSnapshot userProfileDoc = await FirebaseFirestore.instance
+              .collection(collection)
+              .doc(user.uid)
+              .get();
 
-        if (userProfileDoc.exists) {
-          return userProfileDoc.get('accountType');
+          if (userProfileDoc.exists) {
+            return userProfileDoc.get('accountType');
+          }
         }
       }
-    }
 
-    return null;
-  } catch (e) {
-    print("Error getting account type: $e");
-    return null;
+      return null;
+    } catch (e) {
+      print("Error getting account type: $e");
+      return null;
+    }
   }
-} 
 }

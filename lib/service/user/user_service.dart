@@ -1,4 +1,4 @@
-// ignore_for_file: null_check_always_fails
+// ignore_for_file: null_check_always_fails, unused_local_variable
 
 import 'dart:typed_data';
 
@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:quickmed/controller/storage.dart';
+import 'package:quickmed/model/chat.dart';
 import 'package:quickmed/model/user/user_model.dart' as model;
 
 class UserDataBaseServices {
@@ -44,20 +45,23 @@ class UserDataBaseServices {
         .limit(20)
         .get();
   }
+
   //get user by the id
   Future<model.UserModel> getUserByUid() async {
     User currentUser = _firebaseAuth.currentUser!;
     DocumentSnapshot snap =
         await _firestore.collection("users").doc(currentUser.uid).get();
 
-      return model.UserModel.fromSnapshot(snap);
+    return model.UserModel.fromSnapshot(snap);
   }
 
-   //this function update the econsultant location...........
-  Future<void> updateLocation(double latitude, double longitude ) async {
-        User currentUser = _firebaseAuth.currentUser!;
-        FirebaseFirestore.instance.collection('econsultants').doc(currentUser.uid).update(
-        {  'latitude': latitude, 'longitude': longitude});
+  //this function update the user location...........
+  Future<void> updateLocation(double latitude, double longitude) async {
+    User currentUser = _firebaseAuth.currentUser!;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .update({'latitude': latitude, 'longitude': longitude});
   }
 
   //searching for econsultants......
@@ -85,10 +89,12 @@ class UserDataBaseServices {
   }
 
   //this function update the user collection...........
-  Future<void> updateData(String docId, String name, 
-      String address, String email) async {
-    FirebaseFirestore.instance.collection('users').doc(docId).update(
-        {'name': name,  'address': address, 'email': email});
+  Future<void> updateData(
+      String docId, String name, String address, String email) async {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(docId)
+        .update({'name': name, 'address': address, 'email': email});
   }
 
   // Update user's profile image
@@ -110,7 +116,7 @@ class UserDataBaseServices {
       // Reload the user to get the updated information
       await _firebaseAuth.currentUser!.reload();
 
-      // Update the Firestore user document with the new image URL....    
+      // Update the Firestore user document with the new image URL....
       await FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser.uid)
@@ -120,39 +126,18 @@ class UserDataBaseServices {
     }
   }
 
+  Future<void> sendMessage(model.UserModel user, String msg, Type type) async {
+    final time = DateTime.now().millisecondsSinceEpoch.toString();
+    User currentuser = _firebaseAuth.currentUser!;
 
-
-  // Send a message in a chat room
-  Future<void> sendMessage(String message) async {
-    User currentUser = _firebaseAuth.currentUser!;
-    await _firestore.collection('chatRooms').doc(currentUser.uid).set({
-      'message': message,
-      'time': FieldValue.serverTimestamp(),
-    });
+    final Message message = Message(
+        msg: msg,
+        toId: user.id!,
+        read: '',
+        type: type,
+        sent: time,
+        fromId: currentuser.uid);
   }
 
-  // Get chat messages for a specific chat room
-  Stream<QuerySnapshot> getChatMessages(String chatRoomId) {
-    return _firestore
-        .collection('chatRooms')
-        .doc(chatRoomId)
-        .collection('chats')
-        .orderBy('time')
-        .snapshots();
-  }
-
-  // Get a list of chat rooms for a specific user
-  Stream<QuerySnapshot> getChatRooms(String userId) {
-    return _firestore
-        .collection('chatRooms')
-        .where('user1Id', isEqualTo: userId)
-        .where('user2Id', isEqualTo: userId)
-        .snapshots();
-  }
-
+  
 }
-
-
-
-
-

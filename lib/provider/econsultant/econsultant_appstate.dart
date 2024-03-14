@@ -5,12 +5,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:quickmed/model/e-consultant/econsultant_model.dart';
 import 'package:quickmed/model/user/user_model.dart';
 import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/service/map_request.dart';
 import 'package:quickmed/service/ride_request.dart';
 
-enum Show { User_Found, User_Loading, Show_User, Request_Cancelled }
+enum Show {
+  User_Found,
+  User_Loading,
+  Show_User,
+  Request_Cancelled,
+  User_Accepted
+}
 
 class EconsultantAppProvider extends ChangeNotifier {
   static const ACCEPTED = 'accepted';
@@ -50,6 +57,9 @@ class EconsultantAppProvider extends ChangeNotifier {
   // RIDEREQUEST SERVICE
   RideRequest _request = RideRequest();
 
+  EconsultantModel? _user;
+  EconsultantModel? get getUser => _user;
+
   // BOOLEAN VARIABLE TO IN INITIALIZED FRO LATER USAGE....
   bool lookingForDriver = false;
   bool alertsOnUi = false;
@@ -63,6 +73,13 @@ class EconsultantAppProvider extends ChangeNotifier {
     _setCustomMapPin();
     _getUserLocation();
     listenToRequest();
+  }
+
+  //FUNCTION TO GET THE USER FROM THE FIRESTORE DATABASE...
+  Future<void> refreshUser() async {
+    EconsultantModel user = await _econsultantServices.getUserByUid();
+    _user = user;
+    notifyListeners();
   }
 
   //THIS FUNCTION GET THE USER CURRENT USER LOCATION
@@ -91,6 +108,7 @@ class EconsultantAppProvider extends ChangeNotifier {
     }
 
     Position position = await Geolocator.getCurrentPosition();
+    _econsultantServices.updateLocation(position.latitude, position.longitude);
 
     _center = LatLng(position.latitude, position.longitude);
 
@@ -160,9 +178,9 @@ class EconsultantAppProvider extends ChangeNotifier {
     });
   }
 
-  cancelRequest(String id) {
+  cancelRequest(String? id) {
     lookingForDriver = false;
-    _request.upDateRequest(CANCELLED, id);
+    _request.upDateRequest(CANCELLED, id!);
   }
 
   //ACCCEPT REQUEST

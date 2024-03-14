@@ -78,7 +78,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   emailTextEditingController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    backgroundColor: Colors.red,
+                    backgroundColor: Colors.redAccent,
                     content: Text('All fields are required!'),
                   ),
                 );
