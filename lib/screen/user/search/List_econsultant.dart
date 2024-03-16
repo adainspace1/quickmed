@@ -27,70 +27,124 @@ class ListOfEcon extends StatefulWidget {
 
 class _ListOfEconState extends State<ListOfEcon> {
   UserDataBaseServices services = UserDataBaseServices();
+  final TextEditingController _search = TextEditingController();
+  bool _isShowUser = false;
 
   @override
   Widget build(BuildContext context) {
-    EconsultantAppProvider appProvider = Provider.of<EconsultantAppProvider>(context);
+    EconsultantAppProvider appProvider =
+        Provider.of<EconsultantAppProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: COLOR_ACCENT,
-        title: const Text(
-          'Econsultant',
-          style: TextStyle(color: COLOR_BACKGROUND),
+        title: Form(
+          child: TextFormField(
+            controller: _search,
+            decoration: const InputDecoration(
+                labelText: "Search For Econsultants eg nurse, doctor"),
+            onFieldSubmitted: (String _) {
+              setState(() {
+                _isShowUser = true;
+              });
+            },
+          ),
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: services.econsultantStream(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List sp = snapshot.data!.docs;
+      body: _isShowUser
+          ? FutureBuilder(
+              future: FirebaseFirestore.instance
+                  .collection("econsultants")
+                  .where('medicalField', isGreaterThanOrEqualTo: _search.text)
+                  .get(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-            return ListView.builder(
-              itemCount: sp.length,
-              shrinkWrap: true,
-              padding: const EdgeInsets.only(top: 16),
-              itemBuilder: (context, index) {
-                DocumentSnapshot document = sp[index];
-                Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-                String field = data['medicalField'];
-                bool isOnline = data['is_Online'] ?? false;
-                int starRating = data['rating'] ?? 0;
-                String imageUrl = data['img'] ?? '';
-                String son = data['name'] ?? '';
-                String id = data['id'] ?? '';
-
-                return Stack(children: [
-                  
-                  Visibility(
-                    child: ConversationList(
-                      id: id,
-                      name: son,
-                      imageUrl: imageUrl,
-                      star: starRating,
-                      isOnline: isOnline,
-                      messageText: field,
-                    ),
-                  ),
-
-                   Visibility(
-                    visible: appProvider.show == Show.User_Loading,
-                    child: const SpLoading(),
-                  ),
-                  //FOR CANCELLED REQUESTS..
-                  Visibility(
-                    visible: appProvider.show == Show.Request_Cancelled,
-                    child: const SpLoading(),
-                  ),
-                  
-                 
-                ]);
+                return ListView.builder(
+                    itemCount: snapshot.data?.docs.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          ConversationList(
+                              id: (snapshot.data! as dynamic).docs[index]['id'],
+                              name: (snapshot.data! as dynamic).docs[index]
+                                  ['name'],
+                              messageText: (snapshot.data! as dynamic)
+                                  .docs[index]['name'],
+                              imageUrl: (snapshot.data! as dynamic).docs[index]
+                                  ['name'],
+                              star: (snapshot.data! as dynamic).docs[index]
+                                  ['name'],
+                              isOnline: (snapshot.data! as dynamic).docs[index]
+                                  ['name']);
+                        },
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                (snapshot.data! as dynamic).docs[index]
+                                    ['profileImage']),
+                            radius: 16,
+                          ),
+                          title: Text(
+                              (snapshot.data! as dynamic).docs[index]['name']),
+                        ),
+                      );
+                    });
               },
-            );
-          } else {
-            return const Loading();
-          }
-        },
-      ),
+            )
+          : StreamBuilder<QuerySnapshot>(
+              stream: services.econsultantStream(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List sp = snapshot.data!.docs;
+
+                  return ListView.builder(
+                    itemCount: sp.length,
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.only(top: 16),
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot document = sp[index];
+                      Map<String, dynamic> data =
+                          document.data() as Map<String, dynamic>;
+                      String field = data['medicalField'];
+                      bool isOnline = data['is_Online'] ?? false;
+                      int starRating = data['rating'] ?? 0;
+                      String imageUrl = data['img'] ?? '';
+                      String son = data['name'] ?? '';
+                      String id = data['id'] ?? '';
+
+                      return Stack(children: [
+                        Visibility(
+                          child: ConversationList(
+                            id: id,
+                            name: son,
+                            imageUrl: imageUrl,
+                            star: starRating,
+                            isOnline: isOnline,
+                            messageText: field,
+                          ),
+                        ),
+
+                        Visibility(
+                          visible: appProvider.show == Show.User_Loading,
+                          child: const SpLoading(),
+                        ),
+                        //FOR CANCELLED REQUESTS..
+                        Visibility(
+                          visible: appProvider.show == Show.Request_Cancelled,
+                          child: const SpLoading(),
+                        ),
+                      ]);
+                    },
+                  );
+                } else {
+                  return const Loading();
+                }
+              },
+            ),
     );
   }
 }
@@ -132,8 +186,10 @@ class _ConversationListState extends State<ConversationList> {
   }
 
   void openModal() {
-    UserAppProvider appState = Provider.of<UserAppProvider>(context, listen: false);
-    model.UserModel? user = Provider.of<UserAppProvider>(context, listen: false).getUser;
+    UserAppProvider appState =
+        Provider.of<UserAppProvider>(context, listen: false);
+    model.UserModel? user =
+        Provider.of<UserAppProvider>(context, listen: false).getUser;
 
     showDialog(
       context: context,

@@ -107,7 +107,7 @@ class _UserFoundWidgetState extends State<UserFoundWidget> {
                             backgroundColor: Colors.green),
                         onPressed: () {
                           // Handle accepting the request
-                          econsultantAppProvider.acceptRequest();
+                          
                         },
                         child: const Text(
                           "Accepted",

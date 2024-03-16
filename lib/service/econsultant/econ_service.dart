@@ -40,7 +40,7 @@ class EconsultantServices {
 
 
    //get user by the id
-  Future<model.EconsultantModel> getUserByUid() async {
+  Future<model.EconsultantModel> getUserByUid([data]) async {
     User currentUser = _firebaseAuth.currentUser!;
     DocumentSnapshot snap =
         await _firestore.collection("econsultants").doc(currentUser.uid).get();

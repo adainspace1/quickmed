@@ -21,7 +21,7 @@ class RideRequest {
   }
 
   //THIS FUNCTIONS CREATES A ROOM FOR THE USER AND SP
-  void addRooms({String? userId, String? spId, String? message}) {
+  void addRooms(String? userId, String? spId, String? message) {
     var db = FirebaseFirestore.instance;
 
     // Create a unique chat room ID using both user IDs

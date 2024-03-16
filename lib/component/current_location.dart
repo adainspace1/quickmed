@@ -18,8 +18,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   late GoogleMapController googleMapController;
   UserDataBaseServices services = UserDataBaseServices();
 
-  static const CameraPosition initialCameraPosition =
-      CameraPosition(target: LatLng(9.0537984, 7.4612736), zoom: 14);
+  static const CameraPosition initialCameraPosition =CameraPosition(target: LatLng(9.0537984, 7.4612736), zoom: 14);
 
   Set<Marker> markers = {};
 

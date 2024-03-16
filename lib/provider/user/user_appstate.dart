@@ -203,37 +203,4 @@ THIS IS TO SHOW THE WIDGET WHEN THE USER IS FOUND
   }
 
 
-
-  //WHEN THE REQUEST HAS EXPIRED.....
-  showRequestExpiredAlert(BuildContext context) {
-    if (alertsOnUi) Navigator.pop(context);
-
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0)), //this right here
-            child: const SizedBox(
-              height: 200,
-              child: Padding(
-                  padding: EdgeInsets.all(12.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        children: [
-                          Center(
-                            child: Text(
-                                "Request TimedOut! \n TRY REQUESTING AGAIN"),
-                          )
-                        ],
-                      )
-                    ],
-                  )),
-            ),
-          );
-        });
-  }
 }

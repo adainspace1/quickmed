@@ -16,7 +16,7 @@ enum Show {
   User_Loading,
   Show_User,
   Request_Cancelled,
-  User_Accepted
+  User_Accepted,
 }
 
 class EconsultantAppProvider extends ChangeNotifier {
@@ -63,10 +63,13 @@ class EconsultantAppProvider extends ChangeNotifier {
   // BOOLEAN VARIABLE TO IN INITIALIZED FRO LATER USAGE....
   bool lookingForDriver = false;
   bool alertsOnUi = false;
+  EconsultantModel? econsultantModel;
+  Timer? periodicTimer;
 
   //GOOGLE MAP CONTROLLER
   GoogleMapController? get mapController => _mapController;
   late StreamSubscription<QuerySnapshot> requestStream;
+  late StreamSubscription<List<EconsultantModel>> allDriversStream;
 
   //THIS IS THE ECONSULTANT APPSTATE THAT WOULD RUN AT THE START OF THE APP..
   EconsultantAppProvider() {
@@ -164,6 +167,12 @@ class EconsultantAppProvider extends ChangeNotifier {
             break;
 
           case ACCEPTED:
+            lookingForDriver = false;
+            econsultantModel =
+                await _econsultantServices.getUserByUid(data['userId']);
+            periodicTimer?.cancel();
+            _stopListeningToDriveStream();
+            show = Show.User_Accepted;
             break;
 
           case CANCELLED:
@@ -183,8 +192,7 @@ class EconsultantAppProvider extends ChangeNotifier {
     _request.upDateRequest(CANCELLED, id!);
   }
 
-  //ACCCEPT REQUEST
-  acceptRequest() async {
-    _request.addRooms();
+  _stopListeningToDriveStream() {
+    allDriversStream.cancel();
   }
 }
