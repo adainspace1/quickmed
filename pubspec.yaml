@@ -75,8 +75,12 @@ dependencies:
   pull_to_refresh: ^2.0.0
   shimmer: ^3.0.0
   flutter_svg: ^2.0.9
-  flutterwave_standard: ^1.0.4
-  ade_flutterwave_working_version: ^0.0.2+2
+  flutterwave: ^1.0.3
+  lints: ^2.1.1
+
+
+
+
   
 
 

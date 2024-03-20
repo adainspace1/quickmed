@@ -77,15 +77,15 @@ class _CheckUserLoggedInState extends State<CheckUserLoggedIn> {
   @override
   void initState() {
     super.initState();
-    AuthService.getAccountType().then((value) {
-      if (value == "User") {
-        changeScreenReplacement(context, const UserHomeScreen());
-      } else if (value == "ambulance") {
-        changeScreenReplacement(context, const AmbulanceHomeScreen());
-      } else if (value == "econsultants") {
-        changeScreenReplacement(context, const EconsultantHomeScreen());
-      }
-    });
+        AuthService.getAccountType().then((value) {
+          if (value == "User") {
+            changeScreenReplacement(context, const UserHomeScreen());
+          } else if (value == "ambulance") {
+            changeScreenReplacement(context, const AmbulanceHomeScreen());
+          } else if (value == "econsultants") {
+            changeScreenReplacement(context, const EconsultantHomeScreen());
+          }
+        });
   }
 
   @override

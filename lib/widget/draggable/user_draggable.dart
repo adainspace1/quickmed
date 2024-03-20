@@ -36,22 +36,6 @@ class _UserWidgetState extends State<UserWidget> {
               ],
             ),
             child: ListView(controller: myscrollController, children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const Divider(),
               ListTile(
                   onTap: () async {
                     setState(() {

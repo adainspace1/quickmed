@@ -12,7 +12,7 @@ class HospitalScreen extends StatefulWidget {
 class _HospitalScreenState extends State<HospitalScreen> {
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return  const Scaffold(
         
     );
   }

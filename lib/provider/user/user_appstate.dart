@@ -198,6 +198,7 @@ THIS IS TO SHOW THE WIDGET WHEN THE USER IS FOUND
   //decline request
   declineRequest(String? requestId) {
     _request.upDateRequest(EXPIRED, requestId!);
+    
     periodicTimer.cancel();
     notifyListeners();
   }

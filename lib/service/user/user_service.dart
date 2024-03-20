@@ -1,7 +1,5 @@
 // ignore_for_file: null_check_always_fails, unused_local_variable
-
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -63,6 +61,7 @@ class UserDataBaseServices {
         .doc(currentUser.uid)
         .update({'latitude': latitude, 'longitude': longitude});
   }
+
 
   //searching for econsultants......
   Stream<QuerySnapshot> econsultantStream() {
@@ -138,6 +137,4 @@ class UserDataBaseServices {
         sent: time,
         fromId: currentuser.uid);
   }
-
-  
 }

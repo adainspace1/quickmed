@@ -3,7 +3,7 @@ import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/util/constant.dart';
 
 class EconsultantWidget extends StatefulWidget {
-  const EconsultantWidget({super.key});
+  const EconsultantWidget({Key? key}) : super(key: key);
 
   @override
   State<EconsultantWidget> createState() => _EconsultantWidgetState();
@@ -12,142 +12,169 @@ class EconsultantWidget extends StatefulWidget {
 class _EconsultantWidgetState extends State<EconsultantWidget> {
   String statusText = 'Now offline';
   bool isEconsultantActive = false;
+  int _pageIndex = 0;
+  late PageController _pageController;
+  var scaffoldState = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _pageIndex);
   }
 
-  //this function set the online status of the econsultant
-  econIsNowOnline() async {
-    EconsultantServices services = EconsultantServices();
-    services.updateActiveStatus(true);
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
-  //read econsultant current location
+  void onPageChanged(int page) {
+    setState(() {
+      _pageIndex = page;
+    });
+  }
 
-  //this makes the econsultant go offline
-  econIsOffline() {
-    EconsultantServices services = EconsultantServices();
-    services.updateActiveStatus(false);
+  void navigationTapped(int page) {
+    _pageController.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.ease,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.3,
-      minChildSize: 0.3,
-      maxChildSize: 0.5,
-      builder: (BuildContext context, myscrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.grey.shade100,
-                  offset: const Offset(3, 2),
-                  blurRadius: 7)
-            ],
-          ),
-          child: ListView(controller: myscrollController, children: [
-            Container(
-             
-              alignment: Alignment.center,
-              child: ElevatedButton(
-                  onPressed: () {
-                    if (isEconsultantActive != true) {
-                      econIsNowOnline();
-                      setState(() {
-                        statusText = "Now online";
-                        isEconsultantActive = true;
-                      });
-                    } else {
-                      econIsOffline();
-                      setState(() {
-                        statusText = "Now offline";
-                        isEconsultantActive = false;
-                      });
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                      shape: const RoundedRectangleBorder(),
-                      minimumSize: const Size(double.infinity, 50), 
-                                       
-                      backgroundColor: COLOR_ACCENT),
-                  child: statusText == "Now offline"
-                      ? Text(
-                          statusText,
+    return 
+          // Home Screen
+          DraggableScrollableSheet(
+            initialChildSize: 0.3,
+            minChildSize: 0.3,
+            maxChildSize: 0.5,
+            builder: (BuildContext context, myscrollController) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade100,
+                      offset: const Offset(3, 2),
+                      blurRadius: 7,
+                    ),
+                  ],
+                ),
+                child: ListView(
+                  controller: myscrollController,
+                  children: [
+                    Container(
+                      alignment: Alignment.center,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            if (isEconsultantActive) {
+                              econIsOffline();
+                              statusText = 'Now offline';
+                            } else {
+                              econIsNowOnline();
+                              statusText = 'Now online';
+                            }
+                            isEconsultantActive = !isEconsultantActive;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: const RoundedRectangleBorder(),
+                          minimumSize: const Size(double.infinity, 50),
+                          backgroundColor: COLOR_ACCENT,
+                        ),
+                        child: Text(
+                          isEconsultantActive ? 'Online' : statusText,
                           style: const TextStyle(color: COLOR_BACKGROUND),
-                        )
-                      : const Text(
-                          "Online",
-                          style: TextStyle(color: COLOR_BACKGROUND),
-                        )),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-
-            Container(
-                padding: const EdgeInsets.all(40),
-                child: Image.asset(
-                  "images/online.png",
-                  width: 100,
-                  height: 100,
-                )),
-
-            const SizedBox(
-              height: 20,
-            ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: COLOR_ACCENT,
-                        shape: const RoundedRectangleBorder()),
-                    onPressed: () {},
-                    child: const Text(
-                      "Home",
-                      style: TextStyle(color: COLOR_BACKGROUND),
-                    )),
-
-                const SizedBox(
-                  width: 10,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      child: Image.asset(
+                        'images/online.png',
+                        width: 50,
+                        height: 50,
+                      ),
+                    ),
+                  ],
                 ),
+              );
+            },
+          );
 
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: COLOR_ACCENT,
-                        shape: const RoundedRectangleBorder()),
-                    onPressed: () {},
-                    child: const Text(
-                      "Treatment",
-                      style: TextStyle(color: COLOR_BACKGROUND),
-                    )),
 
-                const SizedBox(
-                  width: 10,
-                ),
+    //   Positioned(
+    //     bottom: 0,
+    //         left: 0,
+    //         right: 0,
+    //     child: BottomNavigationBar(
+    //   items: const <BottomNavigationBarItem>[
+    //     BottomNavigationBarItem(
+    //       icon: Icon(Icons.home),
+    //       label: 'Home',
+    //     ),
+    //     BottomNavigationBarItem(
+    //       icon: Icon(Icons.wallet),
+    //       label: 'Wallet',
+    //     ),
+    //     BottomNavigationBarItem(
+    //       icon: Icon(Icons.local_hospital),
+    //       label: 'Treatment',
+    //     ),
+    //   ],
+    //   selectedItemColor: Colors.blue,
+    //   onTap: navigationTapped,
+    //   currentIndex: _pageIndex,
+    // ),
+      
+    //   )
+      
+      
+      
 
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: COLOR_ACCENT,
-                        shape: const RoundedRectangleBorder()),
-                    onPressed: () {},
-                    child: const Text(
-                      "Wallet",
-                      style: TextStyle(color: COLOR_BACKGROUND),
-                    )),
-              ],
-            )
-          ]),
-        );
-      },
-    );
+      
+      
+      
+    
+
+    
+    // bottomNavigationBar: BottomNavigationBar(
+    //   items: const <BottomNavigationBarItem>[
+    //     BottomNavigationBarItem(
+    //       icon: Icon(Icons.home),
+    //       label: 'Home',
+    //     ),
+    //     BottomNavigationBarItem(
+    //       icon: Icon(Icons.wallet),
+    //       label: 'Wallet',
+    //     ),
+    //     BottomNavigationBarItem(
+    //       icon: Icon(Icons.local_hospital),
+    //       label: 'Treatment',
+    //     ),
+    //   ],
+    //   selectedItemColor: Colors.blue,
+    //   onTap: navigationTapped,
+    //   currentIndex: _pageIndex,
+    // ),
+  }
+
+  // Add your econIsNowOnline and econIsOffline functions here
+  void econIsNowOnline() async {
+    EconsultantServices services = EconsultantServices();
+    services.updateActiveStatus(true);
+  }
+
+  void econIsOffline() {
+    EconsultantServices services = EconsultantServices();
+    services.updateActiveStatus(false);
   }
 }

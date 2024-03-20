@@ -1,9 +1,4 @@
-// ignore: duplicate_ignore
-// ignore: duplicate_ignore
-// ignore: duplicate_ignore
-// ignore: file_names
-// ignore: file_names
-// ignore_for_file: file_names, duplicate_ignore, library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, file_names
 
 import 'package:provider/provider.dart';
 import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
@@ -41,7 +36,8 @@ class _ListOfEconState extends State<ListOfEcon> {
           child: TextFormField(
             controller: _search,
             decoration: const InputDecoration(
-                labelText: "Search For Econsultants eg nurse, doctor"),
+                labelText: "Search For Econsultants eg nurse, doctor",
+                labelStyle: TextStyle(color: Colors.white, fontSize: 14)),
             onFieldSubmitted: (String _) {
               setState(() {
                 _isShowUser = true;
@@ -54,45 +50,49 @@ class _ListOfEconState extends State<ListOfEcon> {
           ? FutureBuilder(
               future: FirebaseFirestore.instance
                   .collection("econsultants")
-                  .where('medicalField', isGreaterThanOrEqualTo: _search.text)
+                  .where('medicalField', isEqualTo: _search.text.toLowerCase())
                   .get(),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // Show circular progress indicator while waiting for data
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
-                }
-
-                return ListView.builder(
+                } else if (snapshot.hasError) {
+                  // Handle error state
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.data!.docs.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No results found for "${_search.text}"',
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                  );
+                } else {
+                  // Data has been successfully fetched, display list of items
+                  return ListView.builder(
                     itemCount: snapshot.data?.docs.length,
                     itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          ConversationList(
-                              id: (snapshot.data! as dynamic).docs[index]['id'],
-                              name: (snapshot.data! as dynamic).docs[index]
-                                  ['name'],
-                              messageText: (snapshot.data! as dynamic)
-                                  .docs[index]['name'],
-                              imageUrl: (snapshot.data! as dynamic).docs[index]
-                                  ['name'],
-                              star: (snapshot.data! as dynamic).docs[index]
-                                  ['name'],
-                              isOnline: (snapshot.data! as dynamic).docs[index]
-                                  ['name']);
-                        },
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(
-                                (snapshot.data! as dynamic).docs[index]
-                                    ['profileImage']),
-                            radius: 16,
+                      return Stack(children: [
+                        Visibility(
+                          child: ConversationList(
+                            id: (snapshot.data! as dynamic).docs[index]['id'],
+                            name: (snapshot.data! as dynamic).docs[index]
+                                ['name'],
+                            imageUrl: (snapshot.data! as dynamic).docs[index]
+                                ['img'],
+                            star: (snapshot.data! as dynamic).docs[index]
+                                ['rating'],
+                            isOnline: (snapshot.data! as dynamic).docs[index]
+                                ['is_Online'],
+                            messageText: (snapshot.data! as dynamic).docs[index]
+                                ['medicalField'],
                           ),
-                          title: Text(
-                              (snapshot.data! as dynamic).docs[index]['name']),
                         ),
-                      );
-                    });
+                      ]);
+                    },
+                  );
+                }
               },
             )
           : StreamBuilder<QuerySnapshot>(
@@ -157,6 +157,7 @@ class ConversationList extends StatefulWidget {
   String imageUrl;
   bool isOnline;
   int star;
+
   ConversationList(
       {super.key,
       required this.id,
@@ -185,109 +186,106 @@ class _ConversationListState extends State<ConversationList> {
     await userProvider.refreshUser();
   }
 
-  void openModal() {
-    UserAppProvider appState =
-        Provider.of<UserAppProvider>(context, listen: false);
-    model.UserModel? user =
-        Provider.of<UserAppProvider>(context, listen: false).getUser;
+ void openModal(BuildContext context) {
+  UserAppProvider appState = Provider.of<UserAppProvider>(context, listen: false);
+  model.UserModel? user = appState.getUser;
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Describe Your Issue"),
-        content: Container(
-          height: 200, // Set the desired height
-          decoration: BoxDecoration(
-            color: Colors.white, // Set the background color to white
-            borderRadius:
-                BorderRadius.circular(8.0), // Optional: add border radius
-          ),
-          child: TextField(
-            controller: issueTextEditingController,
-            decoration: const InputDecoration(
-              hintText: "Describe the issue",
-              hintStyle: TextStyle(color: Colors.grey),
-              border: InputBorder.none, // Remove border
-            ),
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Describe Your Issue"),
+      content: Container(
+        height: 200, // Set the desired height
+        decoration: BoxDecoration(
+          color: Colors.white, // Set the background color to white
+          borderRadius: BorderRadius.circular(8.0), // Optional: add border radius
+        ),
+        child: TextField(
+          controller: issueTextEditingController,
+          decoration: const InputDecoration(
+            hintText: "Describe the issue",
+            hintStyle: TextStyle(color: Colors.grey),
+            border: InputBorder.none, // Remove border
           ),
         ),
-        actions: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: COLOR_ACCENT),
-            onPressed: () async {
-              if (issueTextEditingController.text.isEmpty) {
-                notify.error();
-              } else {
-                appState.createRequest(
-                    issueTextEditingController.text, context, user!);
-              }
-
-              Navigator.pop(context);
-            },
-            child: const Text(
-              "Proceed",
-              style: TextStyle(color: COLOR_BACKGROUND),
-            ),
-          )
-        ],
       ),
-    );
-  }
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: COLOR_ACCENT),
+          onPressed: () async {
+            
+            if (issueTextEditingController.text.isEmpty) {
+              notify.error();
+            } else {
+              appState.createRequest(issueTextEditingController.text, context, user!);
+            }
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => openModal(),
-      child: Container(
-        padding:
-            const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                children: <Widget>[
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(widget.imageUrl),
-                    maxRadius: 30,
-                  ),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  Expanded(
-                    child: Container(
-                      color: Colors.transparent,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            widget.name,
-                            style: const TextStyle(fontSize: 16),
+            Navigator.pop(context);
+          },
+          child: const Text(
+            "Proceed",
+            style: TextStyle(color: COLOR_BACKGROUND),
+          ),
+        )
+      ],
+    ),
+  );
+}
+
+
+ @override
+Widget build(BuildContext context) {
+  return GestureDetector(
+    onTap: () => openModal(context), // Pass context here
+    child: Container(
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Row(
+              children: <Widget>[
+                CircleAvatar(
+                  backgroundImage: NetworkImage(widget.imageUrl),
+                  maxRadius: 30,
+                ),
+                const SizedBox(
+                  width: 16,
+                ),
+                Expanded(
+                  child: Container(
+                    color: Colors.transparent,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          widget.name,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          widget.messageText,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(
+                          height: 6,
+                        ),
+                        Text(
+                          widget.isOnline ? 'Online' : 'Offline',
+                          style: TextStyle(
+                            color: widget.isOnline ? Colors.green : Colors.red,
                           ),
-                          Text(
-                            widget.messageText,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(
-                            height: 6,
-                          ),
-                          Text(
-                            widget.isOnline ? 'Online' : 'Offline',
-                            style: TextStyle(
-                              color:
-                                  widget.isOnline ? Colors.green : Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            StarsWidget(numberOfStars: widget.star),
-          ],
-        ),
+          ),
+          StarsWidget(numberOfStars: widget.star),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

@@ -1,13 +1,11 @@
 // ignore_for_file: avoid_unnecessary_containers
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:quickmed/helpers/screen_navigation.dart';
+import 'package:flutterwave/core/flutterwave.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:ade_flutterwave_working_version/core/ade_flutterwave.dart';
 
 class WalletNew extends StatefulWidget {
   const WalletNew({super.key});
@@ -27,6 +25,35 @@ class _WalletNewState extends State<WalletNew> {
   final formKey = GlobalKey<FormState>();
   //amount text editing controller
   final TextEditingController amount = TextEditingController();
+
+
+  void _makePayment(BuildContext context, String amount) async {
+                try {
+                  Flutterwave flutterwave = Flutterwave.forUIPayment(
+                      context: context,
+                      publicKey:
+                          "FLWPUBK_TEST-c3b9f15b0070b4151d09f1b7920000fa-X",
+                      encryptionKey: "FLWSECK_TESTd567ac286928",
+                      currency: "NGN",
+                      amount: amount,
+                      email: "shazaniyu@gmail.com",
+                      fullName: "Shazaniyu Gbadamosi",
+                      txRef: DateTime.now().toIso8601String(),
+                      isDebugMode: true,
+                      phoneNumber: "09074235666");
+
+                  final response = await flutterwave.initializeForUiPayments();
+                  if (response.status == "Transaction successful") {
+                    print(response.data);
+                    print(response.message);
+                  } else {
+                    print(response.message);
+                  }
+                } catch (error) {
+                  print(error);
+                }
+              }
+
 
   void openBox({String? price}) {
     showDialog(
@@ -51,19 +78,9 @@ class _WalletNewState extends State<WalletNew> {
                     content: Text("Fill The Amount")));
                 return;
               }
-              var data = {
-                'amount': amount.text,
-                'payment_options': 'card, banktransfer, ussd',
-                'title': 'Flutterwave payment',
-                'currency': "NGN",
-                'tx_ref':
-                    "AdeFlutterwave-${DateTime.now().millisecondsSinceEpoch}",
-                'icon':
-                    "https://www.aqskill.com/wp-content/uploads/2020/05/logo-pde.png",
-                'public_key': "FLWPUBK_TEST-c3b9f15b0070b4151d09f1b7920000fa-X",
-                'sk_key': 'FLWSECK_TEST-3a4c97270cc4adaa7ff769c474f846bb-X'
-              };
-              changeScreen(context, AdeFlutterWavePay(data));
+              
+
+              _makePayment(context, amount.text);
             },
             child: const Text(
               "Fund",

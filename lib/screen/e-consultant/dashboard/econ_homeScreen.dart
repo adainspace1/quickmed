@@ -28,7 +28,10 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
     with SingleTickerProviderStateMixin {
   var scaffoldState = GlobalKey<ScaffoldState>();
 
+
   EconsultantServices services = EconsultantServices();
+
+         
 
 
   @override
@@ -44,8 +47,11 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
 
    @override
   Widget build(BuildContext context) {
+//user app state 
+model.EconsultantModel? user = Provider.of<EconsultantAppProvider>(context).getUser;
 
-     model.EconsultantModel? user = Provider.of<EconsultantAppProvider>(context).getUser;
+
+
 
     return Scaffold(
       key: scaffoldState,

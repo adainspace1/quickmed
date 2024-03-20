@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // is class will handle our ride request
@@ -19,6 +21,17 @@ class RideRequest {
       "Status": "pending",
     });
   }
+
+  // Function to delete a ride request
+void deleteRideRequest(String userId) {
+  var db = FirebaseFirestore.instance;
+
+  db.collection('requests').doc(userId).delete().then((_) {
+    print("Ride request deleted successfully");
+  }).catchError((error) {
+    print("Failed to delete ride request: $error");
+  });
+}
 
   //THIS FUNCTIONS CREATES A ROOM FOR THE USER AND SP
   void addRooms(String? userId, String? spId, String? message) {
