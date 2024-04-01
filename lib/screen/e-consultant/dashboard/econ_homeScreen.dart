@@ -6,14 +6,16 @@ import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/model/e-consultant/econsultant_model.dart' as model;
 import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
+import 'package:quickmed/screen/ambulance/tabpages/treatment.dart';
 import 'package:quickmed/screen/e-consultant/dashboard/econ_profile.dart';
 import 'package:quickmed/screen/e-consultant/tabPages/home.dart';
 import 'package:quickmed/screen/signin_screen.dart';
 import 'package:quickmed/screen/user/user_wallet/wallet_new.dart';
+import 'package:quickmed/screen/user/user_wallet/wallet_screen.dart';
 import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/util/constant.dart';
-import 'package:quickmed/widget/draggable/econ_draggable.dart';
-import 'package:quickmed/widget/user_reqwidget/user_found.dart';
+
+
 
 class EconsultantHomeScreen extends StatefulWidget {
   const EconsultantHomeScreen({
@@ -30,7 +32,15 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
 
 
   EconsultantServices services = EconsultantServices();
+  TabController? tabController;
+  int selectedScreen = 0;
 
+   onItemClicked(int index) {
+    setState(() {
+      selectedScreen = index;
+      tabController!.index = selectedScreen;
+    });
+  }
          
 
 
@@ -38,6 +48,8 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
   void initState() {
     addData();
     super.initState();
+    tabController = TabController(length: 3, vsync: this);
+
   }
 
   addData() async {
@@ -49,9 +61,6 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
   Widget build(BuildContext context) {
 //user app state 
 model.EconsultantModel? user = Provider.of<EconsultantAppProvider>(context).getUser;
-
-
-
 
     return Scaffold(
       key: scaffoldState,
@@ -156,19 +165,35 @@ model.EconsultantModel? user = Provider.of<EconsultantAppProvider>(context).getU
         
       ),
 
-        body: Stack(
+        body: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: tabController,
           children: [
-            Visibility(
-              child: EconsultantMapScreen(scaffoldState),
-            ),
-            const Visibility(
-              child: EconsultantWidget(),
-            ),
-            Visibility(
-              visible: user?.show == Show.User_Loading,
-              child: const UserFoundWidget(),
-            ),
+                EconsultantMapScreen(scaffoldState),
+                const TreatMent(),
+                const WalletScreen()
+                
+
           ],
-        ));
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.health_and_safety), label: 'Treatment'),
+            BottomNavigationBarItem(icon: Icon(Icons.wallet), label: 'Wallet'),
+
+
+
+          ],
+          unselectedItemColor: COLOR_BACKGROUND,
+          selectedItemColor: COLOR_PRIMARY,
+          backgroundColor: COLOR_ACCENT,
+          type: BottomNavigationBarType.fixed,
+          showUnselectedLabels: true,
+          currentIndex: selectedScreen,
+          onTap: onItemClicked,
+        ),
+        );
   }
 }

@@ -10,14 +10,9 @@ import 'package:quickmed/model/user/user_model.dart';
 import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/service/map_request.dart';
 import 'package:quickmed/service/ride_request.dart';
+import 'package:quickmed/widget/stars.dart';
 
-enum Show {
-  User_Found,
-  User_Loading,
-  Show_User,
-  Request_Cancelled,
-  User_Accepted,
-}
+enum Show { SP_Found, SP_Expired }
 
 class EconsultantAppProvider extends ChangeNotifier {
   static const ACCEPTED = 'accepted';
@@ -35,7 +30,7 @@ class EconsultantAppProvider extends ChangeNotifier {
   LatLng? _lastPosition;
 
   //draggable to show
-  Show show = Show.User_Found;
+  Show show = Show.SP_Found;
 
   //LOCATION PIIN
   BitmapDescriptor? _locationPin;
@@ -154,48 +149,146 @@ class EconsultantAppProvider extends ChangeNotifier {
     requestStream = _request.requestStream()!.listen((querySnapshot) {
       querySnapshot.docChanges.forEach((element) async {
         Map<String, dynamic> data = element.doc.data() as Map<String, dynamic>;
-       
-        switch (data['Status']) {
-          case PENDING:
-            //loading
-            show = Show.User_Loading;
-            notifyListeners();
-            break;
 
-          case EXPIRED:
-            show = Show.Show_User;
-            notifyListeners();
+        switch (data['Status']) {
+          case CANCELLED:
             break;
 
           case ACCEPTED:
-            lookingForDriver = false;
-            econsultantModel =
-                await _econsultantServices.getUserByUid(data['userId']);
-            periodicTimer?.cancel();
-            _stopListeningToDriveStream();
-            show = Show.User_Accepted;
             break;
 
-          case CANCELLED:
-            show == Show.Request_Cancelled;
-            cancelRequest(data['id']);
+          case EXPIRED:
+            show = Show.SP_Expired;
+            break;
+
+          case PENDING:
+            show = Show.SP_Found;
             notifyListeners();
             break;
 
           default:
         }
-        
-       
       });
     });
+  }
+
+  acceptRequest({String? requestId, String? spId}) {
+    _request.upDateRequest(ACCEPTED, requestId!);
+    notifyListeners();
   }
 
   cancelRequest(String? id) {
     lookingForDriver = false;
     _request.upDateRequest(CANCELLED, id!);
+    notifyListeners();
   }
 
-  _stopListeningToDriveStream() {
-    allDriversStream.cancel();
+  listenToEconsultant() {
+    allDriversStream = _econsultantServices.econsultantStream().listen((event) {
+      event.docChanges.forEach((change) async {
+        Map<String, dynamic> data = change.doc.data() as Map<String, dynamic>;
+
+        if (data['id'] == econsultantModel!.id) {
+          notifyListeners();
+
+          show = Show.SP_Found;
+        }
+      });
+    }) as StreamSubscription<List<EconsultantModel>>;
+  }
+
+  // show the avalable service providers
+  showSpBottomSheet(BuildContext context) {
+    if (alertsOnUi) Navigator.pop(context);
+
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SizedBox(
+              height: 400,
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "7 MIN AWAY",
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Visibility(
+                        visible: econsultantModel!.profileImage == null,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(40)),
+                          child: const CircleAvatar(
+                            backgroundColor: Colors.transparent,
+                            radius: 45,
+                            child: Icon(
+                              Icons.person,
+                              size: 65,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Visibility(
+                        visible: econsultantModel!.profileImage != null,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.deepOrange,
+                              borderRadius: BorderRadius.circular(40)),
+                          child: CircleAvatar(
+                            radius: 45,
+                            backgroundImage:
+                                NetworkImage(econsultantModel!.profileImage!),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(econsultantModel!.name ?? "Nada"),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  _stars(
+                      rating: econsultantModel!.rating,
+                      votes: econsultantModel!.vote),
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text("call"),
+                      )
+                    ],
+                  )
+                ],
+              ));
+        });
+  }
+
+  _stars({int? votes, int? rating}) {
+    if (votes == 0) {
+      return const StarsWidget(
+        numberOfStars: 0,
+      );
+    } else {
+      double finalRate = rating! / votes!;
+      return StarsWidget(
+        numberOfStars: finalRate.floor(),
+      );
+    }
   }
 }

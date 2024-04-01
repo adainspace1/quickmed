@@ -4,9 +4,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:quickmed/model/e-consultant/econsultant_model.dart';
 import 'package:quickmed/model/user/user_model.dart';
-import 'package:quickmed/service/location_service.dart';
 import 'package:quickmed/service/ride_request.dart';
 import 'package:quickmed/service/user/user_service.dart';
 
@@ -14,46 +13,13 @@ import 'package:quickmed/service/user/user_service.dart';
 import 'package:uuid/uuid.dart';
 
 //to maintain the state of the app..
-enum Show { SP_ACCEPTED, SEND_REQUEST }
+enum Show { SEND_REQUEST }
 
 class UserAppProvider extends ChangeNotifier {
   static const ACCEPTED = 'accepted';
   static const CANCELLED = 'cancelled';
   static const PENDING = 'pending';
   static const EXPIRED = 'expired';
-
-  final LocationService _locationService = LocationService();
-  late GlobalKey<ScaffoldState>? _scaffoldKey;
-  late GoogleMapController? _controller;
-  late Set<Marker>? _markers;
-  late Marker? _remoteMarker;
-  late BitmapDescriptor? _selectionPin;
-  late BitmapDescriptor? _carPin;
-  late Set<Polyline>? _polylines;
-  late double? _cost;
-  late String? _remoteAddress;
-  late String? _deviceAddress;
-  late double? _distance;
-  late LatLng? _remoteLocation;
-  late Position? _deviceLocation;
-  late CameraPosition? _cameraPos;
-  late StreamSubscription<Position>? _positionStream;
-  bool _driverArrivingInit = false;
-
-  GlobalKey<ScaffoldState>? get scaffoldKey => _scaffoldKey;
-  CameraPosition? get cameraPos => _cameraPos;
-  GoogleMapController? get controller => _controller;
-  Set<Marker>? get markers => _markers;
-  Marker? get remoteMarker => _remoteMarker!;
-  BitmapDescriptor? get selectionPin => _selectionPin;
-  BitmapDescriptor? get carPin => _carPin;
-  Position? get deviceLocation => _deviceLocation;
-  LatLng? get remoteLocation => _remoteLocation;
-  String? get remoteAddress => _remoteAddress;
-  String? get deviceAddress => _deviceAddress;
-  Set<Polyline>? get polylines => _polylines;
-  double? get cost => _cost;
-  double? get distance => _distance;
 
 /* THIS IS TO GET THE USERDATABASE SERVICES*/
   UserDataBaseServices _services = UserDataBaseServices();
@@ -72,30 +38,16 @@ class UserAppProvider extends ChangeNotifier {
   int? get amount => _amount;
 
   bool alertsOnUi = false;
-  bool lookingForDriver = false;
-  bool driverFound = false;
-  bool driverArrived = false;
+  bool lookingForSp = false;
+  bool spFound = false;
+  bool spArrived = false;
   int timeCounter = 0;
   double percentage = 0;
   late Timer periodicTimer;
 
-/*
-THIS IS TO SHOW THE WIDGET WHEN THE USER IS FOUND
-*/
-  Show show = Show.SP_ACCEPTED;
+  late EconsultantModel _econsultantModel;
 
   UserAppProvider() {
-    _scaffoldKey = null;
-    _deviceLocation = null;
-    _remoteLocation = null;
-    _remoteAddress = null;
-    _deviceAddress = null;
-    _cost = null;
-    _distance = null;
-    _cameraPos = null;
-    _markers = {};
-    _polylines = {};
-    _positionStream = null;
     _getUserLocation();
   }
 
@@ -133,12 +85,12 @@ THIS IS TO SHOW THE WIDGET WHEN THE USER IS FOUND
 
     Position position = await Geolocator.getCurrentPosition();
 
-   _services.updateLocation(position.latitude, position.longitude);
-   
+    _services.updateLocation(position.latitude, position.longitude);
+
     return position;
   }
 
-  //FUNCTION TO SEND REQUEST
+  //FUNCTION TO CREATE A RIDE REQUEST
   void createRequest(String? issue, BuildContext context, UserModel user) {
     //TO GENERATE A UNIQUE ID FOR EACH REQUESTS..
     var uuid = const Uuid();
@@ -150,23 +102,17 @@ THIS IS TO SHOW THE WIDGET WHEN THE USER IS FOUND
         userId: user.id,
         name: user.name,
         issue: issue,
+        lat: user.latitude,
+        long: user.longitude,
         img: user.profileImageUrl);
 
-    //Show UI indicating that a request is being sent
-    showWaitingForResponseUI();
     //START TIMER FOR WAITING THE REQUEST...
     startWaitingTimer(user.id!, context);
   }
 
-  void showWaitingForResponseUI() {
-    //Update UI to indicate that a request is being sent
-    alertsOnUi = true;
-    notifyListeners();
-  }
-
   void startWaitingTimer(String requestId, BuildContext context) {
     //Start the timer for waiting
-    lookingForDriver = true;
+    lookingForSp = true;
     notifyListeners();
 
     periodicTimer = Timer.periodic(const Duration(seconds: 1), (time) {
@@ -178,7 +124,7 @@ THIS IS TO SHOW THE WIDGET WHEN THE USER IS FOUND
         // WHEN THE TIMER RUNS OUT
         timeCounter = 0;
         percentage = 0;
-        lookingForDriver = false;
+        lookingForSp = false;
 
         //UPDATE THE REQUEST TO EXPIRED...
         _request.upDateRequest(EXPIRED, requestId);
@@ -195,13 +141,12 @@ THIS IS TO SHOW THE WIDGET WHEN THE USER IS FOUND
     });
   }
 
+
+
   //decline request
   declineRequest(String? requestId) {
-    _request.upDateRequest(EXPIRED, requestId!);
-    
+    _request.deleteRideRequest(requestId);
     periodicTimer.cancel();
     notifyListeners();
   }
-
-
 }

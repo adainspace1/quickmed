@@ -15,10 +15,8 @@ class UserDataBaseServices {
   static Future addtoRealtime(model.UserModel user) async {
     try {
       DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
-      databaseReference
-          .child("${user.phone}")
-          .child("${user.name}")
-          .update(user.toJson());
+      databaseReference.child("users").child("${user.id}").update(user.toJson());
+
       // ignore: empty_catches
     } catch (e) {}
   }
@@ -61,7 +59,6 @@ class UserDataBaseServices {
         .doc(currentUser.uid)
         .update({'latitude': latitude, 'longitude': longitude});
   }
-
 
   //searching for econsultants......
   Stream<QuerySnapshot> econsultantStream() {

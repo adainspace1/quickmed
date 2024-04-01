@@ -7,6 +7,7 @@ import 'package:quickmed/screen/account_type.dart';
 import 'package:quickmed/controller/auth_service.dart';
 import 'package:quickmed/screen/ambulance/dashboard/ambulance_homescreen.dart';
 import 'package:quickmed/screen/e-consultant/dashboard/econ_homeScreen.dart';
+import 'package:quickmed/screen/hospital/dashboard/hospitalHomescreen.dart';
 import 'package:quickmed/screen/user/dashboard/user_home_screen.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/util/notification.dart';
@@ -178,7 +179,8 @@ class _SignInScreenState extends State<SignInScreen>
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
-                                if (_formKey.currentState!.validate() && isChecked) {
+                                if (_formKey.currentState!.validate() &&
+                                    isChecked) {
                                   // Proceed with OTP
                                   setState(() {
                                     isLoading = true; // Set loading to true
@@ -247,8 +249,7 @@ class _SignInScreenState extends State<SignInScreen>
                                                           await AuthService
                                                               .getAccountType();
                                                       Navigator.pop(context);
-                                                      if (accountType !=
-                                                          null) {
+                                                      if (accountType != null) {
                                                         switch (accountType) {
                                                           case "User":
                                                             changeScreenReplacement(
@@ -265,6 +266,12 @@ class _SignInScreenState extends State<SignInScreen>
                                                             changeScreenReplacement(
                                                                 context,
                                                                 const EconsultantHomeScreen());
+                                                            break;
+
+                                                          case "hospital":
+                                                            changeScreenReplacement(
+                                                                context,
+                                                                const HospitalScreen());
                                                             break;
                                                         }
                                                       } else {
@@ -283,7 +290,8 @@ class _SignInScreenState extends State<SignInScreen>
                                                         SnackBar(
                                                           content: Text(
                                                             value,
-                                                            style: const TextStyle(
+                                                            style:
+                                                                const TextStyle(
                                                               color:
                                                                   Colors.white,
                                                             ),
@@ -329,8 +337,7 @@ class _SignInScreenState extends State<SignInScreen>
                               ),
                               child: isLoading
                                   ? const CircularProgressIndicator(
-                                      valueColor:
-                                          AlwaysStoppedAnimation<Color>(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
                                         Colors.white,
                                       ),
                                     )

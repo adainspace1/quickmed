@@ -275,7 +275,15 @@ Future<void> _selectImage() async {
                   ),
                   const SizedBox(
                     height: 10,
-                  ),                
+                  ),
+                  Text(
+                    'Company Name: ${user.companyName ?? ''}',
+                    style: customGoogleFontStyle,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+
                   Text(
                     'Company Email: ${user.companyEmail ?? ''}',
                     style: customGoogleFontStyle,

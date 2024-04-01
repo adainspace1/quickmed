@@ -2,16 +2,24 @@
 // ignore: file_names
 // ignore: file_names
 // ignore: file_names
-// ignore_for_file: file_names, duplicate_ignore
+// ignore_for_file: file_names, duplicate_ignore, prefer_final_fields
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:quickmed/global/global.dart';
+import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/provider/ambulance/ambulance_appstate.dart';
+import 'package:quickmed/service/ambulance/ambulance_service.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/loading.dart';
 import 'package:quickmed/widget/subscription.dart';
-import 'package:quickmed/helpers/screen_navigation.dart';
-
+import 'package:quickmed/widget/loading_dialog.dart';
+import 'package:quickmed/widget/notification_dialog.dart';
+import 'package:quickmed/model/trip_details.dart';
 
 
 class AmbulanceMapScreen extends StatefulWidget {
@@ -27,10 +35,143 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
   String statusText = 'Now offline';
   GlobalKey<ScaffoldState> scaffoldSate = GlobalKey<ScaffoldState>();
   bool isDriverActive = false;
+  Position? currentPositionOfDriver;
+
+  Color colorToShow = Colors.green;
+  String titleToShow = "GO ONLINE NOW";
+  bool isDriverAvailable = false;
+
+  DatabaseReference? newTripRequestReference;
+  GoogleMapController? controllerGoogleMap;
+  AmbulanceDatabaseService _service = AmbulanceDatabaseService();
 
   @override
   void initState() {
     super.initState();
+    retrieveCurrentDriverInfo();
+  }
+
+    // TO ENABLE USER TO SEND RIDE REQUESTS
+   goOnlineNow() async {
+    Position pos = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    driverCurrentPosition = pos;
+
+    Geofire.initialize("onlineDrivers");
+    Geofire.setLocation(
+      FirebaseAuth.instance.currentUser!.uid,
+      driverCurrentPosition!.latitude,
+      driverCurrentPosition!.longitude,
+    );
+
+    newTripRequestReference = FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(FirebaseAuth.instance.currentUser!.uid)
+        .child("newTripStatus");
+    newTripRequestReference!.set("waiting");
+
+    newTripRequestReference!.onValue.listen((event) {});
+
+    _service.updateActiveStatus(true);
+  }
+
+
+  //TO GO OFFLINE DISABLE REQUESTS
+  goOfflineNow() {
+    //stop sharing driver live location updates
+    Geofire.removeLocation(FirebaseAuth.instance.currentUser!.uid);
+
+    //stop listening to the newTripStatus
+    newTripRequestReference!.onDisconnect();
+    newTripRequestReference!.remove();
+    newTripRequestReference = null;
+  }
+
+  setAndGetLocationUpdates() {
+    positionStreamHomePage =
+        Geolocator.getPositionStream().listen((Position position) {
+      currentPositionOfDriver = position;
+
+      if (isDriverAvailable == true) {
+        Geofire.setLocation(
+          FirebaseAuth.instance.currentUser!.uid,
+          currentPositionOfDriver!.latitude,
+          currentPositionOfDriver!.longitude,
+        );
+      }
+
+      LatLng positionLatLng = LatLng(position.latitude, position.longitude);
+      controllerGoogleMap!
+          .animateCamera(CameraUpdate.newLatLng(positionLatLng));
+    });
+  }
+
+ 
+  retrieveCurrentDriverInfo() async {
+    await FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(FirebaseAuth.instance.currentUser!.uid)
+        .once()
+        .then((snap) {
+      driverName = (snap.snapshot.value as Map)["name"];
+      driverPhone = (snap.snapshot.value as Map)["phone"];
+    });
+
+  }
+
+
+  retrieveTripRequestInfo( BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) =>
+          LoadingDialog(messageText: "getting details..."),
+    );
+
+    DatabaseReference tripRequestsRef =
+        FirebaseDatabase.instance.ref().child("tripRequests").child(tripID);
+
+    tripRequestsRef.once().then((dataSnapshot) {
+      Navigator.pop(context);
+
+
+
+      TripDetails tripDetailsInfo = TripDetails();
+      double pickUpLat = double.parse(
+          (dataSnapshot.snapshot.value! as Map)["pickUpLatLng"]["latitude"]);
+      double pickUpLng = double.parse(
+          (dataSnapshot.snapshot.value! as Map)["pickUpLatLng"]["longitude"]);
+      tripDetailsInfo.pickUpLatLng = LatLng(pickUpLat, pickUpLng);
+
+      tripDetailsInfo.pickupAddress =
+          (dataSnapshot.snapshot.value! as Map)["pickUpAddress"];
+
+      double dropOffLat = double.parse(
+          (dataSnapshot.snapshot.value! as Map)["dropOffLatLng"]["latitude"]);
+      double dropOffLng = double.parse(
+          (dataSnapshot.snapshot.value! as Map)["dropOffLatLng"]["longitude"]);
+      tripDetailsInfo.dropOffLatLng = LatLng(dropOffLat, dropOffLng);
+
+      tripDetailsInfo.dropOffAddress =
+          (dataSnapshot.snapshot.value! as Map)["dropOffAddress"];
+
+      tripDetailsInfo.userName = (dataSnapshot.snapshot.value! as Map)["name"];
+      tripDetailsInfo.userPhone =
+          (dataSnapshot.snapshot.value! as Map)["Phone"];
+
+      tripDetailsInfo.tripID = tripID;
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => NotificationDialog(
+          tripDetailsInfo: tripDetailsInfo,
+        ),
+      );
+    });
   }
 
   @override
@@ -52,6 +193,150 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
                 rotateGesturesEnabled: true,
                 markers: appState.markers,
               ),
+              //go online for driver
+              Positioned(
+                top: 61,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                            context: context,
+                            isDismissible: false,
+                            builder: (BuildContext context) {
+                              return Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 5.0,
+                                      spreadRadius: 0.5,
+                                      offset: Offset(
+                                        0.7,
+                                        0.7,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                height: 221,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 18),
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(
+                                        height: 11,
+                                      ),
+                                      Text(
+                                        (!isDriverAvailable)
+                                            ? "GO ONLINE NOW"
+                                            : "GO OFFLINE NOW",
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 22,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 21,
+                                      ),
+                                      Text(
+                                        (!isDriverAvailable)
+                                            ? "You are about to go online, you will become available to receive trip requests from users."
+                                            : "You are about to go offline, you will stop receiving new trip requests from users.",
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 25,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text(
+                                                "BACK",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 16,
+                                          ),
+                                          Expanded(
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                if (!isDriverAvailable) {
+                                                  //go online
+                                                  goOnlineNow();
+
+                                                  //get driver location updates
+                                                  setAndGetLocationUpdates();
+
+                                                  Navigator.pop(context);
+
+                                                  setState(() {
+                                                    colorToShow =
+                                                        Colors.redAccent;
+                                                    titleToShow =
+                                                        "GO OFFLINE NOW";
+                                                    isDriverAvailable = true;
+                                                  });
+                                                } else {
+                                                  //go offline
+                                                  goOfflineNow();
+
+                                                  Navigator.pop(context);
+
+                                                  setState(() {
+                                                    colorToShow = Colors.green;
+                                                    titleToShow =
+                                                        "GO ONLINE NOW";
+                                                    isDriverAvailable = false;
+                                                  });
+                                                }
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: (titleToShow ==
+                                                        "GO ONLINE NOW")
+                                                    ? Colors.green
+                                                    : Colors.pink,
+                                              ),
+                                              child: const Text("CONFIRM",
+                                                  style: TextStyle(
+                                                      color: Colors.white)),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorToShow,
+                      ),
+                      child: Text(titleToShow,
+                          style: const TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              ),
               Positioned(
                 top: 40,
                 left: 15,
@@ -72,7 +357,6 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
                   ),
                 ),
               ),
-
               Positioned(
                 top: 25,
                 right: 15,
@@ -106,11 +390,11 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
               ),
 
               Positioned(
-                top: 470,
+                top: 620,
                 right: 15,
                 child: GestureDetector(
                   onTap: () {
-                    changeScreen(context,const Subscription());
+                    changeScreen(context, const Subscription());
                   },
                   child: Container(
                     padding:
@@ -129,7 +413,8 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
                           size: 20,
                         ),
                         SizedBox(
-                            width: 5), // Add some space between the icon and text
+                            width:
+                                5), // Add some space between the icon and text
                         Text(
                           'Go Premium',
                           style: TextStyle(
@@ -147,6 +432,5 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
           );
   }
 
-
-
+ 
 }

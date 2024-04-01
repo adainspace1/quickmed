@@ -1,16 +1,21 @@
 // ignore_for_file: sort_child_properties_last
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/model/ambulance/driver/driver_model.dart' as model;
 import 'package:quickmed/screen/ambulance/dashboard/ambulance_profile.dart';
+import 'package:quickmed/screen/ambulance/tabpages/earnings.dart';
+import 'package:quickmed/screen/ambulance/tabpages/hometab.dart';
+import 'package:quickmed/screen/ambulance/tabpages/treatment.dart';
+import 'package:quickmed/screen/ambulance/tabpages/trip_page.dart';
 import 'package:quickmed/screen/ambulance/tabpages/wallet.dart';
 import 'package:quickmed/screen/signin_screen.dart';
 import 'package:quickmed/controller/auth_service.dart';
-import 'package:quickmed/service/ambulance/ambulance_service.dart';
 import 'package:quickmed/util/constant.dart';
-import 'package:quickmed/widget/loading.dart';
-import 'package:quickmed/screen/ambulance/tabpages/hometab.dart';
+import 'package:quickmed/provider/ambulance/ambulance_appstate.dart';
+
+
 
 class AmbulanceHomeScreen extends StatefulWidget {
   const AmbulanceHomeScreen({
@@ -25,45 +30,46 @@ class _AmbulanceHomeScreenState extends State<AmbulanceHomeScreen>
     with SingleTickerProviderStateMixin {
   var scaffoldState = GlobalKey<ScaffoldState>();
 
-  AmbulanceDatabaseService services = AmbulanceDatabaseService();
+  TabController? tabController;
+  int selectedScreen = 0;
 
+  onItemClicked(int index) {
+    setState(() {
+      selectedScreen = index;
+      tabController!.index = selectedScreen;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+     addData();
+    tabController = TabController(length: 5, vsync: this);
   }
 
-
+  addData() async {
+    AmbulanceAppProvider userProvider = Provider.of(context, listen: false);
+    await userProvider.refreshUser();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    model.DriverModel? user = Provider.of<AmbulanceAppProvider>(context).getUser;
+    
+
+    return SafeArea(
+      child: Scaffold(
         key: scaffoldState,
         drawer: Drawer(
-          child: StreamBuilder<model.DriverModel>(
-            stream: services.getUserStreamByUid(), // Add your user stream here
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Loading(); // to show a loading indicator while waiting for data
-              }
-
-              model.DriverModel? user = snapshot.data;
-
-              return ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  UserAccountsDrawerHeader(
-                    accountName: Text(
-                      user?.name ?? "",
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    accountEmail: Text(user?.email ?? "",
-                        style: const TextStyle(color: Colors.white)),
-                    currentAccountPicture: CircleAvatar(
-                      backgroundImage:
-                          NetworkImage(user?.profileImageUrl ?? ""),
-                    ),
-                    decoration: BoxDecoration(
+            child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(user?.name ?? " "),
+              accountEmail: Text(user?.email ?? " "),
+              currentAccountPicture: CircleAvatar(
+                backgroundImage: NetworkImage(user?.profileImageUrl ?? ""),
+              ),
+               decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment(0.8, 1),
@@ -81,78 +87,86 @@ class _AmbulanceHomeScreenState extends State<AmbulanceHomeScreen>
                         image: DecorationImage(
                             image: NetworkImage(user?.profileImageUrl ?? ""),
                             fit: BoxFit.cover)),
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.person_3,
-                      size: 30,
-                      color: COLOR_ACCENT,
-                    ),
-                    title: const Text("Profile"),
-                    onTap: () {
-                      changeScreen(context, const AmbulanceProfileScreen());
-                      // Navigate to ProfileScreen with user data
-                    },
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.health_and_safety,
-                      size: 30,
-                      color: COLOR_ACCENT,
-                    ),
-                    title: const Text("Insurance"),
-                    onTap: () {
-                      // Navigate to ProfileScreen with user data
-                    },
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.wallet,
-                      size: 30,
-                      color: COLOR_ACCENT,
-                    ),
-                    title: const Text("Wallet"),
-                    onTap: () {
-                      // Navigate to ProfileScreen with user data
-                      changeScreen(context, const AmbulanceWalletScreen());
-                    },
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.exit_to_app,
-                      size: 30,
-                      color: COLOR_ACCENT,
-                    ),
-                    title: const Text("Log out"),
-                    // this is the logout button
-                    onTap: () async {
-                      // signOut
-                      await AuthService.logout();
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.person_3,
+                size: 30,
+                color: COLOR_ACCENT,
+              ),
+              title: const Text("Profile"),
+              onTap: () {
+                // Navigate to ProfileScreen with user data
+                changeScreen(context, const AmbulanceProfileScreen());
+              },
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+             ListTile(
+              leading: const Icon(
+                Icons.health_and_safety,
+                size: 30,
+                color: COLOR_ACCENT,
+              ),
+              title: const Text("Insurance"),
+              onTap: () {
+              },
+            ),
+            const SizedBox(height: 20,),
 
-                      // ignore: use_build_context_synchronously
-                      changeScreenReplacement(context, const SignInScreen());
-                    },
-                  )
+            ListTile(
+              leading: const Icon(
+                Icons.exit_to_app,
+                size: 30,
+                color: COLOR_ACCENT,
+              ),
+              title: const Text("Log out"),
+              // this is the logout button
+              onTap: () async {
+                // signOut
+                await AuthService.logout();
 
-                  // ... (add more ListTile widgets for other drawer items)
-                ],
-              );
-            },
-          ),
-        ),
-        body: Stack(
-          children: [
-            AmbulanceMapScreen(scaffoldState),
+                // ignore: use_build_context_synchronously
+                changeScreenReplacement(context, const SignInScreen());
+              },
+            )
           ],
-        ));
+        )),
+        body: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: tabController,
+          children: [
+                AmbulanceMapScreen(scaffoldState),
+                const TreatMent(),
+                const AmbulanceWalletScreen(),
+                const TripsPage(),
+                const EarningsPage()
+
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.health_and_safety), label: 'Treatment'),
+            BottomNavigationBarItem(icon: Icon(Icons.wallet), label: 'Wallet'),
+            BottomNavigationBarItem(icon: Icon(Icons.trip_origin), label: 'TripPage'),
+            BottomNavigationBarItem(icon: Icon(Icons.wallet_travel_rounded), label: 'Earning'),
+
+
+
+          ],
+          unselectedItemColor: COLOR_BACKGROUND,
+          selectedItemColor: COLOR_PRIMARY,
+          backgroundColor: COLOR_ACCENT,
+          type: BottomNavigationBarType.fixed,
+          showUnselectedLabels: true,
+          currentIndex: selectedScreen,
+          onTap: onItemClicked,
+        ),
+        ),
+      
+    );
   }
 }

@@ -43,8 +43,7 @@ class _HospitalFormState extends State<HospitalForm> {
   // Document
   final uploadMedicalLicenseTextEditingController = TextEditingController();
   final uploadClearProofAddressTextEditingController = TextEditingController();
-  final uploadFrontViewOfHospitalTextEditingController =
-      TextEditingController();
+  final uploadFrontViewOfHospitalTextEditingController = TextEditingController();
 
   //boolean variable for the submitted form
   bool _isSubmitting = false;
@@ -85,7 +84,7 @@ class _HospitalFormState extends State<HospitalForm> {
           hospitalAddressTextEditingController.text.isEmpty ||
           hospitalEmergencyNumberTextEditingController.text.isEmpty ||
           hospitalRegNumberTextEditingController.text.isEmpty ||
-          onsitDoctorTextEditingController.text.isEmpty) {
+          hospitalEmailTextEditingController.text.isEmpty) {
         // Display an error message or handle the empty fields as needed
 
         setState(() {
@@ -446,6 +445,38 @@ class _HospitalFormState extends State<HospitalForm> {
                               onChanged: (text) {
                                 setState(() {
                                   hospitalEmergencyNumberTextEditingController
+                                      .text = text;
+                                });
+                              },
+                            ),
+                             const SizedBox(
+                              height: 10,
+                            ),
+                            TextFormField(
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(11)
+                              ],
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                hintText: "Hospital Registration Number",
+                                hintStyle: TextStyle(color: Colors.grey),
+                                filled: true,
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 0, style: BorderStyle.none)),
+                              ),
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: (text) {
+                                if (text == null || text.isEmpty) {
+                                  return "Hospital Regoistration Number cannot be empty";
+                                }
+
+                                return null;
+                              },
+                              onChanged: (text) {
+                                setState(() {
+                                  hospitalRegNumberTextEditingController
                                       .text = text;
                                 });
                               },

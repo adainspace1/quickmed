@@ -77,6 +77,10 @@ dependencies:
   flutter_svg: ^2.0.9
   flutterwave: ^1.0.3
   lints: ^2.1.1
+  restart_app: ^1.2.1
+  loading_animation_widget: ^1.2.1
+  connectivity_plus: ^6.0.1
+  permission_handler: ^11.3.1
 
 
 

@@ -123,6 +123,7 @@ class _UserFormState extends State<UserForm> {
             gender: genderTextEditingController.text.trim());
 
         await UserDataBaseServices.addUserToDatabase(user1);
+        await UserDataBaseServices.addtoRealtime(user1);
       }
       changeScreenReplacement(context, UserHomeScreen());
     } else {
@@ -573,7 +574,7 @@ class _UserFormState extends State<UserForm> {
 
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    primary: COLOR_ACCENT,
+                                    backgroundColor: COLOR_ACCENT,
                                     shape: RoundedRectangleBorder(),
                                     minimumSize: Size(double.infinity, 50)),
                                 onPressed: () {

@@ -9,16 +9,28 @@ import 'package:quickmed/model/hospital/hospital_model.dart' as model;
 
 class HospitalServices {
   static final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   // this function adds user to realtime database
   static Future addtoRealtime(model.HospitalModel user) async {
     try {
       DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
       databaseReference
-          .child("${user.hospitalName}")
-          .child("${user.hospitalName}")
+          .child("hospital")
+          .child("${user.id}")
           .update(user.toJson());
       // ignore: empty_catches
     } catch (e) {}
+  }
+
+
+    //get user by the id
+  Future<model.HospitalModel> getUserByUid() async {
+    User currentUser = _firebaseAuth.currentUser!;
+    DocumentSnapshot snap =
+        await _firestore.collection("hospital").doc(currentUser.uid).get();
+
+    return model.HospitalModel.fromSnapshot(snap);
   }
 
   

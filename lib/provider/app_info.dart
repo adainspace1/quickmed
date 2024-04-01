@@ -4,25 +4,18 @@ import 'package:quickmed/model/direction_model.dart';
 class AppInfo extends ChangeNotifier {
   
 
+  AddressModel? pickUpLocation;
+  AddressModel? dropOffLocation;
 
-  Directions? userPickUpLocation, userDropOffLocation;
-  int countToltalTrip = 0;
-  // List<String> historyTripKeyList = [];
-  // List<String> allTripHistoryInformationList = [];
-
-  
-  // Initialize the user on app startup
- 
-
-
-  
-  void upDatePickUpLocationAddress(Directions userPickUpAddress) {
-    userPickUpLocation = userPickUpAddress;
+  void updatePickUpLocation(AddressModel pickUpModel)
+  {
+    pickUpLocation = pickUpModel;
     notifyListeners();
   }
 
-  void upDateDropOffLocationAddress(Directions dropOffUpAddress) {
-    userDropOffLocation = dropOffUpAddress;
+  void updateDropOffLocation(AddressModel dropOffModel)
+  {
+    dropOffLocation = dropOffModel;
     notifyListeners();
   }
 }

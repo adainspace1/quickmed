@@ -2,21 +2,25 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:quickmed/controller/auth_service.dart';
-import 'package:quickmed/controller/messanging_api.dart';
 import 'package:quickmed/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/provider/ambulance/ambulance_appstate.dart';
 import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
+import 'package:quickmed/provider/hospital/hospital_appstate.dart';
 import 'package:quickmed/provider/user/user_appstate.dart';
 import 'package:quickmed/screen/ambulance/dashboard/ambulance_homescreen.dart';
 import 'package:quickmed/screen/e-consultant/dashboard/econ_homeScreen.dart';
+import 'package:quickmed/screen/hospital/dashboard/hospitalHomescreen.dart';
 import 'package:quickmed/screen/splash_screen.dart';
 import 'package:quickmed/screen/user/dashboard/user_home_screen.dart';
+import 'package:quickmed/provider/app_info.dart';
 
-void main() async {
+
+Future<void> main() async {
   // initialized firebase.
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -35,7 +39,14 @@ void main() async {
         options: DefaultFirebaseOptions.currentPlatform);
   }
 
-  await FirebaseAPi().initNotification();
+   await Permission.notification.isDenied.then((valueOfPermission)
+  {
+    if(valueOfPermission)
+    {
+      Permission.notification.request();
+    }
+  });
+   
   runApp(const MyApp());
 }
 
@@ -53,6 +64,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => UserAppProvider()),
         ChangeNotifierProvider(create: (context) => AmbulanceAppProvider()),
         ChangeNotifierProvider(create: (context) => EconsultantAppProvider()),
+        ChangeNotifierProvider(create: (context) => HospitalAppProvider()),
+        ChangeNotifierProvider(create: (context) => AppInfo()),
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -77,15 +90,17 @@ class _CheckUserLoggedInState extends State<CheckUserLoggedIn> {
   @override
   void initState() {
     super.initState();
-        AuthService.getAccountType().then((value) {
-          if (value == "User") {
-            changeScreenReplacement(context, const UserHomeScreen());
-          } else if (value == "ambulance") {
-            changeScreenReplacement(context, const AmbulanceHomeScreen());
-          } else if (value == "econsultants") {
-            changeScreenReplacement(context, const EconsultantHomeScreen());
-          }
-        });
+    AuthService.getAccountType().then((value) {
+      if (value == "User") {
+        changeScreenReplacement(context, const UserHomeScreen());
+      } else if (value == "ambulance") {
+        changeScreenReplacement(context, const AmbulanceHomeScreen());
+      } else if (value == "econsultants") {
+        changeScreenReplacement(context, const EconsultantHomeScreen());
+      } else if (value == "hospital") {
+        changeScreenReplacement(context, const HospitalScreen());
+      }
+    });
   }
 
   @override

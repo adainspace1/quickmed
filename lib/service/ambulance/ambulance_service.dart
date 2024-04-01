@@ -8,14 +8,15 @@ import 'package:quickmed/model/ambulance/driver/driver_model.dart' as model;
 class AmbulanceDatabaseService {
 
   static final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
     // this function adds user to realtime database
   static Future addtoRealtime(model.DriverModel user) async {
     try {
       DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
       databaseReference
-          .child("${user.phone}")
-          .child("${user.name}")
+          .child("drivers")
+          .child("${user.id}")
           .update(user.toJson());
       // ignore: empty_catches
     } catch (e) {}
@@ -33,6 +34,15 @@ class AmbulanceDatabaseService {
     } catch (e) {}
   }
 
+
+    //get user by the id
+  Future<model.DriverModel> getUserByUid() async {
+    User currentUser = _firebaseAuth.currentUser!;
+    DocumentSnapshot snap =
+        await _firestore.collection("ambulance").doc(currentUser.uid).get();
+
+    return model.DriverModel.fromSnapshot(snap);
+  }
  
 
  //this function gets the user stream to rebuild the ui.......
@@ -105,9 +115,9 @@ class AmbulanceDatabaseService {
   Future<void> updateActiveStatus(bool isOnline) async {
     User currentUser = _firebaseAuth.currentUser!;
     FirebaseFirestore.instance
-        .collection('econsultants')
+        .collection('ambulance')
         .doc(currentUser.uid)
-        .update({'is_Online': isOnline, 'timeStamp': Timestamp.now()});
+        .update({'isOnline': isOnline, 'timeStamp': Timestamp.now()});
   }
   
 }

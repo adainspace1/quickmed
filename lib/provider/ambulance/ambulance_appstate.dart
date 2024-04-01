@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:quickmed/model/ambulance/driver/driver_model.dart';
 import 'package:quickmed/service/ambulance/ambulance_service.dart';
 import 'package:quickmed/service/map_request.dart';
 import 'package:quickmed/service/ride_request.dart';
@@ -35,13 +36,14 @@ class AmbulanceAppProvider extends ChangeNotifier {
 
   RideRequest _requestServices = RideRequest();
 
-  AmbulanceDatabaseService _ambulanceDatabaseService =
-      AmbulanceDatabaseService();
+  AmbulanceDatabaseService _ambulanceDatabaseService = AmbulanceDatabaseService();
   AmbulanceDatabaseService get ambulanceservice => _ambulanceDatabaseService;
 
   BitmapDescriptor? _carPin;
   BitmapDescriptor? get carpin => _carPin;
 
+  DriverModel? _user;
+  DriverModel? get getUser => _user;
   // //   location pin
   BitmapDescriptor? _locationPin;
 
@@ -90,12 +92,18 @@ class AmbulanceAppProvider extends ChangeNotifier {
     Position position = await Geolocator.getCurrentPosition();
     _ambulanceDatabaseService.updateLocation(
         position.latitude, position.longitude);
-        
 
     _center = LatLng(position.latitude, position.longitude);
     addMarker(_center!);
     notifyListeners();
     return position;
+  }
+
+  //FUNCTION TO GET THE USER FROM THE FIRESTORE DATABASE...
+  Future<void> refreshUser() async {
+    DriverModel user = await _ambulanceDatabaseService.getUserByUid();
+    _user = user;
+    notifyListeners();
   }
 
   //create the map

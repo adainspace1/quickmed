@@ -13,7 +13,10 @@ class _SubscriptionState extends State<Subscription> {
   Widget build(BuildContext context) {
     // ignore: prefer_const_constructors
     return  Scaffold(
-      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text("Subscription",  style: TextStyle(fontSize: 14.0, color:Colors.white),),
+      ),
+      backgroundColor: COLOR_ACCENT,
       body: Column(     
         children: [
            Container(
@@ -33,18 +36,12 @@ class _SubscriptionState extends State<Subscription> {
               onPress: () => {}
               
               ),
-
-
+              
                CustomCard(
               text: "Get Verified for 5000 Naira", 
               onPress: () => {}
               
-              ),
-
-
-
-
-          
+              ),         
 
         ],
       ),

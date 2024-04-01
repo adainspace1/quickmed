@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_print
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // is class will handle our ride request
@@ -9,7 +8,7 @@ class RideRequest {
 
   // this is the function that create the ride request
   void createRideRequest(
-      {String? id, String? userId, String? name, String? img, String? issue}) {
+      {String? id, String? userId, String? name, String? img, String? issue, double? lat, double? long}) {
     var db = FirebaseFirestore.instance;
 
     db.collection(collection).doc(userId).set({
@@ -18,12 +17,14 @@ class RideRequest {
       "img": img,
       "userId": userId,
       "issue": issue,
+      "latitude":lat,
+      "longitude": long,
       "Status": "pending",
     });
   }
 
   // Function to delete a ride request
-void deleteRideRequest(String userId) {
+void deleteRideRequest(String? userId) {
   var db = FirebaseFirestore.instance;
 
   db.collection('requests').doc(userId).delete().then((_) {

@@ -1,18 +1,10 @@
-class Directions {
-  String? humanReadeAbleAddress;
-  String? locationName;
-  double? locationId;
-  double? locationlatitude;
-  double? locationlongitude;
+class AddressModel
+{
+  String? humanReadableAddress;
+  double? latitudePosition;
+  double? longitudePosition;
+  String? placeID;
+  String? placeName;
 
-  Directions({
-      this.humanReadeAbleAddress,
-      this.locationName,
-      this.locationId,
-      this.locationlatitude,
-      this.locationlongitude
-  });
-
-
-  
+  AddressModel({this.humanReadableAddress, this.latitudePosition, this.longitudePosition, this.placeID, this.placeName,});
 }

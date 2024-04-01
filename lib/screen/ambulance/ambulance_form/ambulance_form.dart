@@ -139,19 +139,19 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
             uploadFrontViewOfCompany: frontview);
 
         await AmbulanceDatabaseService.addUserToDatabase(user1);
+        await AmbulanceDatabaseService.addtoRealtime(user1);
       }
       // ignore: use_build_context_synchronously
       changeScreenReplacement(context, const AmbulanceHomeScreen());
     } else {
       // Validation failed, handle it as needed
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: red,
-            content: Text('Registration Failed Please Try again.'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-
+        const SnackBar(
+          backgroundColor: red,
+          content: Text('Registration Failed Please Try again.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
 
     setState(() {
@@ -615,9 +615,8 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
                             ),
                             TextFormField(
                               inputFormatters: [
-                                LengthLimitingTextInputFormatter(11)
+                                LengthLimitingTextInputFormatter(20)
                               ],
-                              keyboardType: TextInputType.number,
                               decoration: const InputDecoration(
                                 hintText: "Company Registration Number",
                                 hintStyle: TextStyle(color: Colors.grey),
@@ -631,6 +630,13 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
                               validator: (text) {
                                 if (text == null || text.isEmpty) {
                                   return "Company Registration Number cannot be empty";
+                                }
+
+                                final pattern =
+                                    RegExp(r'^RC\d{7}-[A-Z]{2}-\d{4}$');
+
+                                if (!pattern.hasMatch(text)) {
+                                  return "Enter a valid Company Registration Number";
                                 }
 
                                 return null;
@@ -751,7 +757,7 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
                             ),
                             TextFormField(
                               inputFormatters: [
-                                LengthLimitingTextInputFormatter(11)
+                                LengthLimitingTextInputFormatter(30)
                               ],
                               keyboardType: TextInputType.text,
                               decoration: const InputDecoration(
@@ -769,7 +775,8 @@ class _AmbulanceFormState extends State<AmbulanceForm> {
                                   return "Plate Number cannot be empty";
                                 }
                                 // Use RegExp for alphanumeric validation
-                                final alphanumericRegex = RegExp(r'^[a-zA-Z0-9]+$');
+                                final alphanumericRegex =
+                                    RegExp(r'^[A-Z]{3}-\d{3}[A-Z]{2}$');
                                 if (!alphanumericRegex.hasMatch(text)) {
                                   return "Enter a valid alphanumeric plate number";
                                 }

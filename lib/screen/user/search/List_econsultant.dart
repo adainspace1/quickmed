@@ -27,8 +27,7 @@ class _ListOfEconState extends State<ListOfEcon> {
 
   @override
   Widget build(BuildContext context) {
-    EconsultantAppProvider appProvider =
-        Provider.of<EconsultantAppProvider>(context);
+    EconsultantAppProvider appstate = Provider.of<EconsultantAppProvider>(context,);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: COLOR_ACCENT,
@@ -37,7 +36,7 @@ class _ListOfEconState extends State<ListOfEcon> {
             controller: _search,
             decoration: const InputDecoration(
                 labelText: "Search For Econsultants eg nurse, doctor",
-                labelStyle: TextStyle(color: Colors.white, fontSize: 14)),
+                labelStyle: TextStyle(color: Colors.white, fontSize: 16)),
             onFieldSubmitted: (String _) {
               setState(() {
                 _isShowUser = true;
@@ -115,8 +114,10 @@ class _ListOfEconState extends State<ListOfEcon> {
                       String imageUrl = data['img'] ?? '';
                       String son = data['name'] ?? '';
                       String id = data['id'] ?? '';
-
+                      
                       return Stack(children: [
+
+                        
                         Visibility(
                           child: ConversationList(
                             id: id,
@@ -129,14 +130,10 @@ class _ListOfEconState extends State<ListOfEcon> {
                         ),
 
                         Visibility(
-                          visible: appProvider.show == Show.User_Loading,
+                          visible: appstate.show == Show.SP_Found,
                           child: const SpLoading(),
-                        ),
-                        //FOR CANCELLED REQUESTS..
-                        Visibility(
-                          visible: appProvider.show == Show.Request_Cancelled,
-                          child: const SpLoading(),
-                        ),
+                        )
+                        
                       ]);
                     },
                   );
@@ -172,7 +169,6 @@ class ConversationList extends StatefulWidget {
 
 class _ConversationListState extends State<ConversationList> {
   final issueTextEditingController = TextEditingController();
-
   NotificationMessage notify = NotificationMessage();
 
   @override
@@ -186,106 +182,108 @@ class _ConversationListState extends State<ConversationList> {
     await userProvider.refreshUser();
   }
 
- void openModal(BuildContext context) {
-  UserAppProvider appState = Provider.of<UserAppProvider>(context, listen: false);
-  model.UserModel? user = appState.getUser;
+  void openModal(BuildContext context) {
+    UserAppProvider appState =
+        Provider.of<UserAppProvider>(context, listen: false);
+    model.UserModel? user = appState.getUser;
 
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text("Describe Your Issue"),
-      content: Container(
-        height: 200, // Set the desired height
-        decoration: BoxDecoration(
-          color: Colors.white, // Set the background color to white
-          borderRadius: BorderRadius.circular(8.0), // Optional: add border radius
-        ),
-        child: TextField(
-          controller: issueTextEditingController,
-          decoration: const InputDecoration(
-            hintText: "Describe the issue",
-            hintStyle: TextStyle(color: Colors.grey),
-            border: InputBorder.none, // Remove border
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Describe Your Issue"),
+        content: Container(
+          height: 200, // Set the desired height
+          decoration: BoxDecoration(
+            color: Colors.white, // Set the background color to white
+            borderRadius:
+                BorderRadius.circular(8.0), // Optional: add border radius
           ),
-        ),
-      ),
-      actions: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: COLOR_ACCENT),
-          onPressed: () async {
-            
-            if (issueTextEditingController.text.isEmpty) {
-              notify.error();
-            } else {
-              appState.createRequest(issueTextEditingController.text, context, user!);
-            }
-
-            Navigator.pop(context);
-          },
-          child: const Text(
-            "Proceed",
-            style: TextStyle(color: COLOR_BACKGROUND),
-          ),
-        )
-      ],
-    ),
-  );
-}
-
-
- @override
-Widget build(BuildContext context) {
-  return GestureDetector(
-    onTap: () => openModal(context), // Pass context here
-    child: Container(
-      padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Row(
-              children: <Widget>[
-                CircleAvatar(
-                  backgroundImage: NetworkImage(widget.imageUrl),
-                  maxRadius: 30,
-                ),
-                const SizedBox(
-                  width: 16,
-                ),
-                Expanded(
-                  child: Container(
-                    color: Colors.transparent,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          widget.name,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        Text(
-                          widget.messageText,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(
-                          height: 6,
-                        ),
-                        Text(
-                          widget.isOnline ? 'Online' : 'Offline',
-                          style: TextStyle(
-                            color: widget.isOnline ? Colors.green : Colors.red,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+          child: TextField(
+            controller: issueTextEditingController,
+            decoration: const InputDecoration(
+              hintText: "Describe the issue",
+              hintStyle: TextStyle(color: Colors.grey),
+              border: InputBorder.none, // Remove border
             ),
           ),
-          StarsWidget(numberOfStars: widget.star),
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: COLOR_ACCENT),
+            onPressed: () async {
+              if (issueTextEditingController.text.isEmpty) {
+                notify.error();
+              } else {
+                appState.createRequest(
+                    issueTextEditingController.text, context, user!);
+              }
+
+              Navigator.pop(context);
+            },
+            child: const Text(
+              "Proceed",
+              style: TextStyle(color: COLOR_BACKGROUND),
+            ),
+          )
         ],
       ),
-    ),
-  );
-}
+    );
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => openModal(context), // Pass context here
+      child: Container(
+        padding:
+            const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(widget.imageUrl),
+                    maxRadius: 30,
+                  ),
+                  const SizedBox(
+                    width: 16,
+                  ),
+                  Expanded(
+                    child: Container(
+                      color: Colors.transparent,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            widget.name,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            widget.messageText,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(
+                            height: 6,
+                          ),
+                          Text(
+                            widget.isOnline ? 'Online' : 'Offline',
+                            style: TextStyle(
+                              color:
+                                  widget.isOnline ? Colors.green : Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            StarsWidget(numberOfStars: widget.star),
+          ],
+        ),
+      ),
+    );
+  }
 }

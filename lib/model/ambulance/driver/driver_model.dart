@@ -22,6 +22,7 @@ class DriverModel {
   String? accountType;
   String? profileImageUrl;
   double? amount;
+  bool? isOnline;
   bool? verified;
   int? rating;
 
@@ -40,6 +41,7 @@ class DriverModel {
       this.plateNumber,
       this.color,
       this.verified,
+      this.isOnline,
       this.uploadProofOfAddress,
       this.uploadFrontViewOfCompany,
       this.uploadMedicalLicense,
@@ -77,7 +79,9 @@ class DriverModel {
         longitude: userData["longitude"] ?? "",
         rating: userData["rating"] ?? "",
         verified: userData['verified'] ?? "",
-        amount: userData['amount'] ?? "");
+        amount: userData['amount'] ?? "",
+        isOnline: userData['isOnline'] ?? ""
+        );
   }
 
   // this is the maped string that would be displayed ont the firestore database......
@@ -105,7 +109,8 @@ class DriverModel {
       "longitude": 0.0,
       "rating": 0,
       "amount": 0.0,
-      "verified": false
+      "verified": false,
+      "isOnline":false
     };
   }
 }

@@ -16,8 +16,8 @@ class EconsultantServices {
     try {
       DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
       databaseReference
-          .child("${user.name}")
-          .child("${user.name}")
+          .child("econsultants")
+          .child("${user.id}")
           .update(user.toJson());
       // ignore: empty_catches
     } catch (e) {}
