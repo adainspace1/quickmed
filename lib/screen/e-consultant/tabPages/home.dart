@@ -1,8 +1,16 @@
+// ignore_for_file: prefer_final_fields
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:quickmed/global/global.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
+import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/subscription.dart';
 import 'package:quickmed/widget/loading.dart';
@@ -19,6 +27,58 @@ class EconsultantMapScreen extends StatefulWidget {
 
 class _EconsultantMapScreenState extends State<EconsultantMapScreen> {
   GlobalKey<ScaffoldState> scaffoldSate = GlobalKey<ScaffoldState>();
+    String statusText = 'Now offline';
+  bool isDriverActive = false;
+  Position? currentPositionOfDriver;
+
+  Color colorToShow = Colors.green;
+  String titleToShow = "GO ONLINE NOW";
+  bool isDriverAvailable = false;
+
+  DatabaseReference? newSpRequestReference;
+  GoogleMapController? controllerGoogleMap;
+  EconsultantServices _service = EconsultantServices();
+
+ // TO ENABLE USER TO SEND RIDE REQUESTS
+  goOnlineNow() async {
+    Position pos = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    spCurrentPosition = pos;
+
+    Geofire.initialize("onlineEconsultants");
+    Geofire.setLocation(
+      FirebaseAuth.instance.currentUser!.uid,
+      spCurrentPosition!.latitude,
+      spCurrentPosition!.longitude,
+    );
+
+    newSpRequestReference = FirebaseDatabase.instance
+        .ref()
+        .child("econsultants")
+        .child(FirebaseAuth.instance.currentUser!.uid)
+        .child("newTripStatus");
+    newSpRequestReference!.set("waiting");
+
+    newSpRequestReference!.onValue.listen((event) {});
+
+    _service.updateActiveStatus(true);
+  }
+
+
+  //TO GO OFFLINE DISABLE REQUESTS
+  goOfflineNow() {
+    //stop sharing driver live location updates
+    Geofire.removeLocation(FirebaseAuth.instance.currentUser!.uid);
+
+    //stop listening to the newTripStatus
+    newSpRequestReference!.onDisconnect();
+    newSpRequestReference!.remove();
+    newSpRequestReference = null;
+  }
+
+
 
   @override
   void initState() {

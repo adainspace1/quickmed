@@ -70,11 +70,14 @@ class _SignInScreenState extends State<SignInScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.network(
-                        "https://res.cloudinary.com/damufjozr/image/upload/v1703970360/adainlogoblack_qvdoeh.png",
-                        width: 220,
-                        height: 220,
-                        color: COLOR_BACKGROUND_DARK,
+                      Image.asset(
+                        "images/logo.png",
+                        width: 100,
+                        height: 100,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(
+                        height: 30,
                       ),
                       Text(
                         "Powered by Adain",

@@ -17,7 +17,7 @@ class NotificationDialog extends StatefulWidget
 {
   TripDetails? tripDetailsInfo;
 
-  NotificationDialog({super.key, this.tripDetailsInfo,});
+  NotificationDialog({super.key,  this.tripDetailsInfo,});
 
   @override
   State<NotificationDialog> createState() => _NotificationDialogState();

@@ -108,18 +108,19 @@ class _EconsultantFormState extends State<EconsultantForm> {
             dob: dobTextEditingController.text.toString());
 
         await EconsultantServices.addUserToDatabase(user1);
+        await EconsultantServices.addtoRealtime(user1);
       }
       // ignore: use_build_context_synchronously
       changeScreenReplacement(context, const EconsultantHomeScreen());
     } else {
       // Validation failed, handle it as needed
-       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: red,
-            content: Text('Registration Failed please try again.'),
-            duration: Duration(seconds: 2),
-          ),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: red,
+          content: Text('Registration Failed please try again.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
 
     setState(() {

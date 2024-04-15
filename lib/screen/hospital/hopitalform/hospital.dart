@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,7 +42,8 @@ class _HospitalFormState extends State<HospitalForm> {
   // Document
   final uploadMedicalLicenseTextEditingController = TextEditingController();
   final uploadClearProofAddressTextEditingController = TextEditingController();
-  final uploadFrontViewOfHospitalTextEditingController = TextEditingController();
+  final uploadFrontViewOfHospitalTextEditingController =
+      TextEditingController();
 
   //boolean variable for the submitted form
   bool _isSubmitting = false;
@@ -62,7 +62,9 @@ class _HospitalFormState extends State<HospitalForm> {
       });
 
       // Check if the profile photo is empty
-      if (_uploadfrontview == null || _uploadmedicallicence == null || _uploadmedicallicence == null) {
+      if (_uploadfrontview == null ||
+          _uploadmedicallicence == null ||
+          _uploadmedicallicence == null) {
         // Show a Snackbar message if profile photo is empty
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -112,29 +114,31 @@ class _HospitalFormState extends State<HospitalForm> {
 
         HospitalModel user1 = HospitalModel(
             id: currentUser?.uid,
-            hospitalEmergencyNumber:hospitalEmergencyNumberTextEditingController.text.trim(),
+            hospitalEmergencyNumber:
+                hospitalEmergencyNumberTextEditingController.text.trim(),
             hospitalName: hospitalNameTextEditingController.text.trim(),
             hospitaladdress: hospitalAddressTextEditingController.text.trim(),
-            hospitalRegNumber:hospitalRegNumberTextEditingController.text.trim(),
+            hospitalRegNumber:
+                hospitalRegNumberTextEditingController.text.trim(),
             hospitalemail: hospitalEmailTextEditingController.text.trim(),
             uploadMedicalLicence: medicalLicence,
             uploadfrontviewofhospital: frontview,
-            uploadclearProofofaddress: proofaddress            
-            );
+            uploadclearProofofaddress: proofaddress);
 
-            await HospitalServices.addUserToDatabase(user1);
+        await HospitalServices.addUserToDatabase(user1);
+        await HospitalServices.addtoRealtime(user1);
       }
       // ignore: use_build_context_synchronously
       changeScreenReplacement(context, const HospitalScreen());
     } else {
       // Validation failed, handle it as needed
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: red,
-            content: Text('Registration Failed please try again.'),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        const SnackBar(
+          backgroundColor: red,
+          content: Text('Registration Failed please try again.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
 
     setState(() {
@@ -146,8 +150,6 @@ class _HospitalFormState extends State<HospitalForm> {
   Uint8List? _uploadproofaddress;
   Uint8List? _uploadfrontview;
 
-
-
   //function to handle medicallicence images
   void _uploadMedicalLicence() async {
     Uint8List? img = await pickImage(ImageSource.gallery, context);
@@ -156,6 +158,7 @@ class _HospitalFormState extends State<HospitalForm> {
       _uploadmedicallicence = img;
     });
   }
+
   //function to handle proofaddress images
   void _uploadProofAddress() async {
     Uint8List? img = await pickImage(ImageSource.gallery, context);
@@ -164,6 +167,7 @@ class _HospitalFormState extends State<HospitalForm> {
       _uploadproofaddress = img;
     });
   }
+
   //function to handle proofaddress images
   void _uploadFrontView() async {
     Uint8List? img = await pickImage(ImageSource.gallery, context);
@@ -185,7 +189,6 @@ class _HospitalFormState extends State<HospitalForm> {
           children: [
             Column(
               children: [
-   
                 //row containing licenses
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -449,7 +452,7 @@ class _HospitalFormState extends State<HospitalForm> {
                                 });
                               },
                             ),
-                             const SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
                             TextFormField(
@@ -476,8 +479,8 @@ class _HospitalFormState extends State<HospitalForm> {
                               },
                               onChanged: (text) {
                                 setState(() {
-                                  hospitalRegNumberTextEditingController
-                                      .text = text;
+                                  hospitalRegNumberTextEditingController.text =
+                                      text;
                                 });
                               },
                             ),

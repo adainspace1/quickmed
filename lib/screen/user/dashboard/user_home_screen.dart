@@ -90,29 +90,56 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   //get user current position
   getCurrentLiveLocationOfUser() async {
-    Position positionOfUser = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation);
-    currentPositionOfUser = positionOfUser;
+    Position position = await _determinePosition();
 
-    LatLng positionOfUserInLatLng = LatLng(
-        currentPositionOfUser!.latitude, currentPositionOfUser!.longitude);
+    controllerGoogleMap!.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(
+            target: LatLng(position.latitude, position.longitude), zoom: 14)));
 
+    markerSet.clear();
     markerSet.add(Marker(
         markerId: const MarkerId('currentLocation'),
-        position: LatLng(currentPositionOfUser!.latitude,
-            currentPositionOfUser!.longitude)));
+        position: LatLng(position.latitude, position.longitude)));
 
-    CameraPosition cameraPosition =
-        CameraPosition(target: positionOfUserInLatLng, zoom: 15);
-    controllerGoogleMap!
-        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    setState(() {});
 
     await CommonMethods.convertGeoGraphicCoOrdinatesIntoHumanReadableAddress(
-        currentPositionOfUser!, context);
+        position, context);
 
     await getUserInfoAndCheckBlockStatus();
 
     await initializeGeoFireListener();
+  }
+
+  //determing the current position
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled');
+    }
+
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        return Future.error("Location permission denied");
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied');
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+    await services.updateLocation(position.latitude, position.longitude);
+
+    return position;
   }
 
   getUserInfoAndCheckBlockStatus() async {
@@ -469,12 +496,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
       if ((eventSnapshot.snapshot.value as Map)["name"] != null) {
         nameDriver = (eventSnapshot.snapshot.value as Map)["name"];
-        
       }
 
       if ((eventSnapshot.snapshot.value as Map)["phone"] != null) {
-        phoneNumberDriver =
-            (eventSnapshot.snapshot.value as Map)["phone"];
+        phoneNumberDriver = (eventSnapshot.snapshot.value as Map)["phone"];
       }
 
       if ((eventSnapshot.snapshot.value as Map)["proileImageUrl"] != null) {
@@ -763,46 +788,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             ),
             ListTile(
               leading: const Icon(
-                Icons.phone,
-                size: 30,
-                color: COLOR_ACCENT,
-              ),
-              title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                if (isLoading)
-                  const Center(
-                    child: Loading(),
-                  ),
-                RichText(
-                    text: const TextSpan(children: [
-                  TextSpan(
-                      text: "Quick Call",
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w300)),
-                ], style: TextStyle(color: Colors.black)))
-              ]),
-              onTap: () async {
-                setState(() {
-                  isLoading = true; // Set loading to true when tapped
-                });
-
-                // Add a delay using Future.delayed
-                await Future.delayed(const Duration(
-                    seconds: 2)); // Adjust the duration as needed
-
-                // Perform the phone call
-                await FlutterPhoneDirectCaller.callNumber('+2349074235666');
-
-                setState(() {
-                  isLoading =
-                      false; // Set loading to false after the call is complete
-                });
-              },
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            ListTile(
-              leading: const Icon(
                 Icons.wallet,
                 size: 30,
                 color: COLOR_ACCENT,
@@ -930,62 +915,168 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           Positioned(
             left: 0,
             right: 0,
-            bottom: -80,
+            bottom: 0,
             child: SizedBox(
-              height: searchContainerHeight,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      var responseFromSearchPage = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (c) => const SearchDestinationPage()));
+                height: 500,
+                child: DraggableScrollableSheet(
+                    initialChildSize: 0.3,
+                    minChildSize: 0.3,
+                    maxChildSize: 0.5,
+                    builder: (BuildContext context, myscrollController) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20)),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.shade100,
+                                offset: const Offset(3, 2),
+                                blurRadius: 7)
+                          ],
+                        ),
+                        child:
+                            ListView(controller: myscrollController, children: [
+                          ListTile(
+                              onTap: () async {
+                                setState(() {
+                                  isLoading =
+                                      true; // Set loading to true when tapped
+                                });
 
-                      if (responseFromSearchPage == "placeSelected") {
-                        displayUserRideDetailsContainer();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: COLOR_ACCENT,
-                        shape: const CircleBorder(),
-                        padding: const EdgeInsets.all(10)),
-                    child: Image.network(
-                      "https://res.cloudinary.com/damufjozr/image/upload/v1711363249/Ambulance_yihyeu.png",
-                      width: 35,
-                      height: 35,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      changeScreen(context, const ListOfEcon());
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: COLOR_ACCENT,
-                        shape: const CircleBorder(),
-                        padding: const EdgeInsets.all(10)),
-                    child: Image.network(
-                      "https://res.cloudinary.com/damufjozr/image/upload/v1701761216/pers_jfroff.png",
-                      width: 35,
-                      height: 35,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: COLOR_ACCENT,
-                        shape: const CircleBorder(),
-                        padding: const EdgeInsets.all(10)),
-                    child: Image.network(
-                      "https://res.cloudinary.com/damufjozr/image/upload/v1701761462/hos2_qtpkzs.png",
-                      width: 35,
-                      height: 35,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                                // Add a delay using Future.delayed
+                                await Future.delayed(const Duration(
+                                    seconds:
+                                        2)); // Adjust the duration as needed
+
+                                // Perform the phone call
+                                await FlutterPhoneDirectCaller.callNumber(
+                                    '+2349074235666');
+
+                                setState(() {
+                                  isLoading =
+                                      false; // Set loading to false after the call is complete
+                                });
+                                // await FlutterPhoneDirectCaller.callNumber('+2349074235666');
+                              },
+                              leading: Image.network(
+                                "https://res.cloudinary.com/damufjozr/image/upload/v1703405431/Pngtree_phone_icon_isolated_on_abstract_5261328_eyymfy.png",
+                                width: 40,
+                                height: 40,
+                              ),
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  // Loader widget
+                                  if (isLoading)
+                                    const Center(
+                                      child: Loading(),
+                                    ),
+                                  RichText(
+                                      text: const TextSpan(children: [
+                                    TextSpan(
+                                        text: "Quick Call",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w300)),
+                                  ], style: TextStyle(color: Colors.black))),
+                                ],
+                              )),
+                          ListTile(
+                              onTap: () {
+                                changeScreen(context, const ListOfEcon());
+                              },
+                              leading: Image.network(
+                                "https://res.cloudinary.com/damufjozr/image/upload/v1701761216/pers_jfroff.png",
+                                width: 40,
+                                height: 40,
+                              ),
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  RichText(
+                                      text: const TextSpan(children: [
+                                    TextSpan(
+                                        text: "E-consultant",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w300)),
+                                  ], style: TextStyle(color: Colors.black))),
+                                ],
+                              )),
+                          ListTile(
+                              onTap: () async {
+                                var responseFromSearchPage =
+                                    await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (c) =>
+                                                const SearchDestinationPage()));
+
+                                if (responseFromSearchPage == "placeSelected") {
+                                  displayUserRideDetailsContainer();
+                                }
+                              },
+                              leading: Image.network(
+                                "https://res.cloudinary.com/damufjozr/image/upload/v1701760812/amb2_gpa3lp.jpg",
+                                width: 40,
+                                height: 40,
+                              ),
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  RichText(
+                                      text: const TextSpan(children: [
+                                    TextSpan(
+                                        text: "Ambulance",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w300)),
+                                  ], style: TextStyle(color: Colors.black))),
+                                ],
+                              )),
+                          ListTile(
+                              leading: Image.network(
+                                "https://res.cloudinary.com/damufjozr/image/upload/v1701761462/hos2_qtpkzs.png",
+                                width: 40,
+                                height: 40,
+                              ),
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  RichText(
+                                      text: const TextSpan(children: [
+                                    TextSpan(
+                                        text: "Hospital",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w300)),
+                                  ], style: TextStyle(color: Colors.black))),
+                                ],
+                              )),
+                          ListTile(
+                              leading: Image.network(
+                                "https://res.cloudinary.com/damufjozr/image/upload/v1703414009/5172568_add_contact_user_icon_hojgvo.png",
+                                width: 40,
+                                height: 40,
+                              ),
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  RichText(
+                                      text: const TextSpan(children: [
+                                    TextSpan(
+                                        text: "Book for someone",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w300)),
+                                  ], style: TextStyle(color: Colors.black))),
+                                ],
+                              )),
+                        ]),
+                      );
+                    })),
           ),
 
           ///ride details container

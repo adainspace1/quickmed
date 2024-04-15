@@ -1,17 +1,19 @@
-// ignore_for_file: library_private_types_in_public_api, file_names
+// ignore_for_file: library_private_types_in_public_api, file_names, non_constant_identifier_names, unnecessary_import
 
+import 'dart:async';
+
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/widgets.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
-import 'package:quickmed/provider/user/user_appstate.dart' hide Show;
 import 'package:quickmed/util/notification.dart';
 import 'package:quickmed/widget/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quickmed/service/user/user_service.dart';
 import 'package:quickmed/util/constant.dart';
-import 'package:quickmed/widget/requestloader/loader.dart';
 import 'package:quickmed/widget/stars.dart';
-import 'package:quickmed/model/user/user_model.dart' as model;
 
 class ListOfEcon extends StatefulWidget {
   const ListOfEcon({super.key});
@@ -24,10 +26,176 @@ class _ListOfEconState extends State<ListOfEcon> {
   UserDataBaseServices services = UserDataBaseServices();
   final TextEditingController _search = TextEditingController();
   bool _isShowUser = false;
+  final issueTextEditingController = TextEditingController();
+  NotificationMessage notify = NotificationMessage();
+  DatabaseReference? spRequestRef;
+  String stateOfApp = "normal";
+  double bottomMapPadding = 0;
+  double userDetailsContainerHeight = 0;
+  double requestContainerHeight = 0;
+  StreamSubscription<DatabaseEvent>? spStreamSubscription;
+  bool isDrawerOpened = true;
+  GoogleMapController? controllerGoogleMap;
+  String nameSp = "";
+
+  cancelRideRequest() {
+    //remove ride request from database
+    spRequestRef!.remove();
+
+    setState(() {
+      stateOfApp = "normal";
+    });
+  }
+
+  displayRequestContainer() {
+    setState(() {
+      userDetailsContainerHeight = 0;
+      requestContainerHeight = 220;
+      bottomMapPadding = 200;
+      isDrawerOpened = true;
+    });
+  }
+
+  makeRequest() {
+    TextEditingController issue = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Describe Your Issue"),
+        content: Container(
+          height: 200, // Set the desired height
+          decoration: BoxDecoration(
+            color: Colors.white, // Set the background color to white
+            borderRadius:
+                BorderRadius.circular(8.0), // Optional: add border radius
+          ),
+          child: TextField(
+            controller: issue,
+            decoration: const InputDecoration(
+              hintText: "Describe the issue",
+              hintStyle: TextStyle(color: Colors.grey),
+              border: InputBorder.none, // Remove border
+            ),
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: COLOR_ACCENT),
+            onPressed: () async {
+              spRequestRef =
+                  FirebaseDatabase.instance.ref().child("spRequest").push();
+
+              Map spCoOrdinates = {
+                "latitude": "",
+                "longitude": "",
+              };
+
+              Map dataMap = {
+                "spRequestID": "",
+                "publishDateTime": DateTime.now().toString(),
+                "userName": "",
+                "userPhone": "",
+                "userID": "",
+                "userPosition": "",
+                "spID": "waiting",
+                "carDetails": "",
+                "spLocation": spCoOrdinates,
+                "spName": "",
+                "spPhone": "",
+                "issues": issue.text,
+                "fareAmount": "",
+                "status": "new",
+              };
+
+              spRequestRef!.set(dataMap);
+              spStreamSubscription =
+                  spRequestRef!.onValue.listen((event) async {
+                if (event.snapshot.value == null) {
+                  return;
+                }
+
+                if ((event.snapshot.value as Map)["spName"] != null) {
+                  nameSp = (event.snapshot.value as Map)["spName"];
+                  print(nameSp);
+                }
+              });
+
+              Navigator.pop(context);
+            },
+            child: const Text(
+              "Proceed",
+              style: TextStyle(color: COLOR_BACKGROUND),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget UserList(
+      {required String id,
+      required String name,
+      required String imageUrl,
+      required bool isOnline,
+      required int star,
+      required String messageText}) {
+    return GestureDetector(
+      onTap: () {
+        // Handle onTap action here
+        makeRequest();
+      },
+      child: Container(
+        padding:
+            const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+        child: Row(
+          children: <Widget>[
+            CircleAvatar(
+              backgroundImage: NetworkImage(imageUrl), // Set the image
+              maxRadius: 30,
+            ),
+            const SizedBox(
+              width: 16,
+            ),
+            Expanded(
+              child: Container(
+                color: Colors.transparent,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      name, // Display user's name
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(
+                      height: 6,
+                    ),
+                    Text(
+                      isOnline ? 'Online' : 'Offline', // Display online status
+                      style: TextStyle(
+                        color: isOnline ? Colors.green : Colors.red,
+                      ),
+                    ),
+                    Text(
+                      messageText,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            StarsWidget(numberOfStars: star),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    EconsultantAppProvider appstate = Provider.of<EconsultantAppProvider>(context,);
+    Provider.of<EconsultantAppProvider>(
+      context,
+    );
     return Scaffold(
       appBar: AppBar(
         backgroundColor: COLOR_ACCENT,
@@ -74,7 +242,7 @@ class _ListOfEconState extends State<ListOfEcon> {
                     itemBuilder: (context, index) {
                       return Stack(children: [
                         Visibility(
-                          child: ConversationList(
+                          child: UserList(
                             id: (snapshot.data! as dynamic).docs[index]['id'],
                             name: (snapshot.data! as dynamic).docs[index]
                                 ['name'],
@@ -114,12 +282,10 @@ class _ListOfEconState extends State<ListOfEcon> {
                       String imageUrl = data['img'] ?? '';
                       String son = data['name'] ?? '';
                       String id = data['id'] ?? '';
-                      
-                      return Stack(children: [
 
-                        
+                      return Stack(children: [
                         Visibility(
-                          child: ConversationList(
+                          child: UserList(
                             id: id,
                             name: son,
                             imageUrl: imageUrl,
@@ -128,12 +294,6 @@ class _ListOfEconState extends State<ListOfEcon> {
                             messageText: field,
                           ),
                         ),
-
-                        Visibility(
-                          visible: appstate.show == Show.SP_Found,
-                          child: const SpLoading(),
-                        )
-                        
                       ]);
                     },
                   );
@@ -142,148 +302,6 @@ class _ListOfEconState extends State<ListOfEcon> {
                 }
               },
             ),
-    );
-  }
-}
-
-// ignore: must_be_immutable
-class ConversationList extends StatefulWidget {
-  String? id;
-  String name;
-  String messageText;
-  String imageUrl;
-  bool isOnline;
-  int star;
-
-  ConversationList(
-      {super.key,
-      required this.id,
-      required this.name,
-      required this.messageText,
-      required this.imageUrl,
-      required this.star,
-      required this.isOnline});
-  @override
-  _ConversationListState createState() => _ConversationListState();
-}
-
-class _ConversationListState extends State<ConversationList> {
-  final issueTextEditingController = TextEditingController();
-  NotificationMessage notify = NotificationMessage();
-
-  @override
-  void initState() {
-    super.initState();
-    addData();
-  }
-
-  addData() async {
-    UserAppProvider userProvider = Provider.of(context, listen: false);
-    await userProvider.refreshUser();
-  }
-
-  void openModal(BuildContext context) {
-    UserAppProvider appState =
-        Provider.of<UserAppProvider>(context, listen: false);
-    model.UserModel? user = appState.getUser;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Describe Your Issue"),
-        content: Container(
-          height: 200, // Set the desired height
-          decoration: BoxDecoration(
-            color: Colors.white, // Set the background color to white
-            borderRadius:
-                BorderRadius.circular(8.0), // Optional: add border radius
-          ),
-          child: TextField(
-            controller: issueTextEditingController,
-            decoration: const InputDecoration(
-              hintText: "Describe the issue",
-              hintStyle: TextStyle(color: Colors.grey),
-              border: InputBorder.none, // Remove border
-            ),
-          ),
-        ),
-        actions: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: COLOR_ACCENT),
-            onPressed: () async {
-              if (issueTextEditingController.text.isEmpty) {
-                notify.error();
-              } else {
-                appState.createRequest(
-                    issueTextEditingController.text, context, user!);
-              }
-
-              Navigator.pop(context);
-            },
-            child: const Text(
-              "Proceed",
-              style: TextStyle(color: COLOR_BACKGROUND),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => openModal(context), // Pass context here
-      child: Container(
-        padding:
-            const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                children: <Widget>[
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(widget.imageUrl),
-                    maxRadius: 30,
-                  ),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  Expanded(
-                    child: Container(
-                      color: Colors.transparent,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            widget.name,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          Text(
-                            widget.messageText,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(
-                            height: 6,
-                          ),
-                          Text(
-                            widget.isOnline ? 'Online' : 'Offline',
-                            style: TextStyle(
-                              color:
-                                  widget.isOnline ? Colors.green : Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            StarsWidget(numberOfStars: widget.star),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -31,7 +31,9 @@ String serverKeyFCM =
 // user model current info
 UserModel? userModelCurrentInfo;
 
+//user and ambulance
 Position? driverCurrentPosition;
+Position? spCurrentPosition;
 Position? currentPositionOfUser;
 
 //driver model current info

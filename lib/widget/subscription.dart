@@ -12,56 +12,40 @@ class _SubscriptionState extends State<Subscription> {
   @override
   Widget build(BuildContext context) {
     // ignore: prefer_const_constructors
-    return  Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: const Text("Subscription",  style: TextStyle(fontSize: 14.0, color:Colors.white),),
+        backgroundColor: Colors.redAccent,
+        title: const Text(
+          "SUBSCRIPTION",
+          style: TextStyle(fontSize: 14.0, color: Colors.white),
+        ),
       ),
       backgroundColor: COLOR_ACCENT,
-      body: Column(     
+      body: Column(
         children: [
-           Container(
-              padding: const EdgeInsets.fromLTRB(30, 40, 40, 40),
-              child: const Center(
-                child: Text("Enjoy a Premium QuickMed Service", style: TextStyle(color: COLOR_BACKGROUND, fontSize: 20),),
-              ),         
+          Container(
+            padding: const EdgeInsets.fromLTRB(30, 40, 40, 40),
+            child: const Center(
+              child: Text(
+                "Enjoy a Premium QuickMed Service",
+                style: TextStyle(color: COLOR_BACKGROUND, fontSize: 20),
+              ),
             ),
-            CustomCard(
-              text: "Get Verified for 5000 Naira", 
-              onPress: () => {}
-              
-              ),
-
-               CustomCard(
-              text: "Get Verified for 5000 Naira", 
-              onPress: () => {}
-              
-              ),
-              
-               CustomCard(
-              text: "Get Verified for 5000 Naira", 
-              onPress: () => {}
-              
-              ),         
-
+          ),
+          CustomCard(text: "Get Verified for 5000 Naira", onPress: () => {}),
+          CustomCard(text: "Get Verified for 5000 Naira", onPress: () => {}),
+          CustomCard(text: "Get Verified for 5000 Naira", onPress: () => {}),
         ],
       ),
     );
   }
 }
 
-
-
 class CustomCard extends StatelessWidget {
-  
   final String text;
   final VoidCallback onPress;
 
-  const CustomCard
-     ({
-      super.key,
-      required this.text,
-      required this.onPress
-      });
+  const CustomCard({super.key, required this.text, required this.onPress});
 
   @override
   Widget build(BuildContext context) {
@@ -75,13 +59,11 @@ class CustomCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 150,
-                  height: 100,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: const BoxDecoration(shape: BoxShape.circle),
-                  child: const Icon(Icons.star)
-                ),
-                
+                    width: 150,
+                    height: 100,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: const BoxDecoration(shape: BoxShape.circle),
+                    child: const Icon(Icons.star)),
                 Text(
                   text,
                   style: const TextStyle(fontSize: 16.0, fontFamily: 'Lato'),

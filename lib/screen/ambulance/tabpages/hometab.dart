@@ -2,7 +2,7 @@
 // ignore: file_names
 // ignore: file_names
 // ignore: file_names
-// ignore_for_file: file_names, duplicate_ignore, prefer_final_fields
+// ignore_for_file: file_names, duplicate_ignore, prefer_final_fields, use_build_context_synchronously
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -13,14 +13,11 @@ import 'package:provider/provider.dart';
 import 'package:quickmed/global/global.dart';
 import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/provider/ambulance/ambulance_appstate.dart';
+import 'package:quickmed/push_notification/push_notification.dart';
 import 'package:quickmed/service/ambulance/ambulance_service.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/loading.dart';
 import 'package:quickmed/widget/subscription.dart';
-import 'package:quickmed/widget/loading_dialog.dart';
-import 'package:quickmed/widget/notification_dialog.dart';
-import 'package:quickmed/model/trip_details.dart';
-
 
 class AmbulanceMapScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldState;
@@ -51,8 +48,8 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
     retrieveCurrentDriverInfo();
   }
 
-    // TO ENABLE USER TO SEND RIDE REQUESTS
-   goOnlineNow() async {
+  // TO ENABLE USER TO SEND RIDE REQUESTS
+  goOnlineNow() async {
     Position pos = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
@@ -77,7 +74,6 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
 
     _service.updateActiveStatus(true);
   }
-
 
   //TO GO OFFLINE DISABLE REQUESTS
   goOfflineNow() {
@@ -109,68 +105,61 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
     });
   }
 
- 
-  retrieveCurrentDriverInfo() async {
-    await FirebaseDatabase.instance
-        .ref()
-        .child("drivers")
-        .child(FirebaseAuth.instance.currentUser!.uid)
-        .once()
-        .then((snap) {
-      driverName = (snap.snapshot.value as Map)["name"];
-      driverPhone = (snap.snapshot.value as Map)["phone"];
-    });
-
+  initializePushNotificationSystem() {
+    PushNotificationSystem notificationSystem = PushNotificationSystem();
+    notificationSystem.generateDeviceRegistrationToken();
+    notificationSystem.startListeningForNewNotification(context);
   }
 
+  retrieveCurrentDriverInfo() async {
+    // await FirebaseDatabase.instance
+    //     .ref()
+    //     .child("drivers")
+    //     .child(FirebaseAuth.instance.currentUser!.uid)
+    //     .once()
+    //     .then((snap) {
+    //   driverName = (snap.snapshot.value as Map)["name"];
+    //   driverPhone = (snap.snapshot.value as Map)["phone"];
+    //   driverPhoto = (snap.snapshot.value as Map)["photo"];
+    //   carColor = (snap.snapshot.value as Map)["car_details"]["carType"];
+    //   carModel = (snap.snapshot.value as Map)["car_details"]["color"];
+    //   carNumber = (snap.snapshot.value as Map)["car_details"]["plateNumber"];
 
-  retrieveTripRequestInfo( BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) =>
-          LoadingDialog(messageText: "getting details..."),
-    );
+    //   print("dRIVERnAME:$driverName");
+    //   print("driverphoto:$driverPhone");
+    //   print(driverPhoto);
+    //   print(carColor);
+    //   print(carModel);
+    //   print(carNumber);
+    // });
 
-    DatabaseReference tripRequestsRef =
-        FirebaseDatabase.instance.ref().child("tripRequests").child(tripID);
+    DatabaseReference usersRef = FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(FirebaseAuth.instance.currentUser!.uid);
 
-    tripRequestsRef.once().then((dataSnapshot) {
-      Navigator.pop(context);
+    await usersRef.once().then((snap) {
+      if (snap.snapshot.value != null) {
+        setState(() {
+          driverName = (snap.snapshot.value as Map)["name"];
+          driverPhone = (snap.snapshot.value as Map)["phone"];
+          driverPhoto = (snap.snapshot.value as Map)["profileImageUrl"];
+          carColor = (snap.snapshot.value as Map)["carType"];
+          carModel = (snap.snapshot.value as Map)["color"];
+          carNumber = (snap.snapshot.value as Map)["plateNumber"];
 
+          print("drivername:$driverName");
+          print("driverphoto:$driverPhone");
+          print("Driverphoto$driverPhoto");
+          print(carColor);
+          print(carModel);
+          print(carNumber);
 
+          initializePushNotificationSystem();
 
-      TripDetails tripDetailsInfo = TripDetails();
-      double pickUpLat = double.parse(
-          (dataSnapshot.snapshot.value! as Map)["pickUpLatLng"]["latitude"]);
-      double pickUpLng = double.parse(
-          (dataSnapshot.snapshot.value! as Map)["pickUpLatLng"]["longitude"]);
-      tripDetailsInfo.pickUpLatLng = LatLng(pickUpLat, pickUpLng);
-
-      tripDetailsInfo.pickupAddress =
-          (dataSnapshot.snapshot.value! as Map)["pickUpAddress"];
-
-      double dropOffLat = double.parse(
-          (dataSnapshot.snapshot.value! as Map)["dropOffLatLng"]["latitude"]);
-      double dropOffLng = double.parse(
-          (dataSnapshot.snapshot.value! as Map)["dropOffLatLng"]["longitude"]);
-      tripDetailsInfo.dropOffLatLng = LatLng(dropOffLat, dropOffLng);
-
-      tripDetailsInfo.dropOffAddress =
-          (dataSnapshot.snapshot.value! as Map)["dropOffAddress"];
-
-      tripDetailsInfo.userName = (dataSnapshot.snapshot.value! as Map)["name"];
-      tripDetailsInfo.userPhone =
-          (dataSnapshot.snapshot.value! as Map)["Phone"];
-
-      tripDetailsInfo.tripID = tripID;
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => NotificationDialog(
-          tripDetailsInfo: tripDetailsInfo,
-        ),
-      );
+          //add user photo
+        });
+      } else {}
     });
   }
 
@@ -313,7 +302,7 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
                                                 backgroundColor: (titleToShow ==
                                                         "GO ONLINE NOW")
                                                     ? Colors.green
-                                                    : Colors.pink,
+                                                    : Colors.green,
                                               ),
                                               child: const Text("CONFIRM",
                                                   style: TextStyle(
@@ -431,6 +420,4 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
             ],
           );
   }
-
- 
 }
