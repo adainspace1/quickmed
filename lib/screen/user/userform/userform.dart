@@ -159,26 +159,47 @@ class _UserFormState extends State<UserForm> {
           children: [
             Column(
               children: [
-                SizedBox(
-                  height: 20,
-                ),
-                _image != null
-                    ? CircleAvatar(
-                        radius: 64,
-                        backgroundImage: MemoryImage(_image!),
-                      )
-                    : CircleAvatar(
-                        radius: 55,
-                        backgroundImage: NetworkImage(
-                            "https://res.cloudinary.com/damufjozr/image/upload/v1703326116/imgbin_computer-icons-avatar-user-login-png_t9t5b9.png"),
+                SingleChildScrollView(
+                  child: Expanded(
+                    flex: 7,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 400,
+                      padding:
+                          const EdgeInsets.fromLTRB(25.0, 60.0, 25.0, 20.0),
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [COLOR_PRIMARY, COLOR_ACCENT],
+                              begin: Alignment.bottomLeft,
+                              end: Alignment.topRight),
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(150),
+                              bottomRight: Radius.circular(150))),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _image != null
+                              ? CircleAvatar(
+                                  radius: 64,
+                                  backgroundImage: MemoryImage(_image!),
+                                )
+                              : CircleAvatar(
+                                  radius: 55,
+                                  backgroundImage: NetworkImage(
+                                      "https://res.cloudinary.com/damufjozr/image/upload/v1703326116/imgbin_computer-icons-avatar-user-login-png_t9t5b9.png"),
+                                ),
+                          Positioned(
+                            child: IconButton(
+                              onPressed: _selectImage,
+                              icon: Icon(Icons.add_a_photo),
+                            ),
+                            bottom: -10,
+                            left: 80,
+                          ),
+                        ],
                       ),
-                Positioned(
-                  child: IconButton(
-                    onPressed: _selectImage,
-                    icon: Icon(Icons.add_a_photo),
+                    ),
                   ),
-                  bottom: -10,
-                  left: 80,
                 ),
                 SizedBox(
                   height: 20,

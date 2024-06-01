@@ -19,7 +19,6 @@ import 'package:quickmed/screen/splash_screen.dart';
 import 'package:quickmed/screen/user/dashboard/user_home_screen.dart';
 import 'package:quickmed/provider/app_info.dart';
 
-
 Future<void> main() async {
   // initialized firebase.
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +28,8 @@ Future<void> main() async {
         options: const FirebaseOptions(
             apiKey: "AIzaSyAgI5gBiZpxrqGDRvrLso3EW1aEL1jxRiM",
             authDomain: "quickmedapp-68e93.firebaseapp.com",
-            databaseURL:"https://quickmedapp-68e93-default-rtdb.firebaseio.com",
+            databaseURL:
+                "https://quickmedapp-68e93-default-rtdb.firebaseio.com",
             projectId: "quickmedapp-68e93",
             storageBucket: "quickmedapp-68e93.appspot.com",
             messagingSenderId: "200709773011",
@@ -39,14 +39,12 @@ Future<void> main() async {
         options: DefaultFirebaseOptions.currentPlatform);
   }
 
-   await Permission.notification.isDenied.then((valueOfPermission)
-  {
-    if(valueOfPermission)
-    {
+  await Permission.notification.isDenied.then((valueOfPermission) {
+    if (valueOfPermission) {
       Permission.notification.request();
     }
   });
-   
+
   runApp(const MyApp());
 }
 

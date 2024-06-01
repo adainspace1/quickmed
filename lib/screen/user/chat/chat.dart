@@ -1,9 +1,10 @@
 // ignore_for_file: must_be_immutable
-
 import 'package:flutter/material.dart';
 import 'package:quickmed/global/global.dart';
+import 'package:quickmed/model/chatmodel/chat_model.dart';
 import 'package:quickmed/service/user/user_service.dart';
 import 'package:quickmed/util/constant.dart';
+import 'package:quickmed/Assitance/request_assistant.dart';
 
 class MyChatApp extends StatefulWidget {
   String? userId;
@@ -40,20 +41,24 @@ class MyChatAppState extends State<MyChatApp> {
             curve: Curves.linear));
   }
 
-  // void send() async {
-  //   await services.sendMessage(textEditingController.text);
-  //   setState(() {
-  //     messageList.add(MessageData(textEditingController.text, true));
-  //     textEditingController.clear();
-  //   });
+  void send() async {
+    await services.sendMessage(msg: textEditingController.text);
+    setState(() {
+      messageList.add(MessageData(textEditingController.text, true));
+      textEditingController.clear();
+    });
 
-  //   await scrollAnimation();
-  // }
+    await scrollAnimation();
+  }
+
+  //send email to other hospitals
+  void sendMail() {
+    var url = 'http://localhost:3000/send-email';
+    RequestAssistant.receiveRequest(url);
+  }
 
   @override
   Widget build(BuildContext context) {
-    //UserAppProvider appstate = Provider.of<UserAppProvider>(context);
-
     return Scaffold(
       backgroundColor: COLOR_BACKGROUND,
       appBar: AppBar(
@@ -133,9 +138,9 @@ class MyChatAppState extends State<MyChatApp> {
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 5.0),
                       child: GestureDetector(
-                        onTap: () {
-                        },
+                        onTap: () {},
                         onLongPress: () {
+                          send();
                         },
                         child: const Icon(
                           Icons.send,

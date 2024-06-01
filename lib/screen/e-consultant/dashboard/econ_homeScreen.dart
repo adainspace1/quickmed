@@ -8,9 +8,9 @@ import 'package:quickmed/model/e-consultant/econsultant_model.dart' as model;
 import 'package:quickmed/provider/econsultant/econsultant_appstate.dart';
 import 'package:quickmed/screen/ambulance/tabpages/treatment.dart';
 import 'package:quickmed/screen/e-consultant/dashboard/econ_profile.dart';
+import 'package:quickmed/screen/e-consultant/search/listhospital.dart';
 import 'package:quickmed/screen/e-consultant/tabPages/home.dart';
 import 'package:quickmed/screen/signin_screen.dart';
-import 'package:quickmed/screen/user/user_wallet/wallet_new.dart';
 import 'package:quickmed/screen/user/user_wallet/wallet_screen.dart';
 import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/util/constant.dart';
@@ -45,7 +45,6 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
     await appProvider.refreshUser();
   }
 
- 
   @override
   void initState() {
     addData();
@@ -120,24 +119,23 @@ class _EconsultantHomeScreenState extends State<EconsultantHomeScreen>
               // Navigate to ProfileScreen with user data
             },
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           ListTile(
             leading: const Icon(
-              Icons.wallet,
+              Icons.chat,
               size: 30,
               color: COLOR_ACCENT,
             ),
-            title: const Text("Wallet"),
+            title: const Text("Message"),
             onTap: () {
               // Navigate to ProfileScreen with user data
-              changeScreen(context, const WalletNew());
+              changeScreen(context, const ListOfHospital());
             },
           ),
           const SizedBox(
             height: 10,
           ),
+
           ListTile(
             leading: const Icon(
               Icons.exit_to_app,

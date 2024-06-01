@@ -2,7 +2,9 @@
 // ignore: file_names
 // ignore: file_names
 // ignore: file_names
-// ignore_for_file: file_names, duplicate_ignore, prefer_final_fields, use_build_context_synchronously
+// ignore_for_file: file_names, duplicate_ignore, prefer_final_fields, use_build_context_synchronously, unused_local_variable
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,6 @@ import 'package:quickmed/provider/ambulance/ambulance_appstate.dart';
 import 'package:quickmed/push_notification/push_notification.dart';
 import 'package:quickmed/service/ambulance/ambulance_service.dart';
 import 'package:quickmed/util/constant.dart';
-import 'package:quickmed/widget/loading.dart';
 import 'package:quickmed/widget/subscription.dart';
 
 class AmbulanceMapScreen extends StatefulWidget {
@@ -29,6 +30,8 @@ class AmbulanceMapScreen extends StatefulWidget {
 }
 
 class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
+  final Completer<GoogleMapController> googleMapCompleterController = Completer<GoogleMapController>();
+
   String statusText = 'Now offline';
   GlobalKey<ScaffoldState> scaffoldSate = GlobalKey<ScaffoldState>();
   bool isDriverActive = false;
@@ -37,7 +40,6 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
   Color colorToShow = Colors.green;
   String titleToShow = "GO ONLINE NOW";
   bool isDriverAvailable = false;
-
   DatabaseReference? newTripRequestReference;
   GoogleMapController? controllerGoogleMap;
   AmbulanceDatabaseService _service = AmbulanceDatabaseService();
@@ -46,6 +48,20 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
   void initState() {
     super.initState();
     retrieveCurrentDriverInfo();
+    
+  }
+
+
+   getCurrentLiveLocationOfDriver() async
+  {
+    Position positionOfUser = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
+    currentPositionOfDriver = positionOfUser;
+    driverCurrentPosition = currentPositionOfDriver;
+
+    LatLng positionOfUserInLatLng = LatLng(currentPositionOfDriver!.latitude, currentPositionOfDriver!.longitude);
+
+    CameraPosition cameraPosition = CameraPosition(target: positionOfUserInLatLng, zoom: 15);
+    controllerGoogleMap!.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
   // TO ENABLE USER TO SEND RIDE REQUESTS
@@ -112,55 +128,57 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
   }
 
   retrieveCurrentDriverInfo() async {
-    // await FirebaseDatabase.instance
-    //     .ref()
-    //     .child("drivers")
-    //     .child(FirebaseAuth.instance.currentUser!.uid)
-    //     .once()
-    //     .then((snap) {
-    //   driverName = (snap.snapshot.value as Map)["name"];
-    //   driverPhone = (snap.snapshot.value as Map)["phone"];
-    //   driverPhoto = (snap.snapshot.value as Map)["photo"];
-    //   carColor = (snap.snapshot.value as Map)["car_details"]["carType"];
-    //   carModel = (snap.snapshot.value as Map)["car_details"]["color"];
-    //   carNumber = (snap.snapshot.value as Map)["car_details"]["plateNumber"];
-
-    //   print("dRIVERnAME:$driverName");
-    //   print("driverphoto:$driverPhone");
-    //   print(driverPhoto);
-    //   print(carColor);
-    //   print(carModel);
-    //   print(carNumber);
-    // });
-
-    DatabaseReference usersRef = FirebaseDatabase.instance
+    await FirebaseDatabase.instance
         .ref()
         .child("drivers")
-        .child(FirebaseAuth.instance.currentUser!.uid);
+        .child(FirebaseAuth.instance.currentUser!.uid)
+        .once()
+        .then((snap) {
+      driverName = (snap.snapshot.value as Map)["name"];
+      driverPhone = (snap.snapshot.value as Map)["phone"];
+      driverPhoto = (snap.snapshot.value as Map)["photo"];
+      carColor = (snap.snapshot.value as Map)["car_details"]["carType"];
+      carModel = (snap.snapshot.value as Map)["car_details"]["color"];
+      carNumber = (snap.snapshot.value as Map)["car_details"]["plateNumber"];
 
-    await usersRef.once().then((snap) {
-      if (snap.snapshot.value != null) {
-        setState(() {
-          driverName = (snap.snapshot.value as Map)["name"];
-          driverPhone = (snap.snapshot.value as Map)["phone"];
-          driverPhoto = (snap.snapshot.value as Map)["profileImageUrl"];
-          carColor = (snap.snapshot.value as Map)["carType"];
-          carModel = (snap.snapshot.value as Map)["color"];
-          carNumber = (snap.snapshot.value as Map)["plateNumber"];
+      print("dRIVERnAME:$driverName");
+      print("driverphoto:$driverPhone");
+      print(driverPhoto);
+      print(carColor);
+      print(carModel);
+      print(carNumber);
 
-          print("drivername:$driverName");
-          print("driverphoto:$driverPhone");
-          print("Driverphoto$driverPhoto");
-          print(carColor);
-          print(carModel);
-          print(carNumber);
-
-          initializePushNotificationSystem();
-
-          //add user photo
-        });
-      } else {}
+      initializePushNotificationSystem();
     });
+
+    // DatabaseReference usersRef = FirebaseDatabase.instance
+    //     .ref()
+    //     .child("drivers")
+    //     .child(FirebaseAuth.instance.currentUser!.uid);
+
+    // await usersRef.once().then((snap) {
+    //   if (snap.snapshot.value != null) {
+    //     setState(() {
+    //       driverName = (snap.snapshot.value as Map)["name"];
+    //       driverPhone = (snap.snapshot.value as Map)["phone"];
+    //       driverPhoto = (snap.snapshot.value as Map)["profileImageUrl"];
+    //       carColor = (snap.snapshot.value as Map)["carType"];
+    //       carModel = (snap.snapshot.value as Map)["color"];
+    //       carNumber = (snap.snapshot.value as Map)["plateNumber"];
+
+    //       print("drivername:$driverName");
+    //       print("driverphoto:$driverPhone");
+    //       print("Driverphoto$driverPhoto");
+    //       print(carColor);
+    //       print(carModel);
+    //       print(carNumber);
+
+    //       initializePushNotificationSystem();
+
+    //       //add user photo
+    //     });
+    //   } else {}
+    // });
   }
 
   @override
@@ -168,20 +186,21 @@ class _AmbulanceMapScreenState extends State<AmbulanceMapScreen> {
     AmbulanceAppProvider appState = Provider.of<AmbulanceAppProvider>(context);
 
     // ignore: unnecessary_null_comparison
-    return appState.center == null
-        ? const Loading()
-        : Stack(
+    return  Stack(
             children: <Widget>[
               GoogleMap(
-                initialCameraPosition:
-                    CameraPosition(target: appState.center!, zoom: 15),
-                onMapCreated: appState.onCreate,
-                myLocationEnabled: true,
-                mapType: MapType.normal,
-                compassEnabled: true,
-                rotateGesturesEnabled: true,
-                markers: appState.markers,
-              ),
+            padding: const EdgeInsets.only(top: 136),
+            mapType: MapType.normal,
+            myLocationEnabled: true,
+            initialCameraPosition: googlePlexInitialPosition,
+            onMapCreated: (GoogleMapController mapController)
+            {
+              controllerGoogleMap = mapController;
+              googleMapCompleterController.complete(controllerGoogleMap);
+
+              getCurrentLiveLocationOfDriver();
+            },
+          ),
               //go online for driver
               Positioned(
                 top: 61,

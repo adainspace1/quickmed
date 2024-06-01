@@ -15,7 +15,10 @@ class UserDataBaseServices {
   static Future addtoRealtime(model.UserModel user) async {
     try {
       DatabaseReference databaseReference = FirebaseDatabase.instance.ref();
-      databaseReference.child("users").child("${user.id}").update(user.toJson());
+      databaseReference
+          .child("users")
+          .child("${user.id}")
+          .update(user.toJson());
 
       // ignore: empty_catches
     } catch (e) {}
@@ -122,15 +125,15 @@ class UserDataBaseServices {
     }
   }
 
-  Future<void> sendMessage(model.UserModel user, String msg, Type type) async {
+  Future<void> sendMessage({String? user, String? msg, Type? type}) async {
     final time = DateTime.now().millisecondsSinceEpoch.toString();
     User currentuser = _firebaseAuth.currentUser!;
 
     final Message message = Message(
-        msg: msg,
-        toId: user.id!,
+        msg: msg!,
+        toId: currentuser.uid,
         read: '',
-        type: type,
+        type: type!,
         sent: time,
         fromId: currentuser.uid);
   }

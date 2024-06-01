@@ -477,7 +477,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       "pickUpAddress": pickUpLocation.placeName,
       "dropOffAddress": dropOffDestinationLocation.placeName,
       "driverID": "waiting",
-      "carDetails": carDetailsDriver,
+      "carDetails": "",
       "driverLocation": driverCoOrdinates,
       "driverName": "",
       "driverPhone": "",

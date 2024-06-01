@@ -32,9 +32,18 @@ class _SubscriptionState extends State<Subscription> {
               ),
             ),
           ),
-          CustomCard(text: "Get Verified for 5000 Naira", onPress: () => {}),
-          CustomCard(text: "Get Verified for 5000 Naira", onPress: () => {}),
-          CustomCard(text: "Get Verified for 5000 Naira", onPress: () => {}),
+          CustomCard(
+              text:
+                  "Basic 1000 Naira\t -improve trust from client by getting a verified badge",
+              onPress: () => {}),
+          CustomCard(
+              text:
+                  "Medium 3000 Naira\t -improve trust from client by getting a verified badge",
+              onPress: () => {}),
+          CustomCard(
+              text:
+                  "Advance 5000 Naira\t -improve trust from client by getting a verified badge",
+              onPress: () => {}),
         ],
       ),
     );

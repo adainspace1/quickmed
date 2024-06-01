@@ -23,8 +23,7 @@ class HospitalServices {
     } catch (e) {}
   }
 
-
-    //get user by the id
+  //get user by the id
   Future<model.HospitalModel> getUserByUid() async {
     User currentUser = _firebaseAuth.currentUser!;
     DocumentSnapshot snap =
@@ -32,8 +31,6 @@ class HospitalServices {
 
     return model.HospitalModel.fromSnapshot(snap);
   }
-
-  
 
   // this function add user to the firestore database
   static Future addUserToDatabase(model.HospitalModel user) async {
@@ -75,17 +72,21 @@ class HospitalServices {
   }
 
   //this function update the econsultant collection...........
-  Future<void> updateData(String docId, String name, 
-      String address, String email) async {
-    FirebaseFirestore.instance.collection('hospital').doc(docId).update(
-        {'name': name,  'address': address, 'email': email});
+  Future<void> updateData(
+      String docId, String name, String address, String email) async {
+    FirebaseFirestore.instance
+        .collection('hospital')
+        .doc(docId)
+        .update({'name': name, 'address': address, 'email': email});
   }
 
   //this function update the econsultant location...........
-  Future<void> updateLocation(double latitude, double longitude ) async {
-        User currentUser = _firebaseAuth.currentUser!;
-        FirebaseFirestore.instance.collection('hospital').doc(currentUser.uid).update(
-        {  'latitude': latitude, 'longitude': longitude});
+  Future<void> updateLocation(double latitude, double longitude) async {
+    User currentUser = _firebaseAuth.currentUser!;
+    FirebaseFirestore.instance
+        .collection('hospital')
+        .doc(currentUser.uid)
+        .update({'latitude': latitude, 'longitude': longitude});
   }
 
   // Update user's profile image
@@ -117,10 +118,9 @@ class HospitalServices {
     }
   }
 
-
-Stream<QuerySnapshot> econsultantStream() {
-    CollectionReference reference = FirebaseFirestore.instance.collection("hospital");
+  Stream<QuerySnapshot> hospitalStream() {
+    CollectionReference reference =
+        FirebaseFirestore.instance.collection("hospital");
     return reference.snapshots();
   }
-
 }

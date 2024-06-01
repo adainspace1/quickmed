@@ -1,6 +1,5 @@
 // ignore: file_names
-// ignore_for_file: file_names, duplicate_ignore
-
+// ignore_for_file: file_names, duplicate_ignore, unused_element, unused_element, sized_box_for_whitespace
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +12,7 @@ import 'package:quickmed/model/e-consultant/econsultant_model.dart';
 import 'package:quickmed/screen/e-consultant/dashboard/econ_homeScreen.dart';
 import 'package:quickmed/service/econsultant/econ_service.dart';
 import 'package:quickmed/util/constant.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class EconsultantForm extends StatefulWidget {
   const EconsultantForm({super.key});
@@ -23,6 +23,8 @@ class EconsultantForm extends StatefulWidget {
 
 class _EconsultantFormState extends State<EconsultantForm> {
   var currentUser = FirebaseAuth.instance.currentUser;
+
+  late YoutubePlayerController _controller;
 
   // name textcontroller
   final nameTextEditingController = TextEditingController();
@@ -46,9 +48,103 @@ class _EconsultantFormState extends State<EconsultantForm> {
 
   // i declear a bool for the circular indicator
   bool _isSubmitting = false;
+  bool isChecked = false; // Add this boolean variable
 
   // declear a global key
   final _formKey = GlobalKey<FormState>();
+
+  //popup before registration happens
+  void _popUp() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(''),
+        content: Container(
+          width: 350.0, // Set your desired width
+          height: 200.0, // Set your desired height
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  Center(
+                    child: YoutubePlayerIFrame(
+                      controller: _controller,
+                      aspectRatio: 16 / 9,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isChecked,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isChecked = value ?? false;
+                          });
+                        },
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isChecked = !isChecked;
+                          });
+                        },
+                        child: const Text(
+                          'I agree to have watch content',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: COLOR_ACCENT,
+                ),
+                onPressed: () {
+                  // Handle submit action
+                  _submit();
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  "Submit",
+                  style: TextStyle(color: COLOR_BACKGROUND),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.grey, // Customize the Cancel button color
+                ),
+                onPressed: () {
+                  Navigator.pop(context); // Handle cancel action
+                },
+                child: const Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   // function to handle submit
   void _submit() async {
@@ -160,6 +256,26 @@ class _EconsultantFormState extends State<EconsultantForm> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _controller = YoutubePlayerController(
+      initialVideoId: 'oN8NtYea_54', // Replace with your desired video ID
+      params: const YoutubePlayerParams(
+        playlist: ['WLAQvqIjn7Q', 'sMJyCAEVtd8'], // List of video IDs
+        startAt: Duration(seconds: 30),
+        showControls: true,
+        showFullscreenButton: true,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -174,24 +290,49 @@ class _EconsultantFormState extends State<EconsultantForm> {
                 const SizedBox(
                   height: 20,
                 ),
-                _image != null
-                    ? CircleAvatar(
-                        radius: 64,
-                        backgroundImage: MemoryImage(_image!),
-                      )
-                    : const CircleAvatar(
-                        radius: 55,
-                        backgroundImage: NetworkImage(
-                            "https://res.cloudinary.com/damufjozr/image/upload/v1703326116/imgbin_computer-icons-avatar-user-login-png_t9t5b9.png"),
+                SingleChildScrollView(
+                  child: Expanded(
+                    flex: 7,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 400,
+                      padding:
+                          const EdgeInsets.fromLTRB(25.0, 60.0, 25.0, 20.0),
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [COLOR_PRIMARY, COLOR_ACCENT],
+                              begin: Alignment.bottomLeft,
+                              end: Alignment.topRight),
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(150),
+                              bottomRight: Radius.circular(150))),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _image != null
+                              ? CircleAvatar(
+                                  radius: 64,
+                                  backgroundImage: MemoryImage(_image!),
+                                )
+                              : const CircleAvatar(
+                                  radius: 55,
+                                  backgroundImage: NetworkImage(
+                                      "https://res.cloudinary.com/damufjozr/image/upload/v1703326116/imgbin_computer-icons-avatar-user-login-png_t9t5b9.png"),
+                                ),
+                          Positioned(
+                            bottom: -10,
+                            left: 80,
+                            child: IconButton(
+                              onPressed: _selectImage,
+                              icon: const Icon(Icons.add_a_photo),
+                            ),
+                          ),
+                        ],
                       ),
-                Positioned(
-                  bottom: -10,
-                  left: 80,
-                  child: IconButton(
-                    onPressed: _selectImage,
-                    icon: const Icon(Icons.add_a_photo),
+                    ),
                   ),
                 ),
+                const SizedBox(height: 20),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -435,7 +576,8 @@ class _EconsultantFormState extends State<EconsultantForm> {
                                     minimumSize:
                                         const Size(double.infinity, 50)),
                                 onPressed: () {
-                                  _submit();
+                                  //popup
+                                  _popUp();
                                 },
                                 child: _isSubmitting
                                     ? const CircularProgressIndicator(
