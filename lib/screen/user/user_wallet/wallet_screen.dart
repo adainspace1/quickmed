@@ -14,7 +14,10 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
-
+  final amountTextEditingController = TextEditingController();
+  final nameTextEditingController = TextEditingController();
+  final emailTextEditingController = TextEditingController();
+  final phoneTextEditingController = TextEditingController();
   //this code is exceuted at the start of the app.....
   @override
   void initState() {
@@ -27,12 +30,54 @@ class _WalletScreenState extends State<WalletScreen> {
     await userProvider.refreshUser();
   }
 
+  void _fundwallet(
+      {String? amount,
+      String? name,
+      String? email,
+      String? phone,
+      String? id}) async {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text("Fund Wallet"),
+              content: Column(
+                children: [
+                  TextField(
+                    controller: amountTextEditingController,
+                    decoration: const InputDecoration(labelText: "amount"),
+                  ),
+                  TextField(
+                    controller: nameTextEditingController,
+                    decoration: const InputDecoration(
+                      labelText: "name",
+                    ),
+                  ),
+                  TextField(
+                    controller: emailTextEditingController,
+                    decoration: const InputDecoration(
+                      labelText: "email",
+                    ),
+                  ),
+                  TextField(
+                    controller: phoneTextEditingController,
+                    decoration: const InputDecoration(
+                      labelText: "phone",
+                    ),
+                  ),
+                ],
+              ),
+            ));
+  }
+
   @override
   Widget build(BuildContext context) {
-   return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         backgroundColor: COLOR_ACCENT,
-        title: const Text("Wallet",style: TextStyle(color: COLOR_BACKGROUND),),
+        title: const Text(
+          "Wallet",
+          style: TextStyle(color: COLOR_BACKGROUND),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 18, right: 18, top: 34),
@@ -79,7 +124,6 @@ class _WalletScreenState extends State<WalletScreen> {
   }
 
   Widget _contentOverView() {
-
     return Container(
       padding: const EdgeInsets.only(left: 18, right: 18, top: 22, bottom: 22),
       decoration: BoxDecoration(
@@ -102,6 +146,7 @@ class _WalletScreenState extends State<WalletScreen> {
           GestureDetector(
             onTap: () {
               // print("object");
+              _fundwallet(id: '1');
             },
             child: Container(
               height: 55,

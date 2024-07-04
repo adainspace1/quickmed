@@ -31,6 +31,7 @@ import 'package:quickmed/screen/user/search_destination.dart';
 import 'package:quickmed/screen/user/user_wallet/wallet_screen.dart';
 import 'package:quickmed/service/user/user_service.dart';
 import 'package:quickmed/util/constant.dart';
+import 'package:quickmed/widget/commonwidget.dart';
 import 'package:quickmed/widget/info_dialog.dart';
 import 'package:quickmed/widget/loading.dart';
 import 'package:quickmed/widget/loading_dialog.dart';
@@ -49,6 +50,7 @@ class UserHomeScreen extends StatefulWidget {
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
   var scaffoldState = GlobalKey<ScaffoldState>();
+
   final Completer<GoogleMapController> googleMapCompleterController =
       Completer<GoogleMapController>();
   UserDataBaseServices services = UserDataBaseServices();
@@ -153,6 +155,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         setState(() {
           userName = (snap.snapshot.value as Map)["name"];
           userPhone = (snap.snapshot.value as Map)["phone"];
+          userPhoto = (snap.snapshot.value as Map)["profileImageUrl"];
 
           //add user photo
         });
@@ -471,6 +474,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       "publishDateTime": DateTime.now().toString(),
       "userName": userName,
       "userPhone": userPhone,
+      "userPhoto": userPhoto,
       "userID": userID,
       "pickUpLatLng": pickUpCoOrdinatesMap,
       "dropOffLatLng": dropOffDestinationCoOrdinatesMap,
@@ -1007,16 +1011,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               )),
                           ListTile(
                               onTap: () async {
-                                var responseFromSearchPage =
-                                    await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (c) =>
-                                                const SearchDestinationPage()));
+                                CommonWidgets()
+                                    .selectWithdrawBottomSheet(context);
+                                // var responseFromSearchPage =
+                                //     await Navigator.push(
+                                //         context,
+                                //         MaterialPageRoute(
+                                //             builder: (c) =>
+                                //                 const SearchDestinationPage()));
 
-                                if (responseFromSearchPage == "placeSelected") {
-                                  displayUserRideDetailsContainer();
-                                }
+                                // if (responseFromSearchPage == "placeSelected") {
+                                //   displayUserRideDetailsContainer();
+                                // }
                               },
                               leading: Image.network(
                                 "https://res.cloudinary.com/damufjozr/image/upload/v1701760812/amb2_gpa3lp.jpg",

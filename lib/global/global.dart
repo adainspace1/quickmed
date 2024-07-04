@@ -14,6 +14,7 @@ final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 User? currentUser;
 String userName = "";
 String userPhone = "";
+String userPhoto = "";
 String userID = FirebaseAuth.instance.currentUser!.uid;
 
 //subscription stream of position
