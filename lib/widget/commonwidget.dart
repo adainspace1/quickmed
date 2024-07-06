@@ -1,14 +1,16 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:quickmed/screen/user/search_destination.dart';
 import 'package:quickmed/util/constant.dart';
 
 class CommonWidgets {
   //popup before registration happens
-  void _popUp(BuildContext context) {
+  void _popUp(BuildContext context, String text) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(''),
+        title: Text(''),
         content: SizedBox(
           width: 350.0, // Set your desired width
           height: 200.0, // Set your desired height
@@ -29,7 +31,7 @@ class CommonWidgets {
                       const SizedBox(
                         height: 20,
                       ),
-                      const Text("Category 1 ₦5000")
+                      Text(text)
                     ],
                   )),
                   const SizedBox(
@@ -143,7 +145,7 @@ class CommonWidgets {
                       "Category1",
                       "images/ambu.png",
                       () {
-                        _popUp(context);
+                        _popUp(context, "Category1 ₦5000");
                       },
                     ),
                     const SizedBox(width: 16),
@@ -151,14 +153,18 @@ class CommonWidgets {
                       context,
                       "Category2",
                       "images/ambu.png",
-                      () {},
+                      () {
+                        _popUp(context, "Category2 ₦6000");
+                      },
                     ),
                     const SizedBox(width: 16),
                     _buildPaymentMethod(
                       context,
                       "Category3",
                       "images/ambu.png",
-                      () {},
+                      () {
+                        _popUp(context, "Category3 ₦7000");
+                      },
                     ),
                   ],
                 ),

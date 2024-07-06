@@ -117,7 +117,7 @@ class _ListOfEconState extends State<ListOfEcon> {
 
                 if ((event.snapshot.value as Map)["spName"] != null) {
                   nameSp = (event.snapshot.value as Map)["spName"];
-                  print(nameSp);
+                  // print(nameSp);
                 }
               });
 
