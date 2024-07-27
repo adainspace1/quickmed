@@ -1,7 +1,5 @@
 // ignore_for_file: sort_child_properties_last, prefer_collection_literals, prefer_interpolation_to_compose_strings, unused_local_variable, prefer_is_empty, deprecated_member_use, use_build_context_synchronously, avoid_function_literals_in_foreach_calls, duplicate_ignore, unnecessary_string_escapes
-
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -738,7 +736,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(''),
+        title: const Text(''),
         content: SizedBox(
           width: 350.0, // Set your desired width
           height: 200.0, // Set your desired height

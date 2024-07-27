@@ -5,6 +5,7 @@
 import FlutterMacOS
 import Foundation
 
+import audioplayers_darwin
 import cloud_firestore
 import connectivity_plus
 import file_selector_macos
@@ -22,8 +23,12 @@ import shared_preferences_foundation
 import smart_auth
 import sqflite
 import url_launcher_macos
+import wakelock_plus
+import zego_express_engine
+import zego_zim
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  AudioplayersDarwinPlugin.register(with: registry.registrar(forPlugin: "AudioplayersDarwinPlugin"))
   FLTFirebaseFirestorePlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseFirestorePlugin"))
   ConnectivityPlusPlugin.register(with: registry.registrar(forPlugin: "ConnectivityPlusPlugin"))
   FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
@@ -41,4 +46,7 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   SmartAuthPlugin.register(with: registry.registrar(forPlugin: "SmartAuthPlugin"))
   SqflitePlugin.register(with: registry.registrar(forPlugin: "SqflitePlugin"))
   UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
+  WakelockPlusMacosPlugin.register(with: registry.registrar(forPlugin: "WakelockPlusMacosPlugin"))
+  ZegoExpressEnginePlugin.register(with: registry.registrar(forPlugin: "ZegoExpressEnginePlugin"))
+  ZegoZimPlugin.register(with: registry.registrar(forPlugin: "ZegoZimPlugin"))
 }

@@ -4,6 +4,8 @@
 // ignore: file_names
 // ignore_for_file: file_names, duplicate_ignore
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
@@ -11,6 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quickmed/global/global.dart';
 import 'package:quickmed/provider/hospital/hospital_appstate.dart';
+import 'package:quickmed/service/hospital/hospital.dart';
 import 'package:quickmed/util/constant.dart';
 import 'package:quickmed/widget/loading.dart';
 
@@ -24,14 +27,55 @@ class HospitalMapScreen extends StatefulWidget {
 }
 
 class _HospitalMapScreenState extends State<HospitalMapScreen> {
-  String statusText = 'Now offline';
   GlobalKey<ScaffoldState> scaffoldSate = GlobalKey<ScaffoldState>();
-  bool isDriverActive = false;
+  String statusText = 'Now offline';
+  bool isHospitalActive = false;
+  Position? currentPositionOfHospital;
+
+  Color colorToShow = Colors.green;
+  String titleToShow = "GO ONLINE NOW";
+  bool isDriverAvailable = false;
+  GoogleMapController? controllerGoogleMap;
+  DatabaseReference? newHpRequestReference;
+
+// TO ENABLE USER TO SEND RIDE REQUESTS
+  goOnlineNow() async {
+    Position pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    hospitalCurrentPosition = pos;
+
+    Geofire.initialize("onlineHospitals");
+    Geofire.setLocation(
+      FirebaseAuth.instance.currentUser!.uid,
+      hospitalCurrentPosition!.latitude,
+      hospitalCurrentPosition!.longitude,
+    );
+
+    newHpRequestReference = FirebaseDatabase.instance
+        .ref()
+        .child("hospital")
+        .child(FirebaseAuth.instance.currentUser!.uid)
+        .child("newTripStatus");
+    newHpRequestReference!.set("waiting");
+
+    newHpRequestReference!.onValue.listen((event) {});
+  }
+
+  //TO GO OFFLINE DISABLE REQUESTS
+  goOfflineNow() {
+    //stop sharing driver live location updates
+    Geofire.removeLocation(FirebaseAuth.instance.currentUser!.uid);
+
+    //stop listening to the newTripStatus
+    newHpRequestReference!.onDisconnect();
+    newHpRequestReference!.remove();
+    newHpRequestReference = null;
+  }
 
   @override
   void initState() {
     super.initState();
-    readDriverCurrentInfo();
   }
 
   @override
@@ -72,22 +116,7 @@ class _HospitalMapScreenState extends State<HospitalMapScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        if (isDriverActive != true) {
-                          driverIsNowOnline();
-                          updateDriverLocationRealTime();
-                          setState(() {
-                            statusText = "Now online";
-                            isDriverActive = true;
-                          });
-                        } else {
-                          driverIsOffline();
-                          setState(() {
-                            statusText = "Now offline";
-                            isDriverActive = false;
-                          });
-                        }
-                      },
+                      onPressed: () {},
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue),
                       child: statusText == "Now offline"
@@ -119,73 +148,5 @@ class _HospitalMapScreenState extends State<HospitalMapScreen> {
               ),
             ],
           );
-  }
-
-    readDriverCurrentInfo() async {
-    var newuser = firebaseAuth.currentUser;
-
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference driversCollection = firestore.collection('ambulance');
-
-    DocumentSnapshot snap = await driversCollection.doc(newuser!.uid).get();
-
-    if (snap.exists) {
-      Map<String, dynamic>? data = snap.data() as Map<String, dynamic>;
-
-      
-        onLineDriver.id = data['id'];
-        onLineDriver.name = data['name'];
-        driverVehicleType = data['carType'];
-      }
-    
-  }
-
-  driverIsNowOnline() async {
-    Position pos = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-
-    driverCurrentPosition = pos;
-
-    Geofire.initialize("activeDrivers");
-    Geofire.setLocation(
-      currentUser!.uid,
-      driverCurrentPosition!.latitude,
-      driverCurrentPosition!.longitude,
-    );
-
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference driversCollection = firestore.collection('ambulance');
-
-    await driversCollection.doc(currentUser?.uid).update({
-      'new ride status': 'idle',
-    });
-  }
-
-  updateDriverLocationRealTime() async {
-    streamSubscriptionPosition =Geolocator.getPositionStream().listen((Position position) {
-      if (isDriverActive == true) {
-        Geofire.setLocation(
-          currentUser!.uid,
-          position.latitude,
-          position.longitude,
-        );
-      }
-      //LatLng latLng = LatLng(position.latitude, position.longitude);
-    });
-  }
-
-  driverIsOffline() async {
-    Geofire.removeLocation(currentUser!.uid);
-
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference driversCollection = firestore.collection('ambulance');
-
-    // Remove the 'new ride status' field
-    await driversCollection.doc(currentUser!.uid).update({
-      'new ride status': FieldValue.delete(),
-    });
-
-    // ...
   }
 }

@@ -10,7 +10,7 @@ class CommonWidgets {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(''),
+        title: const Text(''),
         content: SizedBox(
           width: 350.0, // Set your desired width
           height: 200.0, // Set your desired height

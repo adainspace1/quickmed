@@ -149,7 +149,7 @@ class _ListOfHospitalState extends State<ListOfHospital> {
 
                       String son = data['hospitalName'] ?? '';
                       String id = data['id'] ?? '';
-                      bool online = data['is_Online'] ?? '';
+                      bool online = data['is_Online'] ?? false;
 
                       return Stack(children: [
                         Visibility(

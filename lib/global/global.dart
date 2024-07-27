@@ -36,6 +36,7 @@ UserModel? userModelCurrentInfo;
 Position? driverCurrentPosition;
 Position? spCurrentPosition;
 Position? currentPositionOfUser;
+Position? hospitalCurrentPosition;
 
 //driver model current info
 DriverModel onLineDriver = DriverModel();

@@ -1,10 +1,10 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:quickmed/global/global.dart';
-import 'package:quickmed/model/chatmodel/chat_model.dart';
+import 'package:quickmed/helpers/screen_navigation.dart';
 import 'package:quickmed/service/user/user_service.dart';
+import 'package:quickmed/telemed/telemed.dart';
 import 'package:quickmed/util/constant.dart';
-import 'package:quickmed/Assitance/request_assistant.dart';
 
 class MyChatApp extends StatefulWidget {
   String? userId;
@@ -41,20 +41,13 @@ class MyChatAppState extends State<MyChatApp> {
             curve: Curves.linear));
   }
 
-  void send() async {
-    await services.sendMessage(msg: textEditingController.text);
-    setState(() {
-      messageList.add(MessageData(textEditingController.text, true));
-      textEditingController.clear();
-    });
-
-    await scrollAnimation();
-  }
-
-  //send email to other hospitals
-  void sendMail() {
-    var url = 'http://localhost:3000/send-email';
-    RequestAssistant.receiveRequest(url);
+  void _startVideoCall() async {
+    changeScreen(
+        context,
+        TeleMedic(
+          userId: widget.userId ?? '',
+          userName: widget.name ?? '',
+        ));
   }
 
   @override
@@ -84,7 +77,11 @@ class MyChatAppState extends State<MyChatApp> {
           ),
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.videocam)),
+          IconButton(
+              onPressed: () {
+                _startVideoCall();
+              },
+              icon: const Icon(Icons.videocam)),
           Padding(
               padding: const EdgeInsets.only(right: 20.0, left: 20.0),
               child:
@@ -139,9 +136,7 @@ class MyChatAppState extends State<MyChatApp> {
                       padding: const EdgeInsets.only(bottom: 5.0),
                       child: GestureDetector(
                         onTap: () {},
-                        onLongPress: () {
-                          send();
-                        },
+                        onLongPress: () {},
                         child: const Icon(
                           Icons.send,
                           color: Colors.white,
